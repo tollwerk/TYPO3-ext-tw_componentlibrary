@@ -1,0 +1,41 @@
+{
+  "name": "tollwerk/tw_componentlibrary",
+  "type": "typo3-cms-extension",
+  "description": "TYPO3 component library",
+  "homepage": "https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary",
+  "license": "GPL-2.0+",
+  "version": "1.0",
+  "require": {
+    "typo3/cms": "~7.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tollwerk\\TwComponentlibrary\\": "Classes/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tollwerk\\TwComponentlibrary\\Tests\\": "Tests/",
+      "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/"
+    }
+  },
+  "replace": {
+    "tw_componentlibrary": "self.version",
+    "typo3-ter/tw_componentlibrary": "self.version"
+  },
+  "authors": [
+    {
+      "name": "Joschi Kuphal",
+      "email": "joschi@tollwerk.de"
+    }
+  ],
+  "extra": {
+    "branch-alias": {
+      "dev-master": "master"
+    },
+    "typo3/cms": {
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web"
+    }
+  }
+}
