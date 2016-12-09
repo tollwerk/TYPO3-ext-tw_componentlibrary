@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * FLUIDTEMPLATE component
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary

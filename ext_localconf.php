@@ -1,11 +1,10 @@
 <?php
 
 /**
- * data
+ * Local configuration
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary
- * @subpackage Tollwerk\TwComponentlibrary\Classes
  * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @copyright Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license http://opensource.org/licenses/MIT The MIT License (MIT)

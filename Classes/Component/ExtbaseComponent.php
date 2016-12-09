@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * Extbase component
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary

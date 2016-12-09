@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * TypoScript component
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary

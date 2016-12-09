@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * Component scanner
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary
@@ -63,7 +63,7 @@ class Scanner
             $components = array_merge($components, self::discoverExtensionComponents($extensionKey));
         }
 
-        echo json_encode($components, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
+        return $components;
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * Component command line controller
  *
  * @category    Tollwerk
  * @package     Tollwerk\TwComponentlibrary
@@ -54,8 +54,6 @@ class ComponentCommandController extends CommandController
      */
     public function discoverCommand()
     {
-        $components = Scanner::discover();
-        print_r($components);
-        return $components;
+        echo json_encode(Scanner::discover(), JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
     }
 }

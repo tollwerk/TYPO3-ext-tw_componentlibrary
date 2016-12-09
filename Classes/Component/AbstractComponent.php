@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * Abstract component
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary
@@ -41,7 +41,7 @@ namespace Tollwerk\TwComponentlibrary\Component;
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
-class AbstractComponent implements ComponentInterface
+abstract class AbstractComponent implements ComponentInterface
 {
 
 }
