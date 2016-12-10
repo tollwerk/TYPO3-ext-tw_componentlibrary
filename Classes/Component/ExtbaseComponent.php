@@ -43,5 +43,20 @@ namespace Tollwerk\TwComponentlibrary\Component;
  */
 class ExtbaseComponent extends AbstractComponent
 {
+    /**
+     * Component type
+     *
+     * @var string
+     */
+    protected $type = 'extbase';
 
+    /**
+     * Render this component
+     *
+     * @return string Rendered component (HTML)
+     */
+    public function render()
+    {
+        return $this->type;
+    }
 }

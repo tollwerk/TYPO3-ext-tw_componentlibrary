@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Component command line controller
+ * data
  *
  * @category    Tollwerk
  * @package     Tollwerk\TwComponentlibrary
- * @subpackage  Tollwerk\TwComponentlibrary\Command
+ * @subpackage  Tollwerk\TwComponentlibrary\Component
  * @author      Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @copyright   Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license     http://opensource.org/licenses/MIT The MIT License (MIT)
@@ -34,42 +34,20 @@
  *  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************/
 
-namespace Tollwerk\TwComponentlibrary\Command;
-
-use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
-use Tollwerk\TwComponentlibrary\Utility\Scanner;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+namespace Tollwerk\TwComponentlibrary\Component\Preview;
 
 /**
- * Component command controller
+ * Preview template interface
  *
  * @package Tollwerk\TwComponentlibrary
- * @subpackage Tollwerk\TwComponentlibrary\Command
+ * @subpackage Tollwerk\TwComponentlibrary\Component
  */
-class ComponentCommandController extends CommandController
+interface TemplateInterface
 {
     /**
-     * Discover and return all styleguide components
+     * Serialize the template
      *
-     * @return array Styleguide components
+     * @return string Serialized template
      */
-    public function discoverCommand()
-    {
-        echo json_encode(Scanner::discover(), JSON_PRETTY_PRINT);
-    }
-
-    /**
-     * Render a particular component
-     *
-     * @param string $component Component class name
-     */
-    public function renderCommand($component)
-    {
-        $componentInstance = $this->objectManager->get($component);
-        if ($componentInstance instanceof ComponentInterface) {
-            echo $componentInstance->render();
-        } else {
-            echo 'ERROR';
-        }
-    }
+    public function __toString();
 }

@@ -35,9 +35,9 @@
 
 namespace Tollwerk\TwComponentlibrary\Utility;
 
+use Tollwerk\TwComponentlibrary\Component\AbstractComponent;
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Component scanner
@@ -119,27 +119,12 @@ class Scanner
      */
     protected static function discoverComponentClass($componentClass, $componentPath)
     {
-        list($name, $variant) = preg_split('/_+/', basename($componentPath));
-        return [
-            'name' => self::expandComponentName($name),
-            'variant' => strtolower($variant) ?: null,
-            'path' => array_map([self, 'expandComponentName'], explode(DIRECTORY_SEPARATOR, dirname($componentPath))),
-            'class' => $componentClass,
-        ];
-    }
-
-    /**
-     * Prepare a component path
-     *
-     * @param string $componentPath Component path
-     * @return string Component name
-     */
-    protected function expandComponentName($componentPath)
-    {
-        return implode(
-            ' ',
-            array_map('ucwords', preg_split('/_+/', GeneralUtility::camelCaseToLowerCaseUnderscored($componentPath)))
-        );
+        /** @var ComponentInterface $component */
+        $component = new $componentClass;
+        return array_merge($component->export(), [
+            'path' => array_map([AbstractComponent::class, 'expandComponentName'],
+                explode(DIRECTORY_SEPARATOR, dirname($componentPath))),
+        ]);
     }
 
     /**

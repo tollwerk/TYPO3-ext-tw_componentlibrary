@@ -43,5 +43,49 @@ namespace Tollwerk\TwComponentlibrary\Component;
  */
 interface ComponentInterface
 {
+    /**
+     * Component is work in progress
+     *
+     * @var int
+     */
+    const STATUS_WIP = 'wip';
+    /**
+     * Component is ready
+     *
+     * @var int
+     */
+    const STATUS_READY = 'ready';
+    /**
+     * Component is in draft state
+     *
+     * @var int
+     */
+    const STATUS_DRAFT = 'draft';
+    /**
+     * Component is a prototype
+     *
+     * @var int
+     */
+    const STATUS_PROTOTYPE = 'prototype';
+    /**
+     * Export the component's properties
+     *
+     * @return array Properties
+     */
+    public function export();
 
+    /**
+     * Prepare a component path
+     *
+     * @param string $componentPath Component path
+     * @return string Component name
+     */
+    public static function expandComponentName($componentPath);
+
+    /**
+     * Render this component
+     *
+     * @return string Rendered component (HTML)
+     */
+    public function render();
 }

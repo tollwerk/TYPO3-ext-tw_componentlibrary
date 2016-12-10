@@ -35,6 +35,11 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
+use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+
 /**
  * TypoScript component
  *
@@ -43,5 +48,73 @@ namespace Tollwerk\TwComponentlibrary\Component;
  */
 class TypoScriptComponent extends AbstractComponent
 {
+    /**
+     * Template file extensions
+     *
+     * @var string
+     */
+    protected $extension = 't3s';
+    /**
+     * Component type
+     *
+     * @var string
+     */
+    protected $type = 'typoscript';
 
+    /**
+     * Set the TypoScript key
+     *
+     * @param string $key TypoScript key
+     */
+    protected function setTypoScriptKey($key)
+    {
+        $this->config = trim($key) ?: null;
+    }
+
+    /**
+     * Return component specific properties
+     *
+     * Override this method in sub classes to export specific properties.
+     *
+     * @return array Component specific properties
+     */
+    protected function exportInternal()
+    {
+
+        // Read the linked TypoScript
+        if ($this->config !== null) {
+            $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
+                $this->page,
+                $this->typeNum,
+                $this->config
+            );
+            $this->template = empty($typoScript) ?
+                null : TypoScriptUtility::serialize(implode('.', explode('.', $this->config, -1)), $typoScript);
+        }
+
+        return parent::exportInternal();
+    }
+
+    /**
+     * Render this component
+     *
+     * @return string Rendered component (HTML)
+     */
+    public function render()
+    {
+        // Set the request arguments as GET parameters
+        $_GET = $this->getRequestArguments();
+
+        // Instantiate a frontend controller
+        $TSFE = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+        $cObj = new ContentObjectRenderer($TSFE);
+        $cObj->start($TSFE->page, 'pages');
+        $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
+            $this->page,
+            $this->typeNum,
+            $this->config
+        );
+
+        return call_user_func_array([$cObj, 'cObjGetSingle'], $typoScript);
+    }
 }

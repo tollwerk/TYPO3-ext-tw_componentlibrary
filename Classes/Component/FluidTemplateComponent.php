@@ -43,5 +43,10 @@ namespace Tollwerk\TwComponentlibrary\Component;
  */
 class FluidTemplateComponent extends TypoScriptComponent
 {
-
+    /**
+     * Component type
+     *
+     * @var string
+     */
+    protected $type = 'fluid';
 }
