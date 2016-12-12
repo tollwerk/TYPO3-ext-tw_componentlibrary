@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Component command line controller
+ * data
  *
  * @category    Tollwerk
- * @package     Tollwerk\TwComponentlibrary
- * @subpackage  Tollwerk\TwComponentlibrary\Command
+ * @package     Tollwerk\Admin
+ * @subpackage  Tollwerk\TwComponentlibrary\Utility
  * @author      Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @copyright   Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license     http://opensource.org/licenses/MIT The MIT License (MIT)
@@ -34,43 +34,59 @@
  *  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************/
 
-namespace Tollwerk\TwComponentlibrary\Command;
-
-use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
-use Tollwerk\TwComponentlibrary\Utility\Scanner;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+namespace Tollwerk\TwComponentlibrary\Utility;
 
 /**
- * Component command controller
+ * Environment service simulating a frontend environment
  *
  * @package Tollwerk\TwComponentlibrary
- * @subpackage Tollwerk\TwComponentlibrary\Command
- * @cli
+ * @subpackage Tollwerk\TwComponentlibrary\Utility
  */
-class ComponentCommandController extends CommandController
+class EnvironmentService extends \TYPO3\CMS\Extbase\Service\EnvironmentService
 {
     /**
-     * Discover and return all styleguide components
+     * Simulate frontend mode
      *
-     * @return array Styleguide components
+     * @var boolean
      */
-    public function discoverCommand()
-    {
-        echo json_encode(Scanner::discover(), JSON_PRETTY_PRINT);
+    protected $simulateFrontendMode = false;
+
+    /**
+     * Simulate Frontend mode
+     *
+     * @param boolean $simulateFrontendMode Simulate Frontend mode
+     */
+    public function simulateFrontendMode($simulateFrontendMode) {
+        $this->simulateFrontendMode = !!$simulateFrontendMode;
     }
 
     /**
-     * Render a particular component
+     * Returns whether TYPO3 runs in Frontend mode
      *
-     * @param string $component Component class name
+     * @return bool
      */
-    public function renderCommand($component)
+    public function isEnvironmentInFrontendMode()
     {
-        $componentInstance = $this->objectManager->get($component);
-        if ($componentInstance instanceof ComponentInterface) {
-            echo $componentInstance->render();
-        } else {
-            echo 'ERROR';
-        }
+        return $this->simulateFrontendMode ? true : parent::isEnvironmentInFrontendMode();
+    }
+
+    /**
+     * Returns whether TYPO3 runs in Backend mode
+     *
+     * @return bool
+     */
+    public function isEnvironmentInBackendMode()
+    {
+        return $this->simulateFrontendMode ? false : parent::isEnvironmentInBackendMode();
+    }
+
+    /**
+     * Returns whether TYPO3 runs in CLI mode
+     *
+     * @return bool
+     */
+    public function isEnvironmentInCliMode()
+    {
+        return $this->simulateFrontendMode ? false : parent::isEnvironmentInCliMode();
     }
 }

@@ -37,6 +37,7 @@ namespace Tollwerk\TwComponentlibrary\Component;
 
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface;
+use Tollwerk\TwComponentlibrary\Utility\EnvironmentService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
@@ -56,6 +57,12 @@ abstract class AbstractComponent implements ComponentInterface
      * @var ObjectManagerInterface
      */
     protected $objectManager;
+    /**
+     * Environment service
+     *
+     * @var EnvironmentService
+     */
+    protected $environmentService;
     /**
      * Request
      *
@@ -145,7 +152,7 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @var string
      */
-    protected $extension = '';
+    protected $extension = 't3s';
     /**
      * Component type
      *
@@ -159,6 +166,7 @@ abstract class AbstractComponent implements ComponentInterface
     public function __construct()
     {
         $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+        $this->environmentService = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Service\\EnvironmentService');
         $this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Request');
         $this->preview = new BasicTemplate();
 

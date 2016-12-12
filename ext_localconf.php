@@ -38,3 +38,10 @@ if (!defined('TYPO3_MODE')) {
 
 // Register the component service command controller
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \Tollwerk\TwComponentlibrary\Command\ComponentCommandController::class;
+
+// Override the environment service when in CLI mode
+if (PHP_SAPI === 'cli') {
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Extbase\\Service\\EnvironmentService'] = array(
+        'className' => 'Tollwerk\\TwComponentlibrary\\Utility\\EnvironmentService',
+    );
+}

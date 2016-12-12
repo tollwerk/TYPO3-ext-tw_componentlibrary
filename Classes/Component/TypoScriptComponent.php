@@ -49,12 +49,6 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 class TypoScriptComponent extends AbstractComponent
 {
     /**
-     * Template file extensions
-     *
-     * @var string
-     */
-    protected $extension = 't3s';
-    /**
      * Component type
      *
      * @var string
@@ -102,6 +96,9 @@ class TypoScriptComponent extends AbstractComponent
      */
     public function render()
     {
+        // Simulate Frontend mode
+        $this->environmentService->simulateFrontendMode(true);
+
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
@@ -114,7 +111,11 @@ class TypoScriptComponent extends AbstractComponent
             $this->typeNum,
             $this->config
         );
+        $result = call_user_func_array([$cObj, 'cObjGetSingle'], $typoScript);
 
-        return call_user_func_array([$cObj, 'cObjGetSingle'], $typoScript);
+        // Stop simulating Frontend mode
+        $this->environmentService->simulateFrontendMode(false);
+
+        return $result;
     }
 }
