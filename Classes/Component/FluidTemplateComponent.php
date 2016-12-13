@@ -64,7 +64,7 @@ class FluidTemplateComponent extends AbstractComponent
      *
      * @param $template
      */
-    public function setTemplate($template)
+    protected function setTemplate($template)
     {
         $this->config = trim($template) ?: null;
     }
@@ -76,7 +76,7 @@ class FluidTemplateComponent extends AbstractComponent
      * @param mixed $value Parameter value
      * @throws \RuntimeException If the parameter name is invalid
      */
-    public function setParameter($param, $value)
+    protected function setParameter($param, $value)
     {
         $param = trim($param);
         if (!strlen($param)) {

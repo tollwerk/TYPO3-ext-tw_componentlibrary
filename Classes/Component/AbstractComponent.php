@@ -233,6 +233,7 @@ abstract class AbstractComponent implements ComponentInterface
         if (!$this->config) {
             throw new \RuntimeException('Invalid configuration', 1481363496);
         }
+
         $properties['config'] = $this->config;
         $properties['template'] = $this->template;
         $properties['extension'] = $this->extension;
