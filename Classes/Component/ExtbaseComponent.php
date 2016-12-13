@@ -68,6 +68,12 @@ class ExtbaseComponent extends AbstractComponent
      */
     protected $extbaseController = null;
     /**
+     * Extbase controller class
+     *
+     * @var string
+     */
+    protected $extbaseControllerClass = null;
+    /**
      * Extbase action name
      *
      * @var string
@@ -93,11 +99,11 @@ class ExtbaseComponent extends AbstractComponent
      * Set the extbase configuration
      *
      * @param string $pluginName Plugin name
-     * @param string $controllerName Controller name
+     * @param string $controllerClass Controller name
      * @param string $actionName Action name
      * @param string|null $extensionName Extension name
      */
-    public function setExtbaseConfiguration($pluginName, $controllerName, $actionName, $extensionName = null)
+    public function setExtbaseConfiguration($pluginName, $controllerClass, $actionName, $extensionName = null)
     {
         // Validate the extension name
         if (!empty($extensionName)) {
@@ -116,53 +122,24 @@ class ExtbaseComponent extends AbstractComponent
         $this->extbasePlugin = $pluginName;
 
         // Validate the controller name
-        $controllerName = trim($controllerName);
-        if (empty($controllerName)
-            || !class_exists($controllerName)
-            || !(new \ReflectionClass($controllerName))->implementsInterface(ControllerInterface::class)
+        $controllerClass = trim($controllerClass);
+        if (empty($controllerClass)
+            || !class_exists($controllerClass)
+            || !($controllerReflection = new \ReflectionClass($controllerClass))->implementsInterface(
+                ControllerInterface::class
+            )
         ) {
-            throw new \RuntimeException(sprintf('Invalid controller "%s"', $controllerName), 1481646376);
+            throw new \RuntimeException(sprintf('Invalid controller class "%s"', $controllerClass), 1481646376);
         }
-        $this->extbaseController = $controllerName;
+        $this->extbaseControllerClass = $controllerClass;
+        $this->extbaseController = preg_replace('/Controller$/', '', $controllerReflection->getShortName());
 
         // Validate the controller action
         $actionName = trim($actionName);
-        if (empty($actionName) || !is_callable([$this->extbaseController, $actionName.'Action'])) {
+        if (empty($actionName) || !is_callable([$this->extbaseControllerClass, $actionName.'Action'])) {
             throw new \RuntimeException(sprintf('Invalid controller action "%s"', $actionName), 1481646569);
         }
         $this->extbaseAction = $actionName;
-    }
-
-    /**
-     * Return component specific properties
-     *
-     * Override this method in sub classes to export specific properties.
-     *
-     * @return array Component specific properties
-     */
-    protected function exportInternal()
-    {
-        // Compose a configuration string
-        if ($this->extbaseExtensionName && $this->extbasePlugin && $this->extbaseController && $this->extbaseAction) {
-            $this->config = 'EXT:'.$this->extbaseExtensionName;
-            $this->config .= ':'.$this->extbasePlugin;
-            $this->config .= ':'.$this->extbaseController;
-            $this->config .= '->'.$this->extbaseAction.'Action';
-
-            $this->template = 'EXTBASE';
-        }
-
-        return array_merge(
-            [
-                'extbase' => [
-                    'extension' => $this->extbaseExtensionName,
-                    'plugin' => $this->extbasePlugin,
-                    'controller' => $this->extbaseController,
-                    'action' => $this->extbaseAction,
-                ]
-            ],
-            parent::exportInternal()
-        );
     }
 
     /**
@@ -193,5 +170,31 @@ class ExtbaseComponent extends AbstractComponent
         $this->environmentService->simulateFrontendMode(false);
 
         return $result;
+    }
+
+    /**
+     * Return component specific properties
+     *
+     * Override this method in sub classes to export specific properties.
+     *
+     * @return array Component specific properties
+     */
+    protected function exportInternal()
+    {
+        // Compose a configuration string
+        if ($this->extbaseExtensionName && $this->extbasePlugin && $this->extbaseController && $this->extbaseAction) {
+            $this->config = [
+                'extension' => $this->extbaseExtensionName,
+                'plugin' => $this->extbasePlugin,
+                'controller' => $this->extbaseController,
+                'action' => $this->extbaseAction,
+            ];
+            $this->template = 'EXTBASE';
+        }
+
+        return array_merge(
+            [],
+            parent::exportInternal()
+        );
     }
 }

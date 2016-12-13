@@ -139,6 +139,7 @@ class Scanner
         $tokens = token_get_all($phpCode);
         $gettingClassname = $gettingNamespace = false;
         $namespace = '';
+        $lastToken = null;
 
         // Run through all tokens
         for ($t = 0, $tokenCount = count($tokens); $t < $tokenCount; ++$t) {
@@ -152,7 +153,7 @@ class Scanner
             }
 
             // If this is a class name token
-            if (is_array($token) && ($token[0] == T_CLASS)) {
+            if (is_array($token) && ($token[0] == T_CLASS) && (!is_array($lastToken) || ($lastToken[0] !== T_PAAMAYIM_NEKUDOTAYIM))) {
                 $gettingClassname = true;
             }
 
@@ -171,6 +172,8 @@ class Scanner
                     $gettingClassname = false;
                 }
             }
+
+            $lastToken = $token;
         }
         return $classes;
     }
