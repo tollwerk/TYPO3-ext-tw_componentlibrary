@@ -44,4 +44,7 @@ if (PHP_SAPI === 'cli') {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Extbase\\Service\\EnvironmentService'] = array(
         'className' => 'Tollwerk\\TwComponentlibrary\\Utility\\EnvironmentService',
     );
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\View\\TemplateView'] = array(
+        'className' => 'Tollwerk\\TwComponentlibrary\\Component\\TemplateView',
+    );
 }

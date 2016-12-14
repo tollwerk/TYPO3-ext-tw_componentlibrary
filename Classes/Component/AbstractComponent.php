@@ -173,13 +173,26 @@ abstract class AbstractComponent implements ComponentInterface
         $this->determineExtensionName();
         $this->determineNameAndVariant();
 
+        $this->initialize();
         $this->configure();
+    }
+
+    /**
+     * Initialize the component
+     *
+     * Gets called immediately after construction. Override this method in components to initialize the component.
+     *
+     * @return void
+     */
+    protected function initialize()
+    {
+
     }
 
     /**
      * Configure the component
      *
-     * Gets called immediately after construction. Override this method in components to set their properties.
+     * Gets called immediately after initialization. Override this method in components to set their properties.
      *
      * @return void
      */

@@ -39,6 +39,7 @@ use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\FrontendConfigurationManager;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
 
 /**
@@ -85,13 +86,35 @@ class ExtbaseComponent extends AbstractComponent
      * @var string
      */
     protected $extbaseExtensionName = null;
+    /**
+     * Controller instance
+     *
+     * @var ActionController|ComponentControllerInterface
+     */
+    protected $controllerInstance = null;
+    /**
+     * Prefix for controller argument requests
+     *
+     * @var string
+     */
+    protected $controllerArgumentRequestPrefix = null;
+    /**
+     * Controller settings
+     *
+     * @var array
+     */
+    protected $controllerSettings = [];
 
     /**
-     * Component constructor
+     * Initialize the component
+     *
+     * @return void
      */
-    public function __construct()
+    protected function initialize()
     {
-        parent::__construct();
+        parent::initialize();
+
+        // Register the default extbase extension name
         $this->extbaseExtensionName = GeneralUtility::camelCaseToLowerCaseUnderscored($this->extensionName);
     }
 
@@ -140,36 +163,55 @@ class ExtbaseComponent extends AbstractComponent
             throw new \RuntimeException(sprintf('Invalid controller action "%s"', $actionName), 1481646569);
         }
         $this->extbaseAction = $actionName;
+
+        // Construct the controller argument request prefix
+        $this->controllerArgumentRequestPrefix = 'tx_'.strtolower(str_replace('_', '', $this->extbaseExtensionName)).
+            '_'.strtolower($this->extbasePlugin);
+
+        // Construct and set the controller request arguments
+        $this->request->setControllerObjectName($this->extbaseControllerClass);
+        $this->request->setControllerExtensionName($this->extbaseExtensionName);
+        $this->request->setControllerName($this->extbaseController);
+        $this->request->setControllerActionName($this->extbaseAction);
+        $this->request->setPluginName($this->extbasePlugin);
+        $this->request->setArgument(
+            $this->controllerArgumentRequestPrefix,
+            [
+                'controller' => $this->extbaseController,
+                'action' => $this->extbaseAction,
+            ]
+        );
     }
 
     /**
-     * Render this component
+     * Set a controller action argument
      *
-     * @return string Rendered component (HTML)
+     * @param string $name Argument name
+     * @param mixed $value Argument value
      */
-    public function render()
+    public function setControllerActionArgument($name, $value)
     {
-        return $this->type;
+        // Validate the argument name
+        $name = trim($name);
+        if (empty($name)) {
+            throw new \RuntimeException('Invalid extbase controller argument name', 1481708515);
+        }
 
-        // Simulate Frontend mode
-        $this->environmentService->simulateFrontendMode(true);
+        $this->request->setArgument($name, $value);
 
-        // Set the request arguments as GET parameters
-        $_GET = $this->getRequestArguments();
+//        $controllerArguments = (array)$this->request->getArgument($this->controllerArgumentRequestPrefix);
+//        $controllerArguments[$name] = $value;
+//        $this->request->setArgument($this->controllerArgumentRequestPrefix, $controllerArguments);
+    }
 
-        // Instantiate a frontend controller
-        $TSFE = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
-
-        /** @var \TYPO3\CMS\Fluid\View\StandaloneView $view */
-        $view = $this->objectManager->get('TYPO3\\CMS\\Fluid\\View\\StandaloneView');
-        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->config));
-        $view->assignMultiple($this->parameters);
-        $result = $view->render();
-
-        // Stop simulating Frontend mode
-        $this->environmentService->simulateFrontendMode(false);
-
-        return $result;
+    /**
+     * Set the controller settings
+     *
+     * @param array $settings Controller settings
+     */
+    public function setControllerSettings(array $settings)
+    {
+        $this->controllerSettings = $settings;
     }
 
     /**
@@ -188,13 +230,68 @@ class ExtbaseComponent extends AbstractComponent
                 'plugin' => $this->extbasePlugin,
                 'controller' => $this->extbaseController,
                 'action' => $this->extbaseAction,
+                'settings' => $this->controllerSettings,
             ];
-            $this->template = 'EXTBASE';
+
+            $controllerInstance = $this->getControllerInstance();
+            $controllerInstance->skipActionCall(true);
+
+            /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
+            $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
+            $controllerInstance->processRequest($this->request, $response);
+
+            $this->template = $controllerInstance->getView()->getComponentTemplate();
         }
 
-        return array_merge(
-            [],
-            parent::exportInternal()
-        );
+        return parent::exportInternal();
+    }
+
+    /**
+     * Render this component
+     *
+     * @return string Rendered component (HTML)
+     */
+    public function render()
+    {
+        // Simulate Frontend mode
+        $this->environmentService->simulateFrontendMode(true);
+
+        // Set the request arguments as GET parameters
+        $_GET = $this->getRequestArguments();
+
+        // Instantiate a frontend controller
+        $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+
+        $controllerInstance = $this->getControllerInstance();
+
+        /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
+        $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
+        $controllerInstance->processRequest($this->request, $response);
+        $result = $response->getContent();
+
+        // Stop simulating Frontend mode
+        $this->environmentService->simulateFrontendMode(false);
+
+        return $result;
+    }
+
+    /**
+     * Return an extend Extbase controller instance
+     *
+     * @return ActionController|ComponentControllerInterface Extended Extbase controller instance
+     */
+    protected function getControllerInstance()
+    {
+        // One-time instantiation of an extended controller object
+        if ($this->controllerInstance === null) {
+            $extendedControllerClassName = $this->extbaseController.'ComponentController_'.md5($this->extbaseControllerClass);
+            $extendedControllerPhp = 'class '.$extendedControllerClassName.' extends '.$this->extbaseControllerClass;
+            $extendedControllerPhp .= ' implements '.ComponentControllerInterface::class;
+            $extendedControllerPhp .= ' { use '.ComponentControllerTrait::class.'; }';
+            eval($extendedControllerPhp);
+            $this->controllerInstance = $this->objectManager->get($extendedControllerClassName);
+        }
+
+        return $this->controllerInstance->setSettings($this->controllerSettings);
     }
 }
