@@ -4,7 +4,6 @@
   "description": "Component library features for your TYPO3 project",
   "homepage": "https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary",
   "license": "GPL-2.0+",
-  "version": "1.0",
   "require": {
     "typo3/cms": "~7.6"
   },
