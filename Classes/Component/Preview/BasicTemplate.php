@@ -36,6 +36,8 @@
 
 namespace Tollwerk\TwComponentlibrary\Component\Preview;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Basic preview template
  *
@@ -102,7 +104,8 @@ class BasicTemplate implements TemplateInterface
     {
         $url = trim($url);
         if (strlen($url)) {
-            $this->stylesheets[] = $url;
+            $absStylesheet = GeneralUtility::getFileAbsFileName($url);
+            $this->stylesheets[] = substr($absStylesheet, strlen(PATH_site));
         }
     }
 
@@ -115,7 +118,10 @@ class BasicTemplate implements TemplateInterface
     {
         $url = trim($url);
         if (strlen($url)) {
-            $this->addHeaderScript[] = $url;
+            $absScript = GeneralUtility::getFileAbsFileName($url);
+            if (is_file($absScript)) {
+                $this->headerScripts[] = substr($absScript, strlen(PATH_site));
+            }
         }
     }
 
@@ -128,7 +134,10 @@ class BasicTemplate implements TemplateInterface
     {
         $url = trim($url);
         if (strlen($url)) {
-            $this->addFooterScript[] = $url;
+            $absScript = GeneralUtility::getFileAbsFileName($url);
+            if (is_file($absScript)) {
+                $this->footerScripts[] = substr($absScript, strlen(PATH_site));
+            }
         }
     }
 }
