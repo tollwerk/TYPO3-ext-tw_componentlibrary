@@ -261,9 +261,12 @@ abstract class AbstractComponent implements ComponentInterface
             $properties['notice'] = trim($this->notice);
         }
 
-        $preview = trim(strval($this->preview));
-        if (strlen($preview)) {
-            $properties['preview'] = $preview;
+        // If this is the default variant
+        if (!$this->variant) {
+            $preview = trim(strval($this->preview));
+            if (strlen($preview)) {
+                $properties['preview'] = $preview;
+            }
         }
 
         return $properties;

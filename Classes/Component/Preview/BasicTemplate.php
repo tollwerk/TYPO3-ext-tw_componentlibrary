@@ -59,11 +59,23 @@ class BasicTemplate implements TemplateInterface
      */
     protected $headerScripts = [];
     /**
+     * Resources to be included in the file header
+     *
+     * @var array
+     */
+    protected $headerIncludes = [];
+    /**
      * JavaScripts to include in the footer
      *
      * @var array
      */
     protected $footerScripts = [];
+    /**
+     * Resources to be included in the file footer
+     *
+     * @var array
+     */
+    protected $footerIncludes = [];
 
     /**
      * Serialize the template
@@ -72,25 +84,28 @@ class BasicTemplate implements TemplateInterface
      */
     public function __toString()
     {
-        $html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>{{ _target.label }}</title>';
+        $html = '<!DOCTYPE html><html lang="en"><head>';
+        $html .= implode('', $this->headerIncludes);
+        $html .= '<meta charset="UTF-8"><title>{{ _target.label }}</title>';
 
         // Include the registered CSS stylesheets
         foreach ($this->stylesheets as $cssUrl) {
-            $html .= ' <link media="all" rel="stylesheet" href="{{ path \'/'.ltrim($cssUrl, '/').'\' }}">';
+            $html .= ' <link media="all" rel="stylesheet" href="{{ path \'/' . ltrim($cssUrl, '/') . '\' }}">';
         }
 
         // Include the registered header JavaScripts
         foreach ($this->headerScripts as $jsUrl) {
-            $html .= ' <script src="{{ path \'/'.ltrim($jsUrl, '/').'\' }}">';
+            $html .= ' <script src="{{ path \'/' . ltrim($jsUrl, '/') . '\' }}"></script>';
         }
 
         $html .= '</head><body>{{{ yield }}}';
 
         // Include the registered footer JavaScripts
         foreach ($this->footerScripts as $jsUrl) {
-            $html .= ' <script src="{{ path \'/'.ltrim($jsUrl, '/').'\' }}">';
+            $html .= ' <script src="{{ path \'/' . ltrim($jsUrl, '/') . '\' }}"></script>';
         }
 
+        $html .= implode('', $this->footerIncludes);
         $html .= '</body></html>';
         return $html;
     }
@@ -126,9 +141,25 @@ class BasicTemplate implements TemplateInterface
     }
 
     /**
+     * Add a header inclusion resource
+     *
+     * @param string $path Header inclusion path
+     */
+    public function addHeaderInclude($path)
+    {
+        $path = trim($path);
+        if (strlen($path)) {
+            $absPath = GeneralUtility::getFileAbsFileName($path);
+            if (is_file($absPath)) {
+                $this->headerIncludes[] = file_get_contents($absPath);
+            }
+        }
+    }
+
+    /**
      * Add a footer JavaScript
      *
-     * @param string $url Footer JavaScript URL
+     * @param string $path Footer JavaScript URL
      */
     public function addFooterScript($url)
     {
@@ -137,6 +168,22 @@ class BasicTemplate implements TemplateInterface
             $absScript = GeneralUtility::getFileAbsFileName($url);
             if (is_file($absScript)) {
                 $this->footerScripts[] = substr($absScript, strlen(PATH_site));
+            }
+        }
+    }
+
+    /**
+     * Add a footer inclusion resource
+     *
+     * @param string $path Footer inclusion path
+     */
+    public function addFooterInclude($path)
+    {
+        $path = trim($path);
+        if (strlen($path)) {
+            $absPath = GeneralUtility::getFileAbsFileName($path);
+            if (is_file($absPath)) {
+                $this->footerIncludes[] = file_get_contents($absPath);
             }
         }
     }
