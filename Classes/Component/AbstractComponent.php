@@ -104,13 +104,19 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @var string
      */
-    protected $name;
+    protected $name = null;
     /**
      * Variant
      *
      * @var string
      */
     protected $variant = null;
+    /**
+     * Alternative label
+     *
+     * @var string
+     */
+    protected $label = null;
     /**
      * Extension name
      *
@@ -212,6 +218,7 @@ abstract class AbstractComponent implements ComponentInterface
             'status' => $this->status,
             'name' => $this->name,
             'variant' => $this->variant,
+            'label' => $this->label,
             'class' => get_class($this),
             'type' => $this->type,
             'valid' => false,
@@ -340,7 +347,8 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @return mixed Request arguments
      */
-    public function getRequestArguments() {
+    public function getRequestArguments()
+    {
         return $this->exportRequest()['arguments'];
     }
 
