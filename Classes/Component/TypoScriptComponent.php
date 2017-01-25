@@ -103,9 +103,9 @@ class TypoScriptComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         // Instantiate a frontend controller
-        $TSFE = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
-        $cObj = new ContentObjectRenderer($TSFE);
-        $cObj->start($TSFE->page, 'pages');
+        $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+        $cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
+        $cObj->start($GLOBALS['TSFE']->page, 'pages');
         $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
             $this->page,
             $this->typeNum,

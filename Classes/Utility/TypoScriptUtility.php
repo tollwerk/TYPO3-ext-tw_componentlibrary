@@ -38,7 +38,6 @@ namespace Tollwerk\TwComponentlibrary\Utility;
 
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Service\TypoScriptService;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
@@ -154,6 +153,14 @@ class TypoScriptUtility
             $TSFE->initTemplate();
             $TSFE->rootLine = $TSFE->sys_page->getRootLine($id, '');
             $TSFE->getConfigArray();
+
+            // Calculate the absolute path prefix
+            if (!empty($TSFE->config['config']['absRefPrefix'])) {
+                $absRefPrefix = trim($TSFE->config['config']['absRefPrefix']);
+                $TSFE->absRefPrefix = ($absRefPrefix === 'auto') ? GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') : $absRefPrefix;
+            } else {
+                $TSFE->absRefPrefix = '';
+            }
 
             self::$frontendControllers["$id/$typeNum"] = $TSFE;
         }
