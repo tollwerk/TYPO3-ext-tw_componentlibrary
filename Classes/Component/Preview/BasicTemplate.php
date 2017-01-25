@@ -84,7 +84,7 @@ class BasicTemplate implements TemplateInterface
      */
     public function __toString()
     {
-        $html = '<!DOCTYPE html><html lang="en"><head>';
+        $html = '<!DOCTYPE html><html lang="en"><head><script>document.documentElement.className+=\'js\'</script>';
         $html .= implode('', $this->headerIncludes);
         $html .= '<meta charset="UTF-8"><title>{{ _target.label }}</title>';
 
