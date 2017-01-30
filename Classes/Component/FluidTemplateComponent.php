@@ -124,7 +124,7 @@ class FluidTemplateComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         // Instantiate a frontend controller
-        $TSFE = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+        $this->initializeTSFE();
 
         /** @var \TYPO3\CMS\Fluid\View\StandaloneView $view */
         $view = $this->objectManager->get('TYPO3\\CMS\\Fluid\\View\\StandaloneView');

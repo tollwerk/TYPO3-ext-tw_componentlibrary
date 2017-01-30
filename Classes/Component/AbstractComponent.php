@@ -38,10 +38,12 @@ namespace Tollwerk\TwComponentlibrary\Component;
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface;
 use Tollwerk\TwComponentlibrary\Utility\EnvironmentService;
+use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * Abstract component
@@ -82,7 +84,7 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected $languageParameter = 'L';
     /**
-     * Page ID for this requet
+     * Page ID for this request
      *
      * @var int
      */
@@ -410,5 +412,18 @@ abstract class AbstractComponent implements ComponentInterface
             ' ',
             array_map('ucwords', preg_split('/_+/', GeneralUtility::camelCaseToLowerCaseUnderscored($componentPath)))
         )) ?: null;
+    }
+
+    /**
+     * Initialize a global Frontend renderer and return a content object renderer instance
+     *
+     * @return ContentObjectRenderer Content object renderer
+     */
+    protected function initializeTSFE()
+    {
+        $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+        $cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
+        $cObj->start($GLOBALS['TSFE']->page, 'pages');
+        return $cObj;
     }
 }
