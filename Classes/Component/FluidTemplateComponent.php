@@ -36,7 +36,9 @@
 namespace Tollwerk\TwComponentlibrary\Component;
 
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
+use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /**
  * FLUIDTEMPLATE component
@@ -125,9 +127,20 @@ class FluidTemplateComponent extends AbstractComponent
 
         // Instantiate a frontend controller
         $this->initializeTSFE();
+        $typoScriptParser = GeneralUtility::makeInstance(TypoScriptParser::class);
+        list(, $viewConfig) = $typoScriptParser->getVal(
+            'plugin.tx_'.strtolower($this->extensionName).'.view',
+            $GLOBALS['TSFE']->tmpl->setup
+        );
+        list(, $layoutRootPaths) = $typoScriptParser->getVal('layoutRootPaths', $viewConfig);
+        list(, $templateRootPaths) = $typoScriptParser->getVal('templateRootPaths', $viewConfig);
+        list(, $partialRootPaths) = $typoScriptParser->getVal('partialRootPaths', $viewConfig);
 
         /** @var \TYPO3\CMS\Fluid\View\StandaloneView $view */
         $view = $this->objectManager->get('TYPO3\\CMS\\Fluid\\View\\StandaloneView');
+        $view->setLayoutRootPaths($layoutRootPaths);
+        $view->setTemplateRootPaths($templateRootPaths);
+        $view->setPartialRootPaths($partialRootPaths);
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->config));
         $view->assignMultiple($this->parameters);
         $result = $view->render();
