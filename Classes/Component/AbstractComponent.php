@@ -422,8 +422,8 @@ abstract class AbstractComponent implements ComponentInterface
     protected function initializeTSFE()
     {
         $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
-        $cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
-        $cObj->start($GLOBALS['TSFE']->page, 'pages');
-        return $cObj;
+        $GLOBALS['TSFE']->cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
+        $GLOBALS['TSFE']->cObj->start($GLOBALS['TSFE']->page, 'pages');
+        return $GLOBALS['TSFE']->cObj;
     }
 }
