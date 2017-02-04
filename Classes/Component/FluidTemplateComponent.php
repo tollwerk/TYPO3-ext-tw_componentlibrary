@@ -119,14 +119,10 @@ class FluidTemplateComponent extends AbstractComponent
      */
     public function render()
     {
-        // Simulate Frontend mode
-        $this->environmentService->simulateFrontendMode(true);
-
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
         // Instantiate a frontend controller
-        $this->initializeTSFE();
         $typoScriptParser = GeneralUtility::makeInstance(TypoScriptParser::class);
         list(, $viewConfig) = $typoScriptParser->getVal(
             'plugin.tx_'.strtolower($this->extensionName).'.view',
@@ -144,9 +140,6 @@ class FluidTemplateComponent extends AbstractComponent
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->config));
         $view->assignMultiple($this->parameters);
         $result = $view->render();
-
-        // Stop simulating Frontend mode
-        $this->environmentService->simulateFrontendMode(false);
 
         return $result;
     }

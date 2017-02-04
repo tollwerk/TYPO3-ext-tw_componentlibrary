@@ -96,23 +96,16 @@ class TypoScriptComponent extends AbstractComponent
      */
     public function render()
     {
-        // Simulate Frontend mode
-        $this->environmentService->simulateFrontendMode(true);
-
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
         // Instantiate a frontend controller
-        $cObj = $this->initializeTSFE();
         $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
             $this->page,
             $this->typeNum,
             $this->config
         );
-        $result = call_user_func_array([$cObj, 'cObjGetSingle'], $typoScript);
-
-        // Stop simulating Frontend mode
-        $this->environmentService->simulateFrontendMode(false);
+        $result = call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript);
 
         return $result;
     }

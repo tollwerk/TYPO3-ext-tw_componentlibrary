@@ -53,9 +53,7 @@ class ComponentController extends ActionController {
     public function renderAction($component) {
         $componentInstance = $this->objectManager->get($component);
         if ($componentInstance instanceof ComponentInterface) {
-            echo $componentInstance->render();
-        } else {
-            echo 'ERROR';
+            return trim($componentInstance->render());
         }
     }
 }

@@ -253,9 +253,6 @@ class ExtbaseComponent extends AbstractComponent
      */
     public function render()
     {
-        // Simulate Frontend mode
-        $this->environmentService->simulateFrontendMode(true);
-
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
@@ -268,9 +265,6 @@ class ExtbaseComponent extends AbstractComponent
         $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
         $controllerInstance->processRequest($this->request, $response);
         $result = $response->getContent();
-
-        // Stop simulating Frontend mode
-        $this->environmentService->simulateFrontendMode(false);
 
         return $result;
     }
