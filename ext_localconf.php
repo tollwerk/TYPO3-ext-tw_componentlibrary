@@ -36,6 +36,14 @@ if (!defined('TYPO3_MODE')) {
     die ('Access denied.');
 }
 
+
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+    'Tollwerk.'.$_EXTKEY,
+    'Component',
+    ['Component' => 'render'],
+    ['Component' => 'render']
+);
+
 // Register the component service command controller
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \Tollwerk\TwComponentlibrary\Command\ComponentCommandController::class;
 
