@@ -257,7 +257,8 @@ class ExtbaseComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         // Instantiate a frontend controller
-        $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+        // TODO: Test if the TSFE instance can be removed
+        // $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
 
         $controllerInstance = $this->getControllerInstance();
 
