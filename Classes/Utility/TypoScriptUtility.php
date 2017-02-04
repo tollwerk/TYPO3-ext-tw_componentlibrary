@@ -149,8 +149,7 @@ class TypoScriptUtility
             $TSFE->sys_page = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
             $TSFE->sys_page->init(true);
             $TSFE->connectToDB();
-            $TSFE->initFEuser();
-            $TSFE->determineId();
+//            $TSFE->determineId();
             $TSFE->initTemplate();
             $TSFE->rootLine = $TSFE->sys_page->getRootLine($id, '');
             $TSFE->getConfigArray();
