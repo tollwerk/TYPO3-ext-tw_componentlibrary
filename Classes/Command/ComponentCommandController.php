@@ -58,19 +58,4 @@ class ComponentCommandController extends CommandController
     {
         echo json_encode(Scanner::discover(), JSON_PRETTY_PRINT);
     }
-
-    /**
-     * Render a particular component
-     *
-     * @param string $component Component class name
-     */
-    public function renderCommand($component)
-    {
-        $componentInstance = $this->objectManager->get($component);
-        if ($componentInstance instanceof ComponentInterface) {
-            echo $componentInstance->render();
-        } else {
-            echo 'ERROR';
-        }
-    }
 }

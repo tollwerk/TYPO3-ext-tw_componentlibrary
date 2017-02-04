@@ -1,12 +1,13 @@
 <?php
 
 /**
- * Local configuration
+ * Component controller
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary
+ * @subpackage Tollwerk\TwComponentlibrary\Component
  * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright Copyright © 2017 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
@@ -32,16 +33,27 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***********************************************************************************/
 
-if (!defined('TYPO3_MODE')) {
-    die ('Access denied.');
-}
+namespace Tollwerk\TwComponentlibrary\Controller;
 
-// Register the component service command controller
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \Tollwerk\TwComponentlibrary\Command\ComponentCommandController::class;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 
-// Override the environment service when in CLI mode
-if (PHP_SAPI === 'cli') {
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\View\\TemplateView'] = array(
-        'className' => 'Tollwerk\\TwComponentlibrary\\Component\\TemplateView',
-    );
+/**
+ * Component controller
+ *
+ * @package Tollwerk\TwComponentlibrary
+ * @subpackage Tollwerk\TwComponentlibrary\Controller
+ */
+class ComponentController extends ActionController {
+    /**
+     * Render action
+     *
+     * @param string $component Component class
+     */
+    public function renderAction($component) {
+        $componentInstance = $this->objectManager->get($component);
+        if ($componentInstance instanceof ComponentInterface) {
+            return trim($componentInstance->render());
+        }
+    }
 }

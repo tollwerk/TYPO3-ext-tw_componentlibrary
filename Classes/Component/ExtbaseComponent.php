@@ -253,14 +253,12 @@ class ExtbaseComponent extends AbstractComponent
      */
     public function render()
     {
-        // Simulate Frontend mode
-        $this->environmentService->simulateFrontendMode(true);
-
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
         // Instantiate a frontend controller
-        $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+        // TODO: Test if the TSFE instance can be removed
+        // $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
 
         $controllerInstance = $this->getControllerInstance();
 
@@ -268,9 +266,6 @@ class ExtbaseComponent extends AbstractComponent
         $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
         $controllerInstance->processRequest($this->request, $response);
         $result = $response->getContent();
-
-        // Stop simulating Frontend mode
-        $this->environmentService->simulateFrontendMode(false);
 
         return $result;
     }
