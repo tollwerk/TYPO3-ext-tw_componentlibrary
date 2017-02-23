@@ -7,12 +7,12 @@
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright Copyright © 2017 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
- *  Copyright © 2016 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2017 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  All rights reserved
  *

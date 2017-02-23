@@ -7,12 +7,12 @@
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright Copyright © 2017 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
- *  Copyright © 2016 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2017 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  All rights reserved
  *
@@ -349,7 +349,6 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * Find the extension name the current component belongs to
      *
-     * @return string Extension name
      * @throws \RuntimeException If the component path is invalid
      */
     protected function determineExtensionName()
@@ -378,9 +377,7 @@ abstract class AbstractComponent implements ComponentInterface
     }
 
     /**
-     * Return the component name and variant
-     *
-     * @return array|null
+     * Determine the component name and variant
      */
     protected function determineNameAndVariant()
     {

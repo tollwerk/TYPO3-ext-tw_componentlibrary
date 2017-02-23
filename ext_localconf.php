@@ -6,12 +6,12 @@
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary
  * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright Copyright © 2017 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
- *  Copyright © 2016 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2017 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  All rights reserved
  *
@@ -35,7 +35,6 @@
 if (!defined('TYPO3_MODE')) {
     die ('Access denied.');
 }
-
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
     'Tollwerk.'.$_EXTKEY,

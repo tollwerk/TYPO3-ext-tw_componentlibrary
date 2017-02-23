@@ -7,12 +7,12 @@
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright Copyright © 2017 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
- *  Copyright © 2016 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2017 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  All rights reserved
  *
@@ -35,12 +35,11 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
-use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Configuration\FrontendConfigurationManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
+use TYPO3\CMS\Extbase\Mvc\Web\Response;
 
 /**
  * Extbase component
@@ -240,7 +239,8 @@ class ExtbaseComponent extends AbstractComponent
             $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
             $controllerInstance->processRequest($this->request, $response);
 
-            $this->template = $controllerInstance->getView()->getComponentTemplate();
+            $this->template = $controllerInstance->getView()
+                ->getComponentTemplate($this->extbaseController, $this->extbaseAction);
         }
 
         return parent::exportInternal();
@@ -256,15 +256,9 @@ class ExtbaseComponent extends AbstractComponent
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
-        // Instantiate a frontend controller
-        // TODO: Test if the TSFE instance can be removed
-        // $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
-
-        $controllerInstance = $this->getControllerInstance();
-
         /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
-        $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
-        $controllerInstance->processRequest($this->request, $response);
+        $response = $this->objectManager->get(Response::class);
+        $this->getControllerInstance()->processRequest($this->request, $response);
         $result = $response->getContent();
 
         return $result;

@@ -7,14 +7,14 @@
  * @package     Tollwerk\TwComponentlibrary
  * @subpackage  Tollwerk\TwComponentlibrary\Component
  * @author      Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright   Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright   Copyright © 2017 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license     http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
  *  The MIT License (MIT)
  *
- *  Copyright © 2016 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2017 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of
  *  this software and associated documentation files (the "Software"), to deal in
@@ -47,10 +47,12 @@ class TemplateView extends \TYPO3\CMS\Fluid\View\TemplateView
     /**
      * Return the template source content
      *
+     * @param string $controller Controller name
+     * @param string $action Action name
      * @return string Template source
      */
-    public function getComponentTemplate()
+    public function getComponentTemplate($controller, $action)
     {
-        return $this->getTemplateSource();
+        return $this->baseRenderingContext->getTemplatePaths()->getTemplateSource($controller, $action);
     }
 }

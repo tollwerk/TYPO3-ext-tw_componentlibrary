@@ -7,14 +7,14 @@
  * @package     Tollwerk\TwComponentlibrary
  * @subpackage  Tollwerk\TwComponentlibrary\Command
  * @author      Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright   Copyright © 2016 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright   Copyright © 2017 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license     http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
  *  The MIT License (MIT)
  *
- *  Copyright © 2016 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2017 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy of
  *  this software and associated documentation files (the "Software"), to deal in
@@ -36,7 +36,6 @@
 
 namespace Tollwerk\TwComponentlibrary\Command;
 
-use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
@@ -50,9 +49,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 class ComponentCommandController extends CommandController
 {
     /**
-     * Discover and return all styleguide components
-     *
-     * @return array Styleguide components
+     * Discover and print all styleguide components
      */
     public function discoverCommand()
     {

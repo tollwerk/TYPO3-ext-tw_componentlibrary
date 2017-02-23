@@ -12,7 +12,7 @@
  */
 
 /***********************************************************************************
- *  Copyright © 2016 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2017 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  All rights reserved
  *
@@ -44,16 +44,20 @@ use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Controller
  */
-class ComponentController extends ActionController {
+class ComponentController extends ActionController
+{
     /**
      * Render action
      *
      * @param string $component Component class
      */
-    public function renderAction($component) {
+    public function renderAction($component)
+    {
         $componentInstance = $this->objectManager->get($component);
         if ($componentInstance instanceof ComponentInterface) {
             return trim($componentInstance->render());
         }
+
+        return $this->view->render();
     }
 }
