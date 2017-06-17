@@ -11,4 +11,14 @@ plugin.tx_twcomponentlibrary {
         # cat=plugin.tx_twcomponentlibrary//a; type=string; label=Default storage PID
         storagePid =
     }
+    settings {
+        # cat=plugin.tx_twcomponentlibrary//b; type=string; label=Common stylesheets
+        stylesheets =
+
+        # cat=plugin.tx_twcomponentlibrary//b; type=string; label=Common header scripts
+        headerScripts =
+
+        # cat=plugin.tx_twcomponentlibrary//c; type=string; label=Common footer scripts
+        footerScripts =
+    }
 }

@@ -36,7 +36,10 @@
 
 namespace Tollwerk\TwComponentlibrary\Command;
 
+use FluidTYPO3\Flux\Configuration\BackendConfigurationManager;
+use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
@@ -53,6 +56,16 @@ class ComponentCommandController extends CommandController
      */
     public function discoverCommand()
     {
+        $setup = $this->objectManager->get(BackendConfigurationManager::class)->getTypoScriptSetup();
+        /** @var TypoScriptService $typoscriptService */
+        $typoscriptService = $this->objectManager->get(TypoScriptService::class);
+        $config = $typoscriptService->convertTypoScriptArrayToPlainArray($setup['plugin.']['tx_twcomponentlibrary.']);
+
+        // Register common stylesheets & scripts
+        BasicTemplate::addCommonStylesheets($config['settings']['stylesheets']);
+        BasicTemplate::addCommonHeaderScripts($config['settings']['headerScripts']);
+        BasicTemplate::addCommonFooterScripts($config['settings']['footerScripts']);
+
         echo json_encode(Scanner::discover(), JSON_PRETTY_PRINT);
     }
 }

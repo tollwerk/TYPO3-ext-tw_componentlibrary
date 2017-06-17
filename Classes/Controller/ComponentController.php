@@ -35,8 +35,9 @@
 
 namespace Tollwerk\TwComponentlibrary\Controller;
 
-use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
+use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 /**
  * Component controller
@@ -53,6 +54,11 @@ class ComponentController extends ActionController
      */
     public function renderAction($component)
     {
+        // Register common stylesheets & scripts
+        BasicTemplate::addCommonStylesheets($this->settings['stylesheets']);
+        BasicTemplate::addCommonHeaderScripts($this->settings['headerScripts']);
+        BasicTemplate::addCommonFooterScripts($this->settings['footerScripts']);
+
         $componentInstance = $this->objectManager->get($component);
         if ($componentInstance instanceof ComponentInterface) {
             return trim($componentInstance->render());

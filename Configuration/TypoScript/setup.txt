@@ -4,8 +4,15 @@ plugin.tx_twcomponentlibrary {
         partialRootPaths.0 = {$plugin.tx_twcomponentlibrary.view.partialRootPath}
         layoutRootPaths.0 = {$plugin.tx_twcomponentlibrary.view.layoutRootPath}
     }
+
     persistence {
         storagePid = {$plugin.tx_twcomponentlibrary.persistence.storagePid}
+    }
+
+    settings {
+        stylesheets = {$plugin.tx_twcomponentlibrary.settings.stylesheets}
+        headerScripts = {$plugin.tx_twcomponentlibrary.settings.headerScripts}
+        footerScripts = {$plugin.tx_twcomponentlibrary.settings.footerScripts}
     }
 }
 
