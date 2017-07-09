@@ -197,10 +197,6 @@ class ExtbaseComponent extends AbstractComponent
         }
 
         $this->request->setArgument($name, $value);
-
-//        $controllerArguments = (array)$this->request->getArgument($this->controllerArgumentRequestPrefix);
-//        $controllerArguments[$name] = $value;
-//        $this->request->setArgument($this->controllerArgumentRequestPrefix, $controllerArguments);
     }
 
     /**

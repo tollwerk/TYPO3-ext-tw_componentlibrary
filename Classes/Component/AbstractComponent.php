@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Abstract component
+ * Abstract component base
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary

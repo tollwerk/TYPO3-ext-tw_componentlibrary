@@ -67,6 +67,7 @@ interface ComponentInterface
      * @var int
      */
     const STATUS_PROTOTYPE = 'prototype';
+
     /**
      * Export the component's properties
      *

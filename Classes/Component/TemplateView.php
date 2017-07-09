@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * Extended fluid template view
  *
  * @category    Tollwerk
  * @package     Tollwerk\TwComponentlibrary

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * data
+ * Component controller trait
  *
  * @category    Tollwerk
  * @package     Tollwerk\TwComponentlibrary
