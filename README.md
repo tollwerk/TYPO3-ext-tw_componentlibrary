@@ -392,7 +392,7 @@ Sample result:
          "path": [
              "Demo"
          ]
-     } /*, ... */
+     }
  ]
 ```
 
@@ -401,10 +401,10 @@ Use these information however it makes sense for you. For instance, the [Fractal
 ### Rendering components
 
 The component library extension introduces the new `type` parameter value `2400` used for calling TYPO3 as a rendering engine for single components. For instance,
- 
- `http://example.com/?type=2400&tx_twcomponentlibrary_component%5Bcomponent%5D=Vendor%5CExtKey%5CComponent%5CMyWidgetComponent`
- 
-will exclusively render the component `\Vendor\ExtKey\Component\MyWidgetComponent` and return the generated source code without surrounding page level HTML. 
+
+http://example.com/?type=2400&tx_twcomponentlibrary_component%5Bcomponent%5D=Vendor%5CExtKey%5CComponent%5CMyWidgetComponent
+
+will exclusively render the component `\Vendor\ExtKey\Component\MyWidgetComponent` and return the generated source code without surrounding page level HTML. You can use this isolated component output for various purposes (including visual regression testing).
 
 License
 -------
