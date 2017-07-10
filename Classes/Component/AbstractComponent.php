@@ -298,7 +298,7 @@ abstract class AbstractComponent implements ComponentInterface
     }
 
     /**
-     * Set a preview preview template
+     * Set a preview template
      *
      * @param TemplateInterface|string|null $preview Preview template
      */
