@@ -36,10 +36,10 @@
 
 namespace Tollwerk\TwComponentlibrary\Command;
 
-use FluidTYPO3\Flux\Configuration\BackendConfigurationManager;
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
