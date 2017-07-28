@@ -121,8 +121,9 @@ class Scanner
     {
         /** @var ComponentInterface $component */
         $component = new $componentClass;
+        $componentDir = dirname($componentPath);
         return array_merge($component->export(), [
-            'path' => array_map([AbstractComponent::class, 'expandComponentName'],
+            'path' => ($componentDir === '.') ? [] : array_map([AbstractComponent::class, 'expandComponentName'],
                 explode(DIRECTORY_SEPARATOR, dirname($componentPath))),
         ]);
     }
