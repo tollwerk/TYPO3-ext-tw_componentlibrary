@@ -411,6 +411,27 @@ http://example.com/?type=2400&tx_twcomponentlibrary_component%5Bcomponent%5D=Ven
 
 will exclusively render the component `\Vendor\ExtKey\Component\MyWidgetComponent` and return the generated source code without surrounding page level HTML.
 
+TYPO3 Backend integration
+-------------------------
+
+The extension provides a simple integration so that you can update your component library from within the TYPO3 backend. So far, only the [Fractal](http://fractal.build) component library is supported. To enable Fractal support, follow these simple steps:
+
+* Enter the extension configuration from the extension manager and enable the use of Fractal:
+
+  ![Enable Fractal support](Docs/be-extension-settings.png)
+  
+* Provide the absolute path to a shell script that is able to run the necessary steps to update and restart your component library. You'll find an example file at `Resources/Private/Script`.
+
+  Updating Fractal with a shell script is easy: Assuming you're using the [TYPO3 Fractal bridge](https://github.com/tollwerk/fractal-typo3), simply `cd` into your Fractal instance directory and issue `fractal update-typo3`. It depends on your specific setup if there are some extra steps involved to re-initialize Fractal.
+  
+* Make sure the shell script is executable for the user your web server runs under and use `sudo` inside the script where necessary (might require configuring appropriate `sudo` privileges which is beyond this documentation). Be careful — the shell script could harm your system if not crafted properly!
+
+* As soon as you enabled support for a component library and the shell script is in place, you should find an additional menu item in the cache menu pulldown:
+
+  ![Cache menu pulldown extension](Docs/be-cache-menu.png)
+
+* If done properly, you can now update and re-initialize your component library easily from within the TYPO3 backend. Depending on the number of components in your system the process of updating might take a while.
+
 Contributing
 ------------
 

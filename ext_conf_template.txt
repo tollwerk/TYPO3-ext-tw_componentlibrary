@@ -1,0 +1,5 @@
+# cat=basic; type=options[None=,Fractal=fractal]; label=Component library: Enable the backend integration of a particular component library
+componentlibrary =
+
+# cat=basic; type=string; label=Component library update script: Absolute path to the shell script updating and restarting the component library
+script =

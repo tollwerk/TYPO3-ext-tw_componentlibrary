@@ -36,6 +36,9 @@ if (!defined('TYPO3_MODE')) {
     die ('Access denied.');
 }
 
+// Expose the extension configuration
+$GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCONF);
+
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
     'Tollwerk.'.$_EXTKEY,
     'Component',
@@ -58,3 +61,25 @@ $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'] = ltrim(
     $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'].',tx_twcomponentlibrary_component[component]',
     ','
 );
+
+/*
+ * ###################################################
+ * Component library integration
+ * ###################################################
+ */
+if (
+    !empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['componentlibrary'])
+    && !empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['script'])
+    && file_exists($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['script'])
+) {
+    // Register icon
+    $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+    $iconRegistry->registerIcon(
+        'tx_twcomponentlibrary_cache',
+        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+        ['source' => 'EXT:tw_componentlibrary/Resources/Public/Icons/'.ucfirst($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['componentlibrary']).'.svg']
+    );
+
+    // Extend the backend cache action menu
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions'][] = \Tollwerk\TwComponentlibrary\Hook\CacheHook::class;
+}

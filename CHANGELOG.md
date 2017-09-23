@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - unreleased
+### Added
+- Backend integration to update and re-initialize an external component library
+
 ## [0.2.3] - 2017-07-28
 ### Fixed
 - Removed flux extension dependency ([#2](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/2))
