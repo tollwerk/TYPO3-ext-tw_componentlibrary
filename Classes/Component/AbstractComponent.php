@@ -186,7 +186,7 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function initialize()
     {
-
+        $this->addDocumentation();
     }
 
     /**
@@ -293,8 +293,92 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function addNotice($notice)
     {
-        $notice = trim($notice);
-        $this->notice = strlen($notice) ? $notice : null;
+        if (!$this->variant) {
+            $notice = trim($notice);
+            $this->notice = strlen($notice) ? $this->exportNotice($notice) : null;
+        }
+    }
+
+    /**
+     * Add an external documentation
+     */
+    protected function addDocumentation()
+    {
+        $docDirectory = $this->getDocumentationDirectory();
+
+        // If there's a documentation directory
+        if (is_dir($docDirectory)) {
+            $validIndexDocuments = [
+                'index.md',
+                'readme.md',
+                strtolower($this->name.'.md')
+            ];
+            $indexDocument = null;
+            $documents = [];
+
+            // Run through all documentation files
+            foreach (scandir($docDirectory) as $document) {
+                if (!is_file($docDirectory.DIRECTORY_SEPARATOR.$document)) {
+                    continue;
+                }
+
+                // If there's a valid documentation index file
+                if (in_array(strtolower($document), $validIndexDocuments)) {
+                    if ($indexDocument === null) {
+                        $indexDocument = $docDirectory.DIRECTORY_SEPARATOR.$document;
+                    }
+                    continue;
+                }
+
+                $documents[] = $docDirectory.DIRECTORY_SEPARATOR.$document;
+            }
+
+            // If there's an index document
+            if ($indexDocument !== null) {
+                $this->addNotice(file_get_contents($indexDocument));
+                return;
+            }
+
+            // If there are remaining documents: Auto-create a simple listing
+            if (count($documents)) {
+                $listing = [];
+
+                // Run through all documents
+                foreach ($documents as $document) {
+                    $extension = strtolower(pathinfo($document, PATHINFO_EXTENSION));
+                    $listing[] = '* '.(in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg']) ? '!' : '').
+                        '['.pathinfo($document, PATHINFO_FILENAME).']('.basename($document).')';
+                }
+
+                $this->addNotice(implode(PHP_EOL, $listing));
+            }
+        }
+    }
+
+    /**
+     * Return the documentation directory for this component
+     *
+     * @param bool $rootRelative Return a root relative path
+     * @return string Documentation directory
+     */
+    protected function getDocumentationDirectory($rootRelative = false)
+    {
+        $reflectionObject = new \ReflectionObject($this);
+        $componentFile = $reflectionObject->getFileName();
+        $docDirectory = dirname($componentFile).DIRECTORY_SEPARATOR.$this->name;
+        return $rootRelative ? substr($docDirectory, strlen(PATH_site) - 1) : $docDirectory;
+    }
+
+    /**
+     * Export a notice
+     *
+     * @param $notice
+     * @return mixed
+     */
+    protected function exportNotice($notice)
+    {
+        $docDirectoryPath = strtr($this->getDocumentationDirectory(true), [DIRECTORY_SEPARATOR => '/']).'/';
+        return preg_replace('/\[([^\]]*?)\]\(([^\)]*?)\)/', "[$1]($docDirectoryPath$2)", $notice);
     }
 
     /**

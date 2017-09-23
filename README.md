@@ -256,7 +256,7 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * Add a notice
      * 
-     * Fractal displays the notice in the "Notes" tab
+     * Fractal displays the notice in the "Notes" tab (only available for the default component variant)
      *
      * @param string $notice Notice
      */
@@ -272,7 +272,7 @@ abstract class AbstractComponent implements ComponentInterface
     protected function setPreview($preview) {}
 }
 ```
- 
+
 ##### Preview templates
   
 By default, the builtin `BasicTemplate` is used for rendering components for external systems. You can use your custom template as long as you implement the `TemplateInterface`. The default `BasicTemplates` supports a couple of configuration methods:
@@ -370,6 +370,27 @@ class ExampleFluidTemplateComponent extends FluidTemplateComponent
     }
 }
 ```
+
+##### Documentation
+
+You can add documentation to your components in two ways:
+
+1. By using `addNotice($str)` inside the `configure()` method of a component.
+2. By creating a **documentation directory** named after the component (without variant suffix) and dropping documentation files in there. When the component is extracted,
+
+    * it will first be checked if a file named `index.md`, `readme.md` or `<component>.md` exists inside that directory. If it does, this file will be used as the main documentation.
+    * If there's no such documentation index, a simple Markdown listing will be auto-generated, enumerating all the files in the directory. Valid image files will be embedded as images, otherwise the file name will be shown.
+
+    Example:
+    
+    ```bash
+    |-- Button
+    |   |-- index.md
+    |   `-- screenshot.jpg
+    `-- ButtonComponent.php
+    ```
+    
+    During extraction, linked files in the documentation (including images) will be prefixed with the root relative path relative to your TYPO3 main directory. 
 
 ### Extracting components
 

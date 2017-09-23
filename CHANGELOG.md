@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [0.2.4] - unreleased
+## [0.2.4] - 2017-09-23
 ### Added
 - Backend integration to update and re-initialize an external component library
 - Support for JSON parameter files for FLUID template components
+- Support for rich documentation & auto-generated documentation listing
 
 ## [0.2.3] - 2017-07-28
 ### Fixed
