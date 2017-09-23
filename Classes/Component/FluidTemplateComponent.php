@@ -59,6 +59,42 @@ class FluidTemplateComponent extends AbstractComponent
      */
     protected $parameters = [];
 
+
+    /**
+     * Initialize the component
+     *
+     * Gets called immediately after construction. Override this method in components to initialize the component.
+     *
+     * @return void
+     */
+    protected function initialize()
+    {
+        parent::initialize();
+        $this->loadJsonParameters();
+    }
+
+    /**
+     * Load parameters provided from an external JSON file
+     */
+    protected function loadJsonParameters()
+    {
+        $reflectionObject = new \ReflectionObject($this);
+        $componentFile = $reflectionObject->getFileName();
+        $parameterFile = dirname($componentFile).DIRECTORY_SEPARATOR.pathinfo($componentFile,
+                PATHINFO_FILENAME).'.json';
+        if (is_readable($parameterFile)) {
+            $jsonParameters = file_get_contents($parameterFile);
+            if (strlen($jsonParameters)) {
+                $jsonParameterObj = @json_decode($jsonParameters);
+                if ($jsonParameterObj && is_object($jsonParameterObj)) {
+                    foreach ($jsonParameterObj as $name => $value) {
+                        $this->setParameter($name, $value);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Set the fluid template
      *

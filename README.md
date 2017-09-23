@@ -128,6 +128,15 @@ class ExampleFluidTemplateComponent extends FluidTemplateComponent
 }
 ```
 
+For convenience reasons, Fluid template components can read in external JSON files for setting parameters. JSON parameter files must be named after their associated component files and lie in the same directory:
+
+```bash
+|-- ButtonComponent.json
+`-- ButtonComponent.php
+```
+
+The key / value pairs inside the JSON file will be used as input for the `setParameter()` method.
+
 #### Extbase plugin component
 
 To configure an Extbase plugin component, use the `setExtbaseConfiguration()` method to specify the plugin name, the controller class name and the controller action to be called. The output will be rendered using the Fluid template associated with the controller action. You can specify action arguments via `setControllerActionArgument()`.

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [0.2.4] - unreleased
 ### Added
 - Backend integration to update and re-initialize an external component library
+- Support for JSON parameter files for FLUID template components
 
 ## [0.2.3] - 2017-07-28
 ### Fixed
