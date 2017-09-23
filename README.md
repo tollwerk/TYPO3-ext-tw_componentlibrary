@@ -379,7 +379,7 @@ You can add documentation to your components in two ways:
 2. By creating a **documentation directory** named after the component (without variant suffix) and dropping documentation files in there. When the component is extracted,
 
     * it will first be checked if a file named `index.md`, `readme.md` or `<component>.md` exists inside that directory. If it does, this file will be used as the main documentation.
-    * If there's no such documentation index, a simple Markdown listing will be auto-generated, enumerating all the files in the directory. Valid image files will be embedded as images, otherwise the file name will be shown.
+    * If there's no such documentation index, a simple Markdown listing will be generated, enumerating all the files in the directory. Valid image files will be embedded as images, otherwise the linked file name will be shown.
 
     Example:
     
@@ -390,7 +390,7 @@ You can add documentation to your components in two ways:
     `-- ButtonComponent.php
     ```
     
-    During extraction, linked files in the documentation (including images) will be prefixed with the root relative path relative to your TYPO3 main directory. 
+    During component extraction, linked files in the documentation (including images) will be rewritten to their root relative path starting at your TYPO3 main directory. 
 
 ### Extracting components
 
