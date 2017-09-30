@@ -131,7 +131,7 @@ class BasicTemplate implements TemplateInterface
             if (preg_match('%^https?\:\/\/%', $jsUrl)) {
                 $html .= ' <script src="'.htmlspecialchars($jsUrl).'"></script>';
             } else {
-                $html .= ' <script src="{{ path \'/'.ltrim($jsUrl, '/').'\' }}"></script>';
+                $html .= ' <script src="{{ path \'/'.ltrim($jsUrl, '/').'\' }}" async defer></script>';
             }
         }
 
