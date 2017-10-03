@@ -59,7 +59,6 @@ class FluidTemplateComponent extends AbstractComponent
      */
     protected $parameters = [];
 
-
     /**
      * Initialize the component
      *
@@ -173,6 +172,7 @@ class FluidTemplateComponent extends AbstractComponent
         $view->setPartialRootPaths($partialRootPaths);
         $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->config));
         $view->assignMultiple($this->parameters);
+        $view->getRequest()->setControllerExtensionName($this->extensionName);
         $result = $view->render();
 
         return $result;
