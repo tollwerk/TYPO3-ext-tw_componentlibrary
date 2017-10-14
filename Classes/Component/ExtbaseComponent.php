@@ -54,7 +54,7 @@ class ExtbaseComponent extends AbstractComponent
      *
      * @var string
      */
-    protected $type = 'extbase';
+    protected $type = self::TYPE_EXTBASE;
     /**
      * Extbase plubin name
      *

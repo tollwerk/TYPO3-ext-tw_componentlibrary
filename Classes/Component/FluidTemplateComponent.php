@@ -51,7 +51,7 @@ class FluidTemplateComponent extends AbstractComponent
      *
      * @var string
      */
-    protected $type = 'fluid';
+    protected $type = self::TYPE_FLUID;
     /**
      * Parameters
      *

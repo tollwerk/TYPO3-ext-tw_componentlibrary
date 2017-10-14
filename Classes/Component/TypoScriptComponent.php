@@ -50,7 +50,7 @@ class TypoScriptComponent extends AbstractComponent
      *
      * @var string
      */
-    protected $type = 'typoscript';
+    protected $type = self::TYPE_TYPOSCRIPT;
 
     /**
      * Set the TypoScript key

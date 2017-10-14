@@ -67,6 +67,30 @@ interface ComponentInterface
      * @var int
      */
     const STATUS_PROTOTYPE = 'prototype';
+    /**
+     * Fluid component type
+     *
+     * @var string
+     */
+    const TYPE_FLUID = 'fluid';
+    /**
+     * TypoScript component type
+     *
+     * @var string
+     */
+    const TYPE_TYPOSCRIPT = 'typoscript';
+    /**
+     * Extbase component type
+     *
+     * @var string
+     */
+    const TYPE_EXTBASE = 'extbase';
+    /**
+     * Valid component types
+     *
+     * @var array
+     */
+    const TYPES = [self::TYPE_FLUID, self::TYPE_TYPOSCRIPT, self::TYPE_EXTBASE];
 
     /**
      * Export the component's properties

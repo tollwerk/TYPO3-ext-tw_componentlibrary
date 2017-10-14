@@ -36,11 +36,16 @@
 
 namespace Tollwerk\TwComponentlibrary\Command;
 
+use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use Tollwerk\TwComponentlibrary\Utility\Kickstarter;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use TYPO3\CMS\Extbase\Mvc\Exception\CommandException;
 
 /**
  * Component command controller
@@ -52,7 +57,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 class ComponentCommandController extends CommandController
 {
     /**
-     * Discover and print all styleguide components
+     * Discover and extract all components
      */
     public function discoverCommand()
     {
@@ -67,5 +72,46 @@ class ComponentCommandController extends CommandController
         BasicTemplate::addCommonFooterScripts($config['settings']['footerScripts']);
 
         echo json_encode(Scanner::discover(), JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Create a new component
+     *
+     * @param string $name Component path and name
+     * @param string $type Component type
+     * @param string $extension Host extension
+     * @param string $vendor Host extension vendor name
+     * @throws CommandException If the component name is empty / invalid
+     * @throws CommandException If the component type is invalid
+     * @throws CommandException If the host extension is invalid
+     * @throws CommandException If the host extension vendor name is invalid
+     */
+    public function createCommand($name, $type, $extension = null, $vendor = null)
+    {
+        // Prepare the component name
+        $name = GeneralUtility::trimExplode('/', $name, true);
+        if (!count($name)) {
+            throw new CommandException('Empty / invalid component name', 1507996606);
+        }
+
+        // Prepare the component type
+        $type = strtolower($type);
+        if (!in_array($type, ComponentInterface::TYPES)) {
+            throw new CommandException(sprintf('Invalid component type "%s"', $type), 1507996917);
+        }
+
+        // Prepare the host extension name
+        $extension = trim($extension ?: $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['defaultextension']);
+        if (!strlen($extension) || !ExtensionManagementUtility::isLoaded($extension)) {
+            throw new CommandException(sprintf('Invalid host extension "%s"', $extension), 1507997408);
+        }
+
+        // Prepare the host extension vendor name
+        $vendor = trim($vendor ?: $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['defaultvendor']);
+        if (!strlen($vendor)) {
+            throw new CommandException(sprintf('Invalid host extension vendor name "%s"', $vendor), 1507998569);
+        }
+
+        Kickstarter::create($name, $type, $extension, $vendor);
     }
 }

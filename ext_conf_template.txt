@@ -3,3 +3,9 @@ componentlibrary =
 
 # cat=basic; type=string; label=Component library update script: Absolute path to the shell script updating and restarting the component library
 script =
+
+# cat=basic; type=string; label=Default extension for new components: Default extension key for CLI component creation
+defaultextension =
+
+# cat=basic; type=string; label=Default extension vendor name: Vendor name for the default extension
+defaultvendor =
