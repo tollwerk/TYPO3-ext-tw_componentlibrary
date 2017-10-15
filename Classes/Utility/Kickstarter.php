@@ -54,7 +54,7 @@ class Kickstarter
      * @param string $name Component name
      * @param string $type Component type
      * @param string $extension Host extension
-     * @throws CommandException If the host extension is invalid
+     * @throws CommandException If the provider extension is invalid
      */
     public static function create($name, $type, $extension, $vendor)
     {
@@ -75,7 +75,8 @@ class Kickstarter
         }
 
         // Prepare the component namespace
-        $componentNamespace = $vendor.'\\Component\\'.implode('\\', $name);
+        $componentNamespace = $vendor.'\\'.GeneralUtility::underscoredToUpperCamelCase($extension)
+            .'\\Component\\'.implode('\\', $name);
 
         // Copy the skeleton template
         $substitute = [

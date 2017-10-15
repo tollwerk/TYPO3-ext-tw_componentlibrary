@@ -83,8 +83,8 @@ class ComponentCommandController extends CommandController
      * @param string $vendor Host extension vendor name
      * @throws CommandException If the component name is empty / invalid
      * @throws CommandException If the component type is invalid
-     * @throws CommandException If the host extension is invalid
-     * @throws CommandException If the host extension vendor name is invalid
+     * @throws CommandException If the provider extension is invalid
+     * @throws CommandException If the provider extension vendor name is invalid
      */
     public function createCommand($name, $type, $extension = null, $vendor = null)
     {
@@ -100,16 +100,16 @@ class ComponentCommandController extends CommandController
             throw new CommandException(sprintf('Invalid component type "%s"', $type), 1507996917);
         }
 
-        // Prepare the host extension name
+        // Prepare the provider extension name
         $extension = trim($extension ?: $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['defaultextension']);
         if (!strlen($extension) || !ExtensionManagementUtility::isLoaded($extension)) {
-            throw new CommandException(sprintf('Invalid host extension "%s"', $extension), 1507997408);
+            throw new CommandException(sprintf('Invalid provider extension "%s"', $extension), 1507997408);
         }
 
-        // Prepare the host extension vendor name
+        // Prepare the provider extension vendor name
         $vendor = trim($vendor ?: $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['defaultvendor']);
         if (!strlen($vendor)) {
-            throw new CommandException(sprintf('Invalid host extension vendor name "%s"', $vendor), 1507998569);
+            throw new CommandException(sprintf('Invalid provider extension vendor name "%s"', $vendor), 1507998569);
         }
 
         Kickstarter::create($name, $type, $extension, $vendor);

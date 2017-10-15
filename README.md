@@ -39,6 +39,8 @@ Enable the extension via the TYPO3 extension manager.
 
 ### Declaring components
 
+You can declare components either manually (described below) or using the [command line component kickstarter](#command-line-component-kickstarter) .
+
 1. Create and install an empty TYPO3 extension that is going to hold your component definitions. Alternatively, pick an existing extension you've got write access to. It's possible to have multiple of these **component provider extensions**. If you're using and maintaining custom extensions anyway, I recommend using these for providing components on an per-extension basis.
 2. Create a `Components` directory inside the provider extension's root directory. In case you're running [TYPO3 in composer mode](https://wiki.typo3.org/Composer), make sure this directory is properly mapped to the `Component` namespace. You might have to add something like this to your main `composer.json` file (replace the vendor name, extension key and paths with appropriate local values):
     ```json
@@ -390,7 +392,40 @@ You can add documentation to your components in two ways:
     `-- ButtonComponent.php
     ```
     
-    During component extraction, linked files in the documentation (including images) will be rewritten to their root relative path starting at your TYPO3 main directory. 
+    During component extraction, linked files in the documentation (including images) will be rewritten to their root relative path starting at your TYPO3 main directory.
+    
+### Command line component kickstarter
+
+The extension provides a command line component kickstarter which let's you scaffold new components with ease. It's implemented as an extbase CLI command:
+
+```bash
+php typo3/cli_dispatch.phpsh extbase component:create Test/Button fluid tw_tollwerk Tollwerk
+```
+
+The command takes 4 arguments (in the following order; you can also enter it with explicit argument names):
+
+* `--name`: Directory path and name of the component within the `Components` directory of your provider extension.
+* `--type`: Component type, must be one of `fluid`, `typoscript` or `extbase`
+* `--extension`: Provider extension key
+* `--vendor`: Provider extension vendor name
+
+The above command will kickstart a Fluid component named `Button` at this location inside the `tw_tollwerk` extension:
+
+```bash
+Components/
+`-- Test
+    `-- ButtonComponent.php
+```
+
+If you're mostly adding components to a particular provider extension, you can simplify the process by defining a **default provider extension** along with its corresponding **default vendor name**. To do so, please enter the extension configuration in the extension manager and provide these two settings:
+
+![Default provider extension settings](Docs/be-extension-settings-cli.png)
+
+You can then omit the `--extension` and `--vendor` arguments when calling the CLI command:
+
+```
+php typo3/cli_dispatch.phpsh extbase component:create Test/Button fluid
+```
 
 ### Extracting components
 
@@ -448,7 +483,7 @@ The extension provides a simple integration so that you can update your componen
 
 * Enter the extension configuration from the extension manager and enable the use of Fractal:
 
-  ![Enable Fractal support](Docs/be-extension-settings.png)
+  ![Enable Fractal support](Docs/be-extension-settings-update.png)
   
 * Provide the absolute path to a shell script that is able to run the necessary steps to update and restart your component library. You'll find an example file at `Resources/Private/Script`.
 
