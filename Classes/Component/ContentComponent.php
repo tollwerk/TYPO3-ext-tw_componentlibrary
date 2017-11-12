@@ -35,6 +35,8 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
+
 /**
  * Content component
  *
@@ -61,7 +63,7 @@ class ContentComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         // Render the content element
-        $result = $GLOBALS['TSFE']->cObj->cObjGetSingle('CONTENT', $this->config);
+        $result = $GLOBALS['TSFE']->cObj->cObjGetSingle('RECORDS', $this->config);
 
         return $result;
     }
@@ -74,11 +76,9 @@ class ContentComponent extends AbstractComponent
     protected function setContentRecordId($id)
     {
         $this->config = intval($id) ? [
-            'table' => 'tt_content',
-            'select.' => [
-                'uidInList' => $id,
-                'languageField' => 'sys_language_uid'
-            ]
+            'source' => $id,
+            'dontCheckPid' => 1,
+            'tables' => 'tt_content'
         ] : null;
     }
 
@@ -91,7 +91,7 @@ class ContentComponent extends AbstractComponent
     {
         // Read the TypoScript rendering configuration for the given content record
         if ($this->config !== null) {
-            $this->template = TypoScriptUtility::serialize('', $this->config, -1);
+            $this->template = '10 = RECORDS'.PHP_EOL.TypoScriptUtility::serialize('', [10 => $this->config]);
         }
 
         return parent::exportInternal();
