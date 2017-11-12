@@ -105,19 +105,6 @@ class ExtbaseComponent extends AbstractComponent
     protected $controllerSettings = [];
 
     /**
-     * Initialize the component
-     *
-     * @return void
-     */
-    protected function initialize()
-    {
-        parent::initialize();
-
-        // Register the default extbase extension name
-        $this->extbaseExtensionName = GeneralUtility::camelCaseToLowerCaseUnderscored($this->extensionName);
-    }
-
-    /**
      * Set the extbase configuration
      *
      * @param string $pluginName Plugin name
@@ -210,6 +197,66 @@ class ExtbaseComponent extends AbstractComponent
     }
 
     /**
+     * Render this component
+     *
+     * @return string Rendered component (HTML)
+     */
+    public function render()
+    {
+        // Set the request arguments as GET parameters
+        $_GET = $this->getRequestArguments();
+
+        try {
+            /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
+            $response = $this->objectManager->get(Response::class);
+            $this->getControllerInstance()->processRequest($this->request, $response);
+            $result = $response->getContent();
+
+            // In case of an error
+        } catch (\Exception $e) {
+            $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
+                .$e->getTraceAsString().'</pre>';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return an extend Extbase controller instance
+     *
+     * @return ActionController|ComponentControllerInterface Extended Extbase controller instance
+     */
+    protected function getControllerInstance()
+    {
+        // One-time instantiation of an extended controller object
+        if ($this->controllerInstance === null) {
+            $extendedControllerClassName = $this->extbaseController.'ComponentController_'.md5(
+                    $this->extbaseControllerClass
+                );
+            $extendedControllerPhp = 'class '.$extendedControllerClassName.' extends '.$this->extbaseControllerClass;
+            $extendedControllerPhp .= ' implements '.ComponentControllerInterface::class;
+            $extendedControllerPhp .= ' { use '.ComponentControllerTrait::class.'; }';
+            eval($extendedControllerPhp);
+            $this->controllerInstance = $this->objectManager->get($extendedControllerClassName);
+        }
+
+        return $this->controllerInstance->setSettings($this->controllerSettings);
+    }
+
+    /**
+     * Initialize the component
+     *
+     * @return void
+     */
+    protected function initialize()
+    {
+        parent::initialize();
+
+        // Register the default extbase extension name
+        $this->extbaseExtensionName = GeneralUtility::camelCaseToLowerCaseUnderscored($this->extensionName);
+    }
+
+    /**
      * Return component specific properties
      *
      * @return array Component specific properties
@@ -238,43 +285,5 @@ class ExtbaseComponent extends AbstractComponent
         }
 
         return parent::exportInternal();
-    }
-
-    /**
-     * Render this component
-     *
-     * @return string Rendered component (HTML)
-     */
-    public function render()
-    {
-        // Set the request arguments as GET parameters
-        $_GET = $this->getRequestArguments();
-
-        /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
-        $response = $this->objectManager->get(Response::class);
-        $this->getControllerInstance()->processRequest($this->request, $response);
-        $result = $response->getContent();
-
-        return $result;
-    }
-
-    /**
-     * Return an extend Extbase controller instance
-     *
-     * @return ActionController|ComponentControllerInterface Extended Extbase controller instance
-     */
-    protected function getControllerInstance()
-    {
-        // One-time instantiation of an extended controller object
-        if ($this->controllerInstance === null) {
-            $extendedControllerClassName = $this->extbaseController.'ComponentController_'.md5($this->extbaseControllerClass);
-            $extendedControllerPhp = 'class '.$extendedControllerClassName.' extends '.$this->extbaseControllerClass;
-            $extendedControllerPhp .= ' implements '.ComponentControllerInterface::class;
-            $extendedControllerPhp .= ' { use '.ComponentControllerTrait::class.'; }';
-            eval($extendedControllerPhp);
-            $this->controllerInstance = $this->objectManager->get($extendedControllerClassName);
-        }
-
-        return $this->controllerInstance->setSettings($this->controllerSettings);
     }
 }

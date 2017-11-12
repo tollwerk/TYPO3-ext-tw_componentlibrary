@@ -62,8 +62,15 @@ class ContentComponent extends AbstractComponent
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
-        // Render the content element
-        $result = $GLOBALS['TSFE']->cObj->cObjGetSingle('RECORDS', $this->config);
+        try {
+            // Render the content element
+            $result = $GLOBALS['TSFE']->cObj->cObjGetSingle('RECORDS', $this->config);
+
+            // In case of an error
+        } catch (\Exception $e) {
+            $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
+                .$e->getTraceAsString().'</pre>';
+        }
 
         return $result;
     }

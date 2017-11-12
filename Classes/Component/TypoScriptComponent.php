@@ -53,6 +53,34 @@ class TypoScriptComponent extends AbstractComponent
     protected $type = self::TYPE_TYPOSCRIPT;
 
     /**
+     * Render this component
+     *
+     * @return string Rendered component (HTML)
+     */
+    public function render()
+    {
+        // Set the request arguments as GET parameters
+        $_GET = $this->getRequestArguments();
+
+        // Instantiate a frontend controller
+        $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
+            $this->page,
+            $this->typeNum,
+            $this->config
+        );
+        try {
+            $result = call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript);
+
+            // In case of an error
+        } catch (\Exception $e) {
+            $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
+                .$e->getTraceAsString().'</pre>';
+        }
+
+        return $result;
+    }
+
+    /**
      * Set the TypoScript key
      *
      * @param string $key TypoScript key
@@ -81,26 +109,5 @@ class TypoScriptComponent extends AbstractComponent
         }
 
         return parent::exportInternal();
-    }
-
-    /**
-     * Render this component
-     *
-     * @return string Rendered component (HTML)
-     */
-    public function render()
-    {
-        // Set the request arguments as GET parameters
-        $_GET = $this->getRequestArguments();
-
-        // Instantiate a frontend controller
-        $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
-            $this->page,
-            $this->typeNum,
-            $this->config
-        );
-        $result = call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript);
-
-        return $result;
     }
 }

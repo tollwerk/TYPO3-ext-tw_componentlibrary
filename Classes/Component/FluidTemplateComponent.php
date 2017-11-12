@@ -60,6 +60,46 @@ class FluidTemplateComponent extends AbstractComponent
     protected $parameters = [];
 
     /**
+     * Render this component
+     *
+     * @return string Rendered component (HTML)
+     */
+    public function render()
+    {
+        // Set the request arguments as GET parameters
+        $_GET = $this->getRequestArguments();
+
+        try {
+            // Instantiate a frontend controller
+            $typoScriptParser = GeneralUtility::makeInstance(TypoScriptParser::class);
+            list(, $viewConfig) = $typoScriptParser->getVal(
+                'plugin.tx_'.strtolower($this->extensionName).'.view',
+                $GLOBALS['TSFE']->tmpl->setup
+            );
+            list(, $layoutRootPaths) = $typoScriptParser->getVal('layoutRootPaths', $viewConfig);
+            list(, $templateRootPaths) = $typoScriptParser->getVal('templateRootPaths', $viewConfig);
+            list(, $partialRootPaths) = $typoScriptParser->getVal('partialRootPaths', $viewConfig);
+
+            /** @var \TYPO3\CMS\Fluid\View\StandaloneView $view */
+            $view = $this->objectManager->get('TYPO3\\CMS\\Fluid\\View\\StandaloneView');
+            $view->setLayoutRootPaths($layoutRootPaths);
+            $view->setTemplateRootPaths($templateRootPaths);
+            $view->setPartialRootPaths($partialRootPaths);
+            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->config));
+            $view->assignMultiple($this->parameters);
+            $view->getRequest()->setControllerExtensionName($this->extensionName);
+            $result = $view->render();
+
+            // In case of an error
+        } catch (\Exception $e) {
+            $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
+                .$e->getTraceAsString().'</pre>';
+        }
+
+        return $result;
+    }
+
+    /**
      * Initialize the component
      *
      * Gets called immediately after construction. Override this method in components to initialize the component.
@@ -79,8 +119,10 @@ class FluidTemplateComponent extends AbstractComponent
     {
         $reflectionObject = new \ReflectionObject($this);
         $componentFile = $reflectionObject->getFileName();
-        $parameterFile = dirname($componentFile).DIRECTORY_SEPARATOR.pathinfo($componentFile,
-                PATHINFO_FILENAME).'.json';
+        $parameterFile = dirname($componentFile).DIRECTORY_SEPARATOR.pathinfo(
+                $componentFile,
+                PATHINFO_FILENAME
+            ).'.json';
         if (is_readable($parameterFile)) {
             $jsonParameters = file_get_contents($parameterFile);
             if (strlen($jsonParameters)) {
@@ -92,16 +134,6 @@ class FluidTemplateComponent extends AbstractComponent
                 }
             }
         }
-    }
-
-    /**
-     * Set the fluid template
-     *
-     * @param $template
-     */
-    protected function setTemplate($template)
-    {
-        $this->config = trim($template) ?: null;
     }
 
     /**
@@ -119,6 +151,16 @@ class FluidTemplateComponent extends AbstractComponent
         }
 
         $this->parameters[$param] = $value;
+    }
+
+    /**
+     * Set the fluid template
+     *
+     * @param $template
+     */
+    protected function setTemplate($template)
+    {
+        $this->config = trim($template) ?: null;
     }
 
     /**
@@ -141,38 +183,5 @@ class FluidTemplateComponent extends AbstractComponent
             ['parameters' => $this->parameters],
             parent::exportInternal()
         );
-    }
-
-    /**
-     * Render this component
-     *
-     * @return string Rendered component (HTML)
-     */
-    public function render()
-    {
-        // Set the request arguments as GET parameters
-        $_GET = $this->getRequestArguments();
-
-        // Instantiate a frontend controller
-        $typoScriptParser = GeneralUtility::makeInstance(TypoScriptParser::class);
-        list(, $viewConfig) = $typoScriptParser->getVal(
-            'plugin.tx_'.strtolower($this->extensionName).'.view',
-            $GLOBALS['TSFE']->tmpl->setup
-        );
-        list(, $layoutRootPaths) = $typoScriptParser->getVal('layoutRootPaths', $viewConfig);
-        list(, $templateRootPaths) = $typoScriptParser->getVal('templateRootPaths', $viewConfig);
-        list(, $partialRootPaths) = $typoScriptParser->getVal('partialRootPaths', $viewConfig);
-
-        /** @var \TYPO3\CMS\Fluid\View\StandaloneView $view */
-        $view = $this->objectManager->get('TYPO3\\CMS\\Fluid\\View\\StandaloneView');
-        $view->setLayoutRootPaths($layoutRootPaths);
-        $view->setTemplateRootPaths($templateRootPaths);
-        $view->setPartialRootPaths($partialRootPaths);
-        $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->config));
-        $view->assignMultiple($this->parameters);
-        $view->getRequest()->setControllerExtensionName($this->extensionName);
-        $result = $view->render();
-
-        return $result;
     }
 }
