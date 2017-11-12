@@ -75,8 +75,11 @@ class Kickstarter
         }
 
         // Prepare the component namespace
-        $componentNamespace = $vendor.'\\'.GeneralUtility::underscoredToUpperCamelCase($extension)
-            .'\\Component\\'.implode('\\', $name);
+        $componentNamespace = rtrim(
+            $vendor.'\\'.GeneralUtility::underscoredToUpperCamelCase($extension)
+            .'\\Component\\'.implode('\\', $name),
+            '\\'
+        );
 
         // Copy the skeleton template
         $substitute = [
@@ -86,7 +89,9 @@ class Kickstarter
             '###tspath###' => strtolower(implode('.', array_merge($name, [$componentLabel]))),
             '###path###' => $componentPath,
         ];
-        $skeletonTemplate = GeneralUtility::getFileAbsFileName('EXT:tw_componentlibrary/Resources/Private/Skeleton/'.ucfirst($type).'.php');
+        $skeletonTemplate = GeneralUtility::getFileAbsFileName(
+            'EXT:tw_componentlibrary/Resources/Private/Skeleton/'.ucfirst($type).'.php'
+        );
         $skeletonString = strtr(file_get_contents($skeletonTemplate), $substitute);
         file_put_contents($componentAbsPath.DIRECTORY_SEPARATOR.$componentName.'.php', $skeletonString);
     }

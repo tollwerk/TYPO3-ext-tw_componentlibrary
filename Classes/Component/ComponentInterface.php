@@ -86,11 +86,17 @@ interface ComponentInterface
      */
     const TYPE_EXTBASE = 'extbase';
     /**
+     * Content component type
+     *
+     * @var string
+     */
+    const TYPE_CONTENT = 'content';
+    /**
      * Valid component types
      *
      * @var array
      */
-    const TYPES = [self::TYPE_FLUID, self::TYPE_TYPOSCRIPT, self::TYPE_EXTBASE];
+    const TYPES = [self::TYPE_FLUID, self::TYPE_TYPOSCRIPT, self::TYPE_EXTBASE, self::TYPE_CONTENT];
 
     /**
      * Export the component's properties

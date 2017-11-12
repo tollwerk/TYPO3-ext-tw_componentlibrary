@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TypoScript component
+ * Content component
  *
  * @category Tollwerk
  * @package Tollwerk\TwComponentlibrary
@@ -35,53 +35,20 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
-use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
-
 /**
- * TypoScript component
+ * Content component
  *
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
-class TypoScriptComponent extends AbstractComponent
+class ContentComponent extends AbstractComponent
 {
     /**
      * Component type
      *
      * @var string
      */
-    protected $type = self::TYPE_TYPOSCRIPT;
-
-    /**
-     * Set the TypoScript key
-     *
-     * @param string $key TypoScript key
-     */
-    protected function setTypoScriptKey($key)
-    {
-        $this->config = trim($key) ?: null;
-    }
-
-    /**
-     * Return component specific properties
-     *
-     * @return array Component specific properties
-     */
-    protected function exportInternal()
-    {
-        // Read the linked TypoScript
-        if ($this->config !== null) {
-            $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
-                $this->page,
-                $this->typeNum,
-                $this->config
-            );
-            $this->template = empty($typoScript) ?
-                null : TypoScriptUtility::serialize(implode('.', explode('.', $this->config, -1)), $typoScript);
-        }
-
-        return parent::exportInternal();
-    }
+    protected $type = self::TYPE_CONTENT;
 
     /**
      * Render this component
@@ -93,14 +60,40 @@ class TypoScriptComponent extends AbstractComponent
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
 
-        // Instantiate a frontend controller
-        $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
-            $this->page,
-            $this->typeNum,
-            $this->config
-        );
-        $result = call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript);
+        // Render the content element
+        $result = $GLOBALS['TSFE']->cObj->cObjGetSingle('CONTENT', $this->config);
 
         return $result;
+    }
+
+    /**
+     * Set the content record UID
+     *
+     * @param int $id Content record UID
+     */
+    protected function setContentRecordId($id)
+    {
+        $this->config = intval($id) ? [
+            'table' => 'tt_content',
+            'select.' => [
+                'uidInList' => $id,
+                'languageField' => 'sys_language_uid'
+            ]
+        ] : null;
+    }
+
+    /**
+     * Return component specific properties
+     *
+     * @return array Component specific properties
+     */
+    protected function exportInternal()
+    {
+        // Read the TypoScript rendering configuration for the given content record
+        if ($this->config !== null) {
+            $this->template = TypoScriptUtility::serialize('', $this->config, -1);
+        }
+
+        return parent::exportInternal();
     }
 }

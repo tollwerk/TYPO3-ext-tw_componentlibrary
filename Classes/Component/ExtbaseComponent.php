@@ -212,8 +212,6 @@ class ExtbaseComponent extends AbstractComponent
     /**
      * Return component specific properties
      *
-     * Override this method in sub classes to export specific properties.
-     *
      * @return array Component specific properties
      */
     protected function exportInternal()
