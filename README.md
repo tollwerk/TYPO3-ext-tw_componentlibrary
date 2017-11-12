@@ -12,11 +12,12 @@ This TYPO3 extension
 
 ### Component types
 
-The extension distiguishes 3 main types of components:
+The extension distiguishes 4 main types of components:
 
 * **TypoScript components**: Require a [TypoScript](https://docs.typo3.org/typo3cms/TyposcriptReference/) path with an object definition to render (e.g. `lib.menu`, defined as `HMENU`).
 * **Fluid template components**: Require a [Fluid template file](https://github.com/TYPO3/Fluid) (e.g. an Extbase / Fluid partial or standalone Fluid template) and an optional set of rendering parameters / variables.
 * **Extbase plugin components**: Require an [Extbase controller](https://docs.typo3.org/typo3cms/ExtbaseGuide/Extbase/Step3Documentation/ActionController.html), a controller action to call and possibly a list of parameters to pass to the controller action. 
+* **Content components**: Convenient way to render existing TYPO3 content elements as components. Works with both default and custom content elements.
 
 The extension **doesn't impose any requirements towards your TypoScript, Fluid templates or directory layout** except that every component must be individually addressable. That is, you cannot expose e.g. just a part of a rendered Fluid template as a component. In that case, you'd have to outsource the desired part as a partial file of its own.
 
@@ -162,6 +163,32 @@ class ExampleExtbaseComponent extends ExtbaseComponent
     {
         $this->setExtbaseConfiguration('PluginName', MyCustomController::class, 'action');
         $this->setControllerActionArgument('param', [1, 2, 3]);
+    }
+}
+```
+
+#### Content component
+
+Use the `setContentRecordId()` method to specify the UID of the content element (`tt_content` table) you want to render as component output.
+
+```php
+<?php
+
+namespace Vendor\ExtKey\Component;
+
+use Tollwerk\TwComponentlibrary\Component\ContentComponent;
+
+/**
+ * Example content component
+ */
+class ExampleContentComponent extends ContentComponent
+{
+    /**
+     * Configure the component
+     */
+    protected function configure()
+    {
+        $this->setContentRecordId(123);
     }
 }
 ```
