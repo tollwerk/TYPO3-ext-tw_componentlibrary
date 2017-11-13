@@ -119,4 +119,18 @@ interface ComponentInterface
      * @return string Rendered component (HTML)
      */
     public function render();
+
+    /**
+     * Return a list of component dependencies
+     *
+     * @return array Component dependencies
+     */
+    public function getDependencies();
+
+    /**
+     * Return the preview template resources
+     *
+     * @return TemplateResources Preview template resources
+     */
+    public function getPreviewTemplateResources();
 }

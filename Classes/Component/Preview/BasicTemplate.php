@@ -96,6 +96,20 @@ class BasicTemplate implements TemplateInterface
     protected $footerIncludes = [];
 
     /**
+     * Constructor
+     *
+     * @param TemplateResources[] $templateResources Base template resources
+     */
+    public function __construct(array $templateResources = [])
+    {
+        // Run through all base template resources
+        /** @var TemplateResources $templateResource */
+        foreach ($templateResources as $templateResource) {
+            $this->mergeTemplateResources($templateResource);
+        }
+    }
+
+    /**
      * Serialize the template
      *
      * @return string Serialized template
@@ -149,7 +163,7 @@ class BasicTemplate implements TemplateInterface
     {
         $url = self::resolveUrl($url);
         if ($url) {
-            $this->stylesheets[] = $url;
+            $this->stylesheets[self::hashResource($url)] = $url;
         }
     }
 
@@ -162,7 +176,7 @@ class BasicTemplate implements TemplateInterface
     {
         $url = self::resolveUrl($url);
         if ($url) {
-            $this->headerScripts[] = $url;
+            $this->headerScripts[self::hashResource($url)] = $url;
         }
     }
 
@@ -177,7 +191,8 @@ class BasicTemplate implements TemplateInterface
         if (strlen($path)) {
             $absPath = GeneralUtility::getFileAbsFileName($path);
             if (is_file($absPath)) {
-                $this->headerIncludes[] = file_get_contents($absPath);
+                $include = file_get_contents($absPath);
+                $this->headerIncludes[self::hashResource($include)] = $include;
             }
         }
     }
@@ -191,7 +206,7 @@ class BasicTemplate implements TemplateInterface
     {
         $url = self::resolveUrl($url);
         if ($url) {
-            $this->footerScripts[] = $url;
+            $this->footerScripts[self::hashResource($url)] = $url;
         }
     }
 
@@ -206,7 +221,8 @@ class BasicTemplate implements TemplateInterface
         if (strlen($path)) {
             $absPath = GeneralUtility::getFileAbsFileName($path);
             if (is_file($absPath)) {
-                $this->footerIncludes[] = file_get_contents($absPath);
+                $include = file_get_contents($absPath);
+                $this->footerIncludes[self::hashResource($include)] = $include;
             }
         }
     }
@@ -275,5 +291,46 @@ class BasicTemplate implements TemplateInterface
             }
         }
         return null;
+    }
+
+    /**
+     * Return an MD5 hash for a resource
+     *
+     * @param string $resource Resource
+     * @return string MD5 resource hash
+     */
+    protected static function hashResource($resource)
+    {
+        return md5($resource);
+    }
+
+    /**
+     * Return all template resources
+     *
+     * @return TemplateResources Template resources
+     */
+    public function getTemplateResources()
+    {
+        return new TemplateResources(
+            $this->stylesheets,
+            $this->headerScripts,
+            $this->headerIncludes,
+            $this->footerScripts,
+            $this->footerIncludes
+        );
+    }
+
+    /**
+     * Merge a set of template resources
+     *
+     * @param TemplateResources $templateResources Template resources
+     */
+    protected function mergeTemplateResources(TemplateResources $templateResources)
+    {
+        $this->stylesheets = array_merge($this->stylesheets, $templateResources->getStylesheets());
+        $this->headerScripts = array_merge($this->headerScripts, $templateResources->getHeaderScripts());
+        $this->headerIncludes = array_merge($this->headerIncludes, $templateResources->getHeaderIncludes());
+        $this->footerScripts = array_merge($this->footerScripts, $templateResources->getFooterScripts());
+        $this->footerIncludes = array_merge($this->footerIncludes, $templateResources->getFooterIncludes());
     }
 }

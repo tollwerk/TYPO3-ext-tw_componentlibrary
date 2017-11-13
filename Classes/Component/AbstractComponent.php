@@ -37,10 +37,12 @@ namespace Tollwerk\TwComponentlibrary\Component;
 
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface;
+use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -160,15 +162,21 @@ abstract class AbstractComponent implements ComponentInterface
      * @var string
      */
     protected $type = 'abstract';
+    /**
+     * List of components dependencies
+     *
+     * @var array
+     */
+    protected $dependencies = [];
 
     /**
      * Component constructor
      */
     public function __construct()
     {
-        $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        $this->request = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Request');
-        $this->preview = new BasicTemplate();
+        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->request = $this->objectManager->get(Request::class);
+        $this->preview = new BasicTemplate($this->getDependencyTemplateResources());
 
         $this->determineExtensionName();
         $this->determineNameAndVariant();
@@ -498,5 +506,42 @@ abstract class AbstractComponent implements ComponentInterface
         $GLOBALS['TSFE']->cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
         $GLOBALS['TSFE']->cObj->start($GLOBALS['TSFE']->page, 'pages');
         return $GLOBALS['TSFE']->cObj;
+    }
+
+    /**
+     * Return a list of component dependencies
+     *
+     * @return array Component dependencies
+     */
+    public function getDependencies()
+    {
+        return $this->dependencies;
+    }
+
+    /**
+     * Get the template resources of component dependencies
+     *
+     * @return TemplateResources[] Component dependency templace resources
+     */
+    protected function getDependencyTemplateResources()
+    {
+        $templateResources = [];
+
+        // Run through all component dependencies
+        foreach ($this->dependencies as $dependency) {
+            $templateResources[] = $this->objectManager->get($dependency)->getPreviewTemplateResources();
+        }
+
+        return $templateResources;
+    }
+
+    /**
+     * Return the preview template resources
+     *
+     * @return TemplateResources Preview template resources
+     */
+    public function getPreviewTemplateResources()
+    {
+        return $this->preview->getTemplateResources();
     }
 }

@@ -34,83 +34,113 @@
  *  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************/
 
+
 namespace Tollwerk\TwComponentlibrary\Component\Preview;
 
-/**
- * Preview template interface
- *
- * @package Tollwerk\TwComponentlibrary
- * @subpackage Tollwerk\TwComponentlibrary\Component
- */
-interface TemplateInterface
+
+class TemplateResources
 {
     /**
-     * Serialize the template
+     * Stylesheets
      *
-     * @return string Serialized template
+     * @var array
      */
-    public function __toString();
+    protected $stylesheets = [];
+    /**
+     * Header scripts
+     *
+     * @var array
+     */
+    protected $headerScripts = [];
+    /**
+     * Header includes
+     *
+     * @var array
+     */
+    protected $headerIncludes = [];
+    /**
+     * Footer scripts
+     *
+     * @var array
+     */
+    protected $footerScripts = [];
+    /**
+     * Footer includes
+     *
+     * @var array
+     */
+    protected $footerIncludes = [];
 
     /**
-     * Add a CSS stylesheet
+     * Constructor
      *
-     * @param string $url CSS stylesheet URL
+     * @param array $stylesheets Stylesheets
+     * @param array $headerScripts Header scripts
+     * @param array $headerIncludes Header includes
+     * @param array $footerScripts Footer scripts
+     * @param array $footerIncludes Footer includes
      */
-    public function addStylesheet($url);
+    public function __construct(
+        array $stylesheets,
+        array $headerScripts,
+        array $headerIncludes,
+        array $footerScripts,
+        array $footerIncludes
+    ) {
+        $this->stylesheets = $stylesheets;
+        $this->headerScripts = $headerScripts;
+        $this->headerIncludes = $headerIncludes;
+        $this->footerScripts = $footerScripts;
+        $this->footerIncludes = $footerIncludes;
+    }
 
     /**
-     * Add a header JavaScript
+     * Return the stylesheets
      *
-     * @param string $url Header JavaScript URL
+     * @return array Stylesheets
      */
-    public function addHeaderScript($url);
+    public function getStylesheets()
+    {
+        return $this->stylesheets;
+    }
 
     /**
-     * Add a header inclusion resource
+     * Return the header scripts
      *
-     * @param string $path Header inclusion path
+     * @return array Header scripts
      */
-    public function addHeaderInclude($path);
+    public function getHeaderScripts()
+    {
+        return $this->headerScripts;
+    }
 
     /**
-     * Add a footer JavaScript
+     * Return the header includes
      *
-     * @param string $path Footer JavaScript URL
+     * @return array Header includes
      */
-    public function addFooterScript($url);
+    public function getHeaderIncludes()
+    {
+        return $this->headerIncludes;
+    }
 
     /**
-     * Add a footer inclusion resource
+     * Return the footer scripts
      *
-     * @param string $path Footer inclusion path
+     * @return array Footer scripts
      */
-    public function addFooterInclude($path);
+    public function getFooterScripts()
+    {
+        return $this->footerScripts;
+    }
 
     /**
-     * Return all template resources
+     * Return the footer includes
      *
-     * @return TemplateResources Template resources
+     * @return array Footer includes
      */
-    public function getTemplateResources();
-
-    /**
-     * Add common stylesheets
-     *
-     * @param string $commonStylesheets Common stylesheets
-     */
-    public static function addCommonStylesheets($commonStylesheets);
-
-    /**
-     * Add common header scripts
-     *
-     * @param string $commonHeaderScripts Common header scripts
-     */
-    public static function addCommonHeaderScripts($commonHeaderScripts);
-
-    /**
-     * Add common footer scripts
-     *
-     * @param string $commonFooterScripts Common footer scripts
-     */
-    public static function addCommonFooterScripts($commonFooterScripts);
+    public function getFooterIncludes()
+    {
+        return $this->footerIncludes;
+    }
 }
