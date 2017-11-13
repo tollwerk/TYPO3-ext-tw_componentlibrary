@@ -70,7 +70,7 @@ class Kickstarter
             'EXT:'.$extension.DIRECTORY_SEPARATOR.'Components'.DIRECTORY_SEPARATOR
             .implode(DIRECTORY_SEPARATOR, $name)
         );
-        if (!is_dir($componentAbsPath) && !mkdir($componentAbsPath, 0775, true)) {
+        if (!is_dir($componentAbsPath) && !mkdir($componentAbsPath, 06775, true)) {
             throw new CommandException('Could not create component directory', 1507997978);
         }
 
@@ -93,6 +93,8 @@ class Kickstarter
             'EXT:tw_componentlibrary/Resources/Private/Skeleton/'.ucfirst($type).'.php'
         );
         $skeletonString = strtr(file_get_contents($skeletonTemplate), $substitute);
-        file_put_contents($componentAbsPath.DIRECTORY_SEPARATOR.$componentName.'.php', $skeletonString);
+        $skeletonFile = $componentAbsPath.DIRECTORY_SEPARATOR.$componentName.'.php';
+        file_put_contents($skeletonFile, $skeletonString);
+        chmod($skeletonString, 0664);
     }
 }

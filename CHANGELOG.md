@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.3.0] - unreleased
 ### Added
+- Set file system privileges of kickstarted components
 - Added content component type ([#5](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/5))
 - Improved error reporting in case of component rendering issues ([#6](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/6))
 
