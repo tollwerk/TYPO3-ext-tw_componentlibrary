@@ -5,7 +5,8 @@
   "homepage": "https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary",
   "license": "GPL-2.0+",
   "require": {
-    "typo3/cms": ">=7.6"
+    "typo3/cms": ">=7.6",
+    "alom/graphviz": "~1.1"
   },
   "autoload": {
     "psr-4": {

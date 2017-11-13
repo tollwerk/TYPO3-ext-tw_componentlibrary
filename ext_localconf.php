@@ -62,7 +62,7 @@ $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'] = ltrim(
     ','
 );
 
-/*
+/**
  * ###################################################
  * Component library integration
  * ###################################################
@@ -77,9 +77,42 @@ if (
     $iconRegistry->registerIcon(
         'tx_twcomponentlibrary_cache',
         \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        ['source' => 'EXT:tw_componentlibrary/Resources/Public/Icons/'.ucfirst($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['componentlibrary']).'.svg']
+        [
+            'source' => 'EXT:tw_componentlibrary/Resources/Public/Icons/'.ucfirst(
+                    $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['componentlibrary']
+                ).'.svg'
+        ]
     );
 
     // Extend the backend cache action menu
     $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions'][] = \Tollwerk\TwComponentlibrary\Hook\CacheHook::class;
 }
+
+
+/**
+ * ###################################################
+ * Graph service
+ * ###################################################
+ */
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
+    $_EXTKEY,
+    // Service type
+    'graphviz',
+    // Service key
+    'tx_twcomponentlibrary_graphviz',
+    array(
+        'title' => 'GraphViz',
+        'description' => 'Create an SVG graph uzing the GraphViz library',
+
+        'subtype' => 'svg',
+
+        'available' => true,
+        'priority' => 60,
+        'quality' => 80,
+
+        'os' => '',
+        'exec' => 'dot',
+
+        'className' => \Tollwerk\TwComponentlibrary\Service\GraphvizService::class
+    )
+);

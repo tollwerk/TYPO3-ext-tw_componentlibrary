@@ -35,7 +35,6 @@
 
 namespace Tollwerk\TwComponentlibrary\Utility;
 
-use Tollwerk\TwComponentlibrary\Component\AbstractComponent;
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
@@ -54,7 +53,7 @@ class Scanner
      *
      * @return array Components
      */
-    public static function discover()
+    public static function discoverAll()
     {
         $components = [];
 
@@ -91,7 +90,7 @@ class Scanner
         $recursiveIterator = new \RecursiveIteratorIterator($directoryIterator);
         $regexIterator = new \RegexIterator(
             $recursiveIterator,
-            PATH_SEPARATOR.'^'.preg_quote($directory.DIRECTORY_SEPARATOR).'(.+)Component\.php$'.PATH_SEPARATOR,
+            PATH_SEPARATOR.'^'.preg_quote($directory.DIRECTORY_SEPARATOR).'.+Component\.php$'.PATH_SEPARATOR,
             \RecursiveRegexIterator::GET_MATCH
         );
 
@@ -102,30 +101,12 @@ class Scanner
                 // Test if this is a component class
                 $classReflection = new \ReflectionClass($className);
                 if ($classReflection->implementsInterface(ComponentInterface::class)) {
-                    $components[] = self::discoverComponentClass($className, $component[1]);
+                    $components[] = self::discoverComponent($className);
                 }
             }
         }
 
         return $components;
-    }
-
-    /**
-     * Discover a single component class
-     *
-     * @param string $componentClass Component class
-     * @param string $componentPath Component path
-     * @return array Component profile
-     */
-    protected static function discoverComponentClass($componentClass, $componentPath)
-    {
-        /** @var ComponentInterface $component */
-        $component = new $componentClass;
-        $componentDir = dirname($componentPath);
-        return array_merge($component->export(), [
-            'path' => ($componentDir === '.') ? [] : array_map([AbstractComponent::class, 'expandComponentName'],
-                explode(DIRECTORY_SEPARATOR, dirname($componentPath))),
-        ]);
     }
 
     /**
@@ -154,7 +135,9 @@ class Scanner
             }
 
             // If this is a class name token
-            if (is_array($token) && ($token[0] == T_CLASS) && (!is_array($lastToken) || ($lastToken[0] !== T_PAAMAYIM_NEKUDOTAYIM))) {
+            if (is_array($token) && ($token[0] == T_CLASS) && (!is_array(
+                        $lastToken
+                    ) || ($lastToken[0] !== T_PAAMAYIM_NEKUDOTAYIM))) {
                 $gettingClassname = true;
             }
 
@@ -177,5 +160,18 @@ class Scanner
             $lastToken = $token;
         }
         return $classes;
+    }
+
+    /**
+     * Discover a single component class
+     *
+     * @param string $componentClass Component class
+     * @return array Component profile
+     */
+    public static function discoverComponent($componentClass)
+    {
+        /** @var ComponentInterface $component */
+        $component = new $componentClass;
+        return $component->export();
     }
 }

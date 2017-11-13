@@ -121,6 +121,12 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected $extensionName;
     /**
+     * Component path
+     *
+     * @var array
+     */
+    protected $componentPath = [];
+    /**
      * Associated resources
      *
      * @var array
@@ -186,6 +192,91 @@ abstract class AbstractComponent implements ComponentInterface
     }
 
     /**
+     * Get the template resources of component dependencies
+     *
+     * @return TemplateResources[] Component dependency templace resources
+     */
+    protected function getDependencyTemplateResources()
+    {
+        $templateResources = [];
+
+        // Run through all component dependencies
+        foreach ($this->dependencies as $dependency) {
+            $templateResources[] = $this->objectManager->get($dependency)->getPreviewTemplateResources();
+        }
+
+        return $templateResources;
+    }
+
+    /**
+     * Find the extension name the current component belongs to
+     *
+     * @throws \RuntimeException If the component path is invalid
+     */
+    protected function determineExtensionName()
+    {
+        $reflectionClass = new \ReflectionClass($this);
+        $componentFilePath = dirname($reflectionClass->getFileName());
+
+        // If the file path is invalid
+        $extensionDirPosition = strpos($componentFilePath, 'ext'.DIRECTORY_SEPARATOR);
+        if ($extensionDirPosition === false) {
+            throw new \RuntimeException('Invalid component path', 1481360976);
+        }
+
+        // Extract the extension key
+        $componentPath = explode(
+            DIRECTORY_SEPARATOR,
+            substr($componentFilePath, $extensionDirPosition + strlen('ext'.DIRECTORY_SEPARATOR))
+        );
+        $extensionKey = array_shift($componentPath);
+
+        // If the extension is unknown
+        if (!in_array($extensionKey, ExtensionManagementUtility::getLoadedExtensionListArray())) {
+            throw new \RuntimeException(sprintf('Unknown extension key "%s"', $extensionKey), 1481361198);
+        }
+
+        // Register the extension name
+        $this->extensionName = GeneralUtility::underscoredToUpperCamelCase($extensionKey);
+
+        // Process the component path
+        if (array_shift($componentPath) !== 'Components') {
+            throw new \RuntimeException('Invalid component path', 1481360976);
+        }
+        $this->componentPath = array_map([static::class, 'expandComponentName'], $componentPath);
+    }
+
+    /**
+     * Determine the component name and variant
+     */
+    protected function determineNameAndVariant()
+    {
+        $reflectionClass = new \ReflectionClass($this);
+        $componentName = preg_replace('/Component$/', '', $reflectionClass->getShortName());
+        list($name, $variant) = preg_split('/_+/', $componentName, 2);
+        $this->name = self::expandComponentName($name);
+        $this->variant = self::expandComponentName($variant);
+    }
+
+    /**
+     * Prepare a component path
+     *
+     * @param string $componentPath Component path
+     * @return string Component name
+     */
+    public static function expandComponentName($componentPath)
+    {
+        return trim(
+            implode(
+                ' ',
+                array_map(
+                    'ucwords', preg_split('/_+/', GeneralUtility::camelCaseToLowerCaseUnderscored($componentPath))
+                )
+            )
+        ) ?: null;
+    }
+
+    /**
      * Initialize the component
      *
      * Gets called immediately after construction. Override this method in components to initialize the component.
@@ -195,116 +286,6 @@ abstract class AbstractComponent implements ComponentInterface
     protected function initialize()
     {
         $this->addDocumentation();
-    }
-
-    /**
-     * Configure the component
-     *
-     * Gets called immediately after initialization. Override this method in components to set their properties.
-     *
-     * @return void
-     */
-    protected function configure()
-    {
-
-    }
-
-    /**
-     * Export the component's properties
-     *
-     * @return array Properties
-     */
-    final public function export()
-    {
-        $properties = [
-            'status' => $this->status,
-            'name' => $this->name,
-            'variant' => $this->variant,
-            'label' => $this->label,
-            'class' => get_class($this),
-            'type' => $this->type,
-            'valid' => false,
-        ];
-
-        // Export the component properties
-        try {
-            $properties = array_merge($properties, $this->exportInternal());
-            $properties['request'] = $this->exportRequest();
-            $properties['valid'] = true;
-
-            // In case of an error
-        } catch (\Exception $e) {
-            $properties['error'] = $e->getMessage();
-        }
-
-        return $properties;
-    }
-
-    /**
-     * Return component specific properties
-     *
-     * Override this method in sub classes to export specific properties.
-     *
-     * @return array Component specific properties
-     */
-    protected function exportInternal()
-    {
-        $properties = [];
-
-        // Export the configuration & $template
-        if (!$this->config) {
-            throw new \RuntimeException('Invalid configuration', 1481363496);
-        }
-
-        $properties['config'] = $this->config;
-        $properties['template'] = $this->template;
-        $properties['extension'] = $this->extension;
-
-        // Export the associated resources
-        if (count($this->resources)) {
-            $properties['resources'] = $this->resources;
-        }
-
-        // Export the notice
-        if (strlen(trim($this->notice))) {
-            $properties['notice'] = trim($this->notice);
-        }
-
-        // If this is the default variant
-        if (!$this->variant) {
-            $preview = trim(strval($this->preview));
-            if (strlen($preview)) {
-                $properties['preview'] = $preview;
-            }
-        }
-
-        return $properties;
-    }
-
-    /**
-     * Add an associated resource
-     *
-     * @param string $resource Associated resource
-     */
-    protected function addResource($resource)
-    {
-        $resource = trim($resource);
-        if (strlen($resource)) {
-            $this->resources[] = $resource;
-        }
-    }
-
-    /**
-     * Add a notice
-     *
-     * @param string $notice Notice
-     */
-    protected function addNotice($notice)
-    {
-        if (!$this->variant) {
-            $notice = trim($notice);
-            $this->notice = strlen($notice) ? $this->exportNotice($notice) : null;
-        }
     }
 
     /**
@@ -378,6 +359,19 @@ abstract class AbstractComponent implements ComponentInterface
     }
 
     /**
+     * Add a notice
+     *
+     * @param string $notice Notice
+     */
+    protected function addNotice($notice)
+    {
+        if (!$this->variant) {
+            $notice = trim($notice);
+            $this->notice = strlen($notice) ? $this->exportNotice($notice) : null;
+        }
+    }
+
+    /**
      * Export a notice
      *
      * @param $notice
@@ -390,16 +384,88 @@ abstract class AbstractComponent implements ComponentInterface
     }
 
     /**
-     * Set a preview template
+     * Configure the component
      *
-     * @param TemplateInterface|string|null $preview Preview template
+     * Gets called immediately after initialization. Override this method in components to set their properties.
+     *
+     * @return void
      */
-    protected function setPreview($preview)
+    protected function configure()
     {
-        if (!($preview instanceof TemplateInterface) && !is_string($preview) && ($preview !== null)) {
-            throw new \RuntimeException('Invalid preview preview', 1481368492);
+
+    }
+
+    /**
+     * Export the component's properties
+     *
+     * @return array Properties
+     */
+    final public function export()
+    {
+        $properties = [
+            'status' => $this->status,
+            'name' => $this->name,
+            'variant' => $this->variant,
+            'label' => $this->label,
+            'class' => get_class($this),
+            'type' => $this->type,
+            'valid' => false,
+            'path' => $this->componentPath,
+        ];
+
+        // Export the component properties
+        try {
+            $properties = array_merge($properties, $this->exportInternal());
+            $properties['request'] = $this->exportRequest();
+            $properties['valid'] = true;
+
+            // In case of an error
+        } catch (\Exception $e) {
+            $properties['error'] = $e->getMessage();
         }
-        $this->preview = $preview;
+
+        return $properties;
+    }
+
+    /**
+     * Return component specific properties
+     *
+     * Override this method in sub classes to export specific properties.
+     *
+     * @return array Component specific properties
+     */
+    protected function exportInternal()
+    {
+        $properties = [];
+
+        // Export the configuration & $template
+        if (!$this->config) {
+            throw new \RuntimeException('Invalid configuration', 1481363496);
+        }
+
+        $properties['config'] = $this->config;
+        $properties['template'] = $this->template;
+        $properties['extension'] = $this->extension;
+
+        // Export the associated resources
+        if (count($this->resources)) {
+            $properties['resources'] = $this->resources;
+        }
+
+        // Export the notice
+        if (strlen(trim($this->notice))) {
+            $properties['notice'] = trim($this->notice);
+        }
+
+        // If this is the default variant
+        if (!$this->variant) {
+            $preview = trim(strval($this->preview));
+            if (strlen($preview)) {
+                $properties['preview'] = $preview;
+            }
+        }
+
+        return $properties;
     }
 
     /**
@@ -439,60 +505,49 @@ abstract class AbstractComponent implements ComponentInterface
     }
 
     /**
-     * Find the extension name the current component belongs to
+     * Return a list of component dependencies
      *
-     * @throws \RuntimeException If the component path is invalid
+     * @return array Component dependencies
      */
-    protected function determineExtensionName()
+    public function getDependencies()
     {
-        $reflectionClass = new \ReflectionClass($this);
-        $componentFilePath = $reflectionClass->getFileName();
-
-        // If the file path is invalid
-        $extensionDirPosition = strpos($componentFilePath, 'ext'.DIRECTORY_SEPARATOR);
-        if ($extensionDirPosition === false) {
-            throw new \RuntimeException('Invalid component path', 1481360976);
-        }
-
-        // Extract the extension key
-        list($extensionKey) = explode(
-            DIRECTORY_SEPARATOR,
-            substr($componentFilePath, $extensionDirPosition + strlen('ext'.DIRECTORY_SEPARATOR))
-        );
-
-        // If the extension is unknown
-        if (!in_array($extensionKey, ExtensionManagementUtility::getLoadedExtensionListArray())) {
-            throw new \RuntimeException(sprintf('Unknown extension key "%s"', $extensionKey), 1481361198);
-        }
-
-        $this->extensionName = GeneralUtility::underscoredToUpperCamelCase($extensionKey);
+        return $this->dependencies;
     }
 
     /**
-     * Determine the component name and variant
+     * Return the preview template resources
+     *
+     * @return TemplateResources Preview template resources
      */
-    protected function determineNameAndVariant()
+    public function getPreviewTemplateResources()
     {
-        $reflectionClass = new \ReflectionClass($this);
-        $componentName = preg_replace('/Component$/', '', $reflectionClass->getShortName());
-        list($name, $variant) = preg_split('/_+/', $componentName, 2);
-        $this->name = self::expandComponentName($name);
-        $this->variant = self::expandComponentName($variant);
+        return $this->preview->getTemplateResources();
     }
 
+    /**
+     * Add an associated resource
+     *
+     * @param string $resource Associated resource
+     */
+    protected function addResource($resource)
+    {
+        $resource = trim($resource);
+        if (strlen($resource)) {
+            $this->resources[] = $resource;
+        }
+    }
 
     /**
-     * Prepare a component path
+     * Set a preview template
      *
-     * @param string $componentPath Component path
-     * @return string Component name
+     * @param TemplateInterface|string|null $preview Preview template
      */
-    public static function expandComponentName($componentPath)
+    protected function setPreview($preview)
     {
-        return trim(implode(
-            ' ',
-            array_map('ucwords', preg_split('/_+/', GeneralUtility::camelCaseToLowerCaseUnderscored($componentPath)))
-        )) ?: null;
+        if (!($preview instanceof TemplateInterface) && !is_string($preview) && ($preview !== null)) {
+            throw new \RuntimeException('Invalid preview preview', 1481368492);
+        }
+        $this->preview = $preview;
     }
 
     /**
@@ -506,42 +561,5 @@ abstract class AbstractComponent implements ComponentInterface
         $GLOBALS['TSFE']->cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
         $GLOBALS['TSFE']->cObj->start($GLOBALS['TSFE']->page, 'pages');
         return $GLOBALS['TSFE']->cObj;
-    }
-
-    /**
-     * Return a list of component dependencies
-     *
-     * @return array Component dependencies
-     */
-    public function getDependencies()
-    {
-        return $this->dependencies;
-    }
-
-    /**
-     * Get the template resources of component dependencies
-     *
-     * @return TemplateResources[] Component dependency templace resources
-     */
-    protected function getDependencyTemplateResources()
-    {
-        $templateResources = [];
-
-        // Run through all component dependencies
-        foreach ($this->dependencies as $dependency) {
-            $templateResources[] = $this->objectManager->get($dependency)->getPreviewTemplateResources();
-        }
-
-        return $templateResources;
-    }
-
-    /**
-     * Return the preview template resources
-     *
-     * @return TemplateResources Preview template resources
-     */
-    public function getPreviewTemplateResources()
-    {
-        return $this->preview->getTemplateResources();
     }
 }

@@ -71,7 +71,7 @@ class ComponentCommandController extends CommandController
         BasicTemplate::addCommonHeaderScripts($config['settings']['headerScripts']);
         BasicTemplate::addCommonFooterScripts($config['settings']['footerScripts']);
 
-        echo json_encode(Scanner::discover(), JSON_PRETTY_PRINT);
+        echo json_encode(Scanner::discoverAll(), JSON_PRETTY_PRINT);
     }
 
     /**
