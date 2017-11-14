@@ -411,6 +411,7 @@ abstract class AbstractComponent implements ComponentInterface
             'type' => $this->type,
             'valid' => false,
             'path' => $this->componentPath,
+            'docs' => $this->getDocumentationDirectory(),
         ];
 
         // Export the component properties

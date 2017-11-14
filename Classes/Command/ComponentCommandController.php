@@ -38,6 +38,7 @@ namespace Tollwerk\TwComponentlibrary\Command;
 
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use Tollwerk\TwComponentlibrary\Utility\Graph;
 use Tollwerk\TwComponentlibrary\Utility\Kickstarter;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
@@ -113,5 +114,14 @@ class ComponentCommandController extends CommandController
         }
 
         Kickstarter::create($name, $type, $extension, $vendor);
+    }
+
+    /**
+     * Create and update the component dependency graphs
+     */
+    public function graphCommand()
+    {
+        $graph = new Graph(Scanner::discoverAll());
+        echo $graph();
     }
 }

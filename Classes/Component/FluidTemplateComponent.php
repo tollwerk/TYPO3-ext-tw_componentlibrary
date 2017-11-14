@@ -109,6 +109,7 @@ class FluidTemplateComponent extends AbstractComponent
     protected function initialize()
     {
         parent::initialize();
+        
         $this->loadJsonParameters();
     }
 
