@@ -38,6 +38,7 @@ namespace Tollwerk\TwComponentlibrary\Utility;
 use Alom\Graphviz\Digraph;
 use Alom\Graphviz\Graph as BaseGraph;
 use Alom\Graphviz\Node;
+use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 
 /**
  * Component dependency graph utility
@@ -61,6 +62,17 @@ class Graph
      * @var array
      */
     protected $graphComponentTree = [];
+    /**
+     * Component type colors
+     *
+     * @var array
+     */
+    protected static $colors = [
+        ComponentInterface::TYPE_TYPOSCRIPT => 'khaki',
+        ComponentInterface::TYPE_FLUID => 'lightblue',
+        ComponentInterface::TYPE_EXTBASE => 'palegreen',
+        ComponentInterface::TYPE_CONTENT => 'lightpink',
+    ];
 
     /**
      * Constructor
@@ -91,6 +103,7 @@ class Graph
             [
                 'class' => null,
                 'id' => null,
+                'type' => null,
                 'label' => null,
                 'variant' => null,
                 'master' => null,
@@ -105,6 +118,7 @@ class Graph
         foreach ($components as $component) {
             $graphComponents[$componentClass]['class'] = $componentClass = $component['class'];
             $graphComponents[$componentClass]['id'] = $component['name'];
+            $graphComponents[$componentClass]['type'] = $component['type'];
             $graphComponents[$componentClass]['label'] = $component['label'] ?: $component['name'];
             $graphComponents[$componentClass]['variant'] = $component['variant'];
             $graphComponents[$componentClass]['path'] = $component['path'];
@@ -161,7 +175,7 @@ class Graph
     public function __invoke($rootComponent = null)
     {
         $graph = new Digraph('G');
-        $graph->attr('node', array('shape' => 'Mrecord', 'style' => 'radial'))
+        $graph->attr('node', array('shape' => 'Mrecord', 'style' => 'radial', 'penwidth' => .5))
             ->set('rankdir', 'TB')
             ->set('ranksep', '0.5')
             ->set('nodesep', '.1')
@@ -217,7 +231,7 @@ class Graph
         );
 
         if ($parentNode instanceof Node) {
-            $graph->edge([$parentNode->getId(), $absNodeId]);
+            $graph->edge([$parentNode->getId(), $absNodeId], ['arrowhead' => 'none', 'color' => 'darkgrey', 'penwidth' => .5]);
         }
 
         return $this->addComponents($graph, $components, $graph->get($absNodeId));
@@ -233,67 +247,46 @@ class Graph
      */
     protected function addComponent(BaseGraph $graph, $componentId, Node $parentNode = null)
     {
-        return count($this->graphComponents[$componentId]['variants']) ?
-            $this->addComponentVariants($graph, $componentId, $parentNode) :
-            $this->addComponentAndDependencies($graph, $componentId, $parentNode);
-    }
-
-    /**
-     * Add a component to a graph
-     *
-     * @param BaseGraph $graph Graph
-     * @param string $componentId Component ID
-     * @param Node $parentNode Parent node
-     * @return BaseGraph Graph
-     */
-    protected function addComponentVariants(BaseGraph $graph, $componentId, Node $parentNode = null)
-    {
-        $component =& $this->graphComponents[$componentId];
-        $subgraph = $graph->subgraph('cluster_'.md5($componentId), ['shape' => 'record', 'style' => 'filled'])
-            ->set('color', 'blue')
-            ->set('style', 'filled');
-
-        $this->addComponentAndDependencies($subgraph, $componentId);
-        $edgeStart = md5($componentId);
-
-        // Run through all variants
-        foreach ($component['variants'] as $variant) {
-            $this->addComponentAndDependencies($subgraph, $variant['class']);
-            $subgraph->edge([$edgeStart, $edgeStart = md5($variant['class'])], ['style' => 'invis']);
-        }
-
-        return $subgraph->end()->edge([$parentNode->getId(), md5($componentId)]);
-    }
-
-    /**
-     * Add a component to a graph
-     *
-     * @param BaseGraph $graph Graph
-     * @param string $componentId Component ID
-     * @param Node $parentNode Parent node
-     * @return BaseGraph Graph
-     */
-    protected function addComponentAndDependencies(BaseGraph $graph, $componentId, Node $parentNode = null)
-    {
         $component =& $this->graphComponents[$componentId];
         $componentId = md5($componentId);
+        $componentLabel = '<b>'.$component['label'].'</b><br align="left"/>';
+        $escaped = false;
+        $dependencyNodes = [];
+
+        if (count($component['variants'])) {
+            $componentLabel .= '<br align="left"/>';
+
+            // Run through all variants
+            foreach ($component['variants'] as $variant) {
+                $componentLabel .= '&bull; '.$variant['label'].'<br align="left"/>';
+                foreach ($variant['dependencies'] as $dependency) {
+                    $dependencyNodes[md5($dependency['class'])] = true;
+                }
+            }
+        }
 
         // Add the component node
         $graph->node(
             $componentId,
             [
-                'label' => $component['label']
+                'label' => "<$componentLabel>",
+                '_escaped' => $escaped,
+                'margin' => '.15,.15',
+                'fillcolor' => self::$colors[$component['type']],
             ]
         );
 
         // Add an edge from the parent node
         if ($parentNode instanceof Node) {
-            $graph->edge([$parentNode->getId(), $componentId]);
+            $graph->edge([$parentNode->getId(), $componentId], ['arrowhead' => 'none', 'color' => 'darkgrey', 'penwidth' => .5]);
         }
 
         // Add dependency edges
         foreach ($component['dependencies'] as $dependency) {
-            $graph->edge([$componentId, md5($dependency['class'])]);
+            $dependencyNodes[md5($dependency['class'])] = true;
+        }
+        foreach (array_keys($dependencyNodes) as $dependencyNode) {
+            $graph->edge([$componentId, $dependencyNode]);
         }
 
         return $graph;

@@ -47,8 +47,8 @@ class GraphvizService extends AbstractService
         file_put_contents($tempDot, $graph);
 
         // Create component graph
-        $dotCommand = 'ccomps -x '.CommandUtility::escapeShellArgument($tempDot).' | dot -Nfontname=sans-serif -Efontname=sans-serif | gvpack -array_1 | neato -Tsvg -n2';
-//        $dotCommand = 'dot -Tsvg '.CommandUtility::escapeShellArgument($tempDot);
+//        $dotCommand = 'ccomps -x '.CommandUtility::escapeShellArgument($tempDot).' | dot -Nfontname=sans-serif -Efontname=sans-serif | gvpack -array_1 | neato -Tsvg ';
+        $dotCommand = 'dot -Tsvg -Nfontname=sans-serif -Efontname=sans-serif '.CommandUtility::escapeShellArgument($tempDot);
         $output = $returnValue = null;
         CommandUtility::exec($dotCommand, $output, $returnValue);
         return $returnValue ? '' : implode('', (array)$output);
