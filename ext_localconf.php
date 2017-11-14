@@ -111,7 +111,7 @@ if (
         'quality' => 80,
 
         'os' => '',
-        'exec' => 'dot',
+        'exec' => 'ccomps,dot,gvpack,neato',
 
         'className' => \Tollwerk\TwComponentlibrary\Service\GraphvizService::class
     )

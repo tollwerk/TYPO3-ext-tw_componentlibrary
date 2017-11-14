@@ -37,6 +37,10 @@ namespace Tollwerk\TwComponentlibrary\Controller;
 
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use Tollwerk\TwComponentlibrary\Utility\Graph;
+use Tollwerk\TwComponentlibrary\Utility\Scanner;
+use TYPO3\CMS\Core\Service\AbstractService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
 /**
@@ -51,6 +55,7 @@ class ComponentController extends ActionController
      * Render a component
      *
      * @param string $component Component class
+     * @return string Rendered component
      */
     public function renderAction($component)
     {
@@ -65,5 +70,20 @@ class ComponentController extends ActionController
         }
 
         return $this->view->render();
+    }
+
+    /**
+     * Graph action
+     *
+     * @return string SVG Graph
+     */
+    public function graphAction()
+    {
+        $graphvizService = GeneralUtility::makeInstanceService('graphviz', 'svg');
+        if ($graphvizService instanceof AbstractService) {
+            $graph = new Graph(Scanner::discoverAll());
+            return $graphvizService->createGraph($graph());
+        }
+        return '';
     }
 }

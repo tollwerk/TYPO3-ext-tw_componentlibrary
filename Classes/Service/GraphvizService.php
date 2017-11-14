@@ -24,7 +24,6 @@
 
 namespace Tollwerk\TwComponentlibrary\Service;
 
-use Tollwerk\TwComponentlibrary\Utility\Scanner;
 use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\CommandUtility;
 
@@ -36,33 +35,22 @@ class GraphvizService extends AbstractService
     /**
      * Create an SVG component graph
      *
-     * @param string $rootComponent Optional: Root component
+     * @param string $graph GraphViz graph
      * @return string SVG component graph
+     * @see https://stackoverflow.com/questions/8002352/how-to-control-subgraphs-layout-in-dot
      */
-    public function createComponentGraph($rootComponent = null)
+    public function createGraph($graph)
     {
         // Write the dot source to a temporary file
         $tempDot = tempnam(sys_get_temp_dir(), 'DOT_');
         $this->registerTempFile($tempDot);
-        file_put_contents($tempDot, $this->createDotGraph($rootComponent));
+        file_put_contents($tempDot, $graph);
 
         // Create component graph
-        $dotCommand = 'dot -Tsvg '.CommandUtility::escapeShellArgument($tempDot);
+        $dotCommand = 'ccomps -x '.CommandUtility::escapeShellArgument($tempDot).' | dot -Nfontname=sans-serif -Efontname=sans-serif | gvpack -array_1 | neato -Tsvg -n2';
+//        $dotCommand = 'dot -Tsvg '.CommandUtility::escapeShellArgument($tempDot);
         $output = $returnValue = null;
         CommandUtility::exec($dotCommand, $output, $returnValue);
         return $returnValue ? '' : implode('', (array)$output);
-    }
-
-    /**
-     * Create a dot graph for a set of components
-     *
-     * @param string $rootComponent Optional: Root component
-     * @return string SVG component graph
-     */
-    protected function createDotGraph($rootComponent = null)
-    {
-        $components = $rootComponent ? [Scanner::discoverComponent($rootComponent)] : Scanner::discoverAll();
-
-        return '';
     }
 }

@@ -37,6 +37,7 @@ namespace Tollwerk\TwComponentlibrary\Utility;
 
 use Alom\Graphviz\Digraph;
 use Alom\Graphviz\Graph as BaseGraph;
+use Alom\Graphviz\Node;
 
 /**
  * Component dependency graph utility
@@ -54,6 +55,12 @@ class Graph
      * @var array
      */
     protected $graphComponents = [];
+    /**
+     * Graph component tree
+     *
+     * @var array
+     */
+    protected $graphComponentTree = [];
 
     /**
      * Constructor
@@ -63,104 +70,11 @@ class Graph
     public function __construct(array $components)
     {
         $this->graphComponents = $this->buildGraphComponents($components);
-    }
-
-    /**
-     * Create or update the dependency graph for a component
-     *
-     * @param null $rootComponent Optional: Root component
-     * @return Digraph GraphViz digraph
-     */
-    public function __invoke($rootComponent = null)
-    {
-        $graph = new Digraph();
-        $rootComponents = ($rootComponent === null) ? array_keys($this->graphComponents) : [$rootComponent];
-        $rootComponents = array_combine($rootComponents, $rootComponents);
-
-        // While there are root components
-        while (count($rootComponents)) {
-            $rootComponent = array_shift($rootComponents);
-            $this->addComponentGraph($graph, $this->graphComponents[$rootComponent], $rootComponents);
+        foreach ($this->graphComponents as $graphComponentId => $graphComponent) {
+            if ($graphComponent['variant'] === null) {
+                $this->addToComponentTree($graphComponentId, $graphComponent['path'], $this->graphComponentTree);
+            }
         }
-
-        return $graph->render();
-    }
-
-    /**
-     * Add a single component to the graph
-     *
-     * @param BaseGraph $graph GraphViz BaseGraph
-     * @param array $component Component properties
-     * @param array $rootComponents Remaining root components
-     * @return BaseGraph GraphViz BaseGraph
-     */
-    protected function addComponentGraph(BaseGraph $graph, array $component, array &$rootComponents)
-    {
-        // If this is a master component with variants
-        if (count($component['variants'])) {
-            return $this->addMasterComponentGraph($graph, $component, $rootComponents);
-        }
-
-        // Add if it's not a variant
-        if ($component['master'] === null) {
-            return $this->addVariantComponentGraph($graph, $component, $rootComponents);
-        }
-
-        return $graph;
-    }
-
-    /**
-     * Add a master component with variants to the graph
-     *
-     * @param BaseGraph $graph GraphViz BaseGraph
-     * @param array $component Master component properties
-     * @param array $rootComponents Remaining root components
-     * @return BaseGraph GraphViz BaseGraph
-     */
-    protected function addMasterComponentGraph(BaseGraph $graph, array $component, array &$rootComponents)
-    {
-        $graph = $graph->subgraph(md5($component['id']))
-            ->node($component['id']);
-
-        // Run through all variants
-        foreach ($component['variants'] as $variantClass => $variantProperties) {
-            $this->addVariantComponentGraph($graph, $variantProperties, $rootComponents);
-            unset($rootComponents[$variantClass]);
-        }
-
-        return $this->addDependenciesComponentGraph($graph, $component, $rootComponents)->end();
-    }
-
-    /**
-     * Add a variant component to the graph
-     *
-     * @param BaseGraph $graph GraphViz BaseGraph
-     * @param array $component Variant component properties
-     * @param array $rootComponents Remaining root components
-     * @return BaseGraph GraphViz BaseGraph
-     */
-    protected function addVariantComponentGraph(BaseGraph $graph, array $component, array &$rootComponents)
-    {
-        $graph->node($component['id']);
-        return $this->addDependenciesComponentGraph($graph, $component, $rootComponents);
-    }
-
-    /**
-     * Add a component dependencies to the graph
-     *
-     * @param BaseGraph $graph GraphViz BaseGraph
-     * @param array $component Variant component properties
-     * @param array $rootComponents Remaining root components
-     * @return BaseGraph GraphViz BaseGraph
-     */
-    protected function addDependenciesComponentGraph(BaseGraph $graph, array $component, array &$rootComponents)
-    {
-        // Draw the edges to all dependencies
-        foreach ($component['dependencies'] as $dependency) {
-            $graph->edge(array($component['id'], $dependency['id']));
-        }
-
-        return $graph;
     }
 
     /**
@@ -175,14 +89,13 @@ class Graph
         $graphComponents = array_fill_keys(
             array_column($components, 'class'),
             [
+                'class' => null,
                 'id' => null,
-                'name' => null,
                 'label' => null,
                 'variant' => null,
                 'master' => null,
                 'variants' => [],
                 'dependencies' => [],
-                'dependents' => 0,
                 'path' => [],
             ]
         );
@@ -190,10 +103,8 @@ class Graph
         // Run through all components
         /** @var array $component */
         foreach ($components as $component) {
-            $componentClass = $component['class'];
-            $graphComponents[$componentClass]['id'] = implode('/',
-                array_filter(array_merge($component['path'], [$component['name']])));
-            $graphComponents[$componentClass]['name'] = $component['name'];
+            $graphComponents[$componentClass]['class'] = $componentClass = $component['class'];
+            $graphComponents[$componentClass]['id'] = $component['name'];
             $graphComponents[$componentClass]['label'] = $component['label'] ?: $component['name'];
             $graphComponents[$componentClass]['variant'] = $component['variant'];
             $graphComponents[$componentClass]['path'] = $component['path'];
@@ -202,13 +113,11 @@ class Graph
             foreach ((new $componentClass)->getDependencies() as $componentDependency) {
                 if (isset($graphComponents[$componentDependency])) {
                     $graphComponents[$componentClass]['dependencies'][$componentDependency] =& $graphComponents[$componentDependency];
-                    ++$graphComponents[$componentDependency]['dependents'];
                 }
             }
 
             // If this is a variant: Register it with its master component
             if ($component['variant']) {
-                $graphComponents[$componentClass]['id'] .= '-'.$component['variant'];
                 list ($masterClass) = explode('_', $componentClass, 2);
                 $masterClass .= 'Component';
                 if (isset($graphComponents[$masterClass])) {
@@ -218,26 +127,175 @@ class Graph
             }
         }
 
-        // Sort the components
-        uasort($graphComponents, [$this, 'sortComponents']);
-
         return $graphComponents;
     }
 
     /**
-     * Component comparison
+     * Add a component to the component tree
      *
-     * @param array $component1 Component 1
-     * @param array $component2 Component 1
-     * @return int Sorting
+     * @param string $componentId Component ID
+     * @param array $componentPath Component path
+     * @param array $tree Component base tree
      */
-    protected function sortComponents(array $component1, array $component2)
+    protected function addToComponentTree($componentId, array $componentPath, array &$tree)
     {
-        // If both components serve as dependency for the same number of components
-        if ($component1['dependents'] == $component2['dependents']) {
-            return strnatcmp($component1['label'], $component2['label']);
-        } else {
-            return ($component1['dependents'] > $component2['dependents']) ? 1 : -1;
+        // If the component has to be placed in a subpath
+        if (count($componentPath)) {
+            $subpath = array_shift($componentPath);
+            if (empty($tree[$subpath])) {
+                $tree[$subpath] = [];
+            }
+            $this->addToComponentTree($componentId, $componentPath, $tree[$subpath]);
+            return;
         }
+
+        $tree[] = $componentId;
+    }
+
+    /**
+     * Create or update the dependency graph for a component
+     *
+     * @param null $rootComponent Optional: Root component
+     * @return Digraph GraphViz digraph
+     */
+    public function __invoke($rootComponent = null)
+    {
+        $graph = new Digraph('G');
+        $graph->attr('node', array('shape' => 'Mrecord', 'style' => 'radial'))
+            ->set('rankdir', 'TB')
+            ->set('ranksep', '0.5')
+            ->set('nodesep', '.1')
+            ->node(md5('/'), ['label' => '/']);
+
+        return $this->addComponents($graph, $this->graphComponentTree, $graph->get(md5('/')))->render();
+    }
+
+    /**
+     * Add a list of components to a graph
+     *
+     * @param BaseGraph $graph Graph
+     * @param array $components Component list
+     * @param Node $parentNode Parent node
+     * @return BaseGraph Graph
+     */
+    protected function addComponents(BaseGraph $graph, array $components, Node $parentNode = null)
+    {
+        // Run through all components
+        foreach ($components as $name => $component) {
+            // If this is a subnode
+            if (is_array($component)) {
+                $this->addNode($graph, $name, $component, $parentNode);
+
+                // Else: Regular component
+            } else {
+                $this->addComponent($graph, $component, $parentNode);
+            }
+        }
+
+        return $graph;
+    }
+
+    /**
+     * Add a node to a graph
+     *
+     * @param BaseGraph $graph Graph
+     * @param string $nodeId Node ID
+     * @param array $components Component list
+     * @param Node $parentNode Parent node
+     * @return BaseGraph Graph
+     */
+    protected function addNode(BaseGraph $graph, $nodeId, array $components, Node $parentNode = null)
+    {
+        $absNodeId = md5((($parentNode instanceof Node) ? $parentNode->getId() : md5('/')).$nodeId);
+        $graph->node(
+            $absNodeId,
+            [
+                'label' => $nodeId,
+                'shape' => 'none',
+                'style' => 'none',
+            ]
+        );
+
+        if ($parentNode instanceof Node) {
+            $graph->edge([$parentNode->getId(), $absNodeId]);
+        }
+
+        return $this->addComponents($graph, $components, $graph->get($absNodeId));
+    }
+
+    /**
+     * Add a component to a graph
+     *
+     * @param BaseGraph $graph Graph
+     * @param string $componentId Component ID
+     * @param Node $parentNode Parent node
+     * @return BaseGraph Graph
+     */
+    protected function addComponent(BaseGraph $graph, $componentId, Node $parentNode = null)
+    {
+        return count($this->graphComponents[$componentId]['variants']) ?
+            $this->addComponentVariants($graph, $componentId, $parentNode) :
+            $this->addComponentAndDependencies($graph, $componentId, $parentNode);
+    }
+
+    /**
+     * Add a component to a graph
+     *
+     * @param BaseGraph $graph Graph
+     * @param string $componentId Component ID
+     * @param Node $parentNode Parent node
+     * @return BaseGraph Graph
+     */
+    protected function addComponentVariants(BaseGraph $graph, $componentId, Node $parentNode = null)
+    {
+        $component =& $this->graphComponents[$componentId];
+        $subgraph = $graph->subgraph('cluster_'.md5($componentId), ['shape' => 'record', 'style' => 'filled'])
+            ->set('color', 'blue')
+            ->set('style', 'filled');
+
+        $this->addComponentAndDependencies($subgraph, $componentId);
+        $edgeStart = md5($componentId);
+
+        // Run through all variants
+        foreach ($component['variants'] as $variant) {
+            $this->addComponentAndDependencies($subgraph, $variant['class']);
+            $subgraph->edge([$edgeStart, $edgeStart = md5($variant['class'])], ['style' => 'invis']);
+        }
+
+        return $subgraph->end()->edge([$parentNode->getId(), md5($componentId)]);
+    }
+
+    /**
+     * Add a component to a graph
+     *
+     * @param BaseGraph $graph Graph
+     * @param string $componentId Component ID
+     * @param Node $parentNode Parent node
+     * @return BaseGraph Graph
+     */
+    protected function addComponentAndDependencies(BaseGraph $graph, $componentId, Node $parentNode = null)
+    {
+        $component =& $this->graphComponents[$componentId];
+        $componentId = md5($componentId);
+
+        // Add the component node
+        $graph->node(
+            $componentId,
+            [
+                'label' => $component['label']
+            ]
+        );
+
+        // Add an edge from the parent node
+        if ($parentNode instanceof Node) {
+            $graph->edge([$parentNode->getId(), $componentId]);
+        }
+
+        // Add dependency edges
+        foreach ($component['dependencies'] as $dependency) {
+            $graph->edge([$componentId, md5($dependency['class'])]);
+        }
+
+        return $graph;
     }
 }
