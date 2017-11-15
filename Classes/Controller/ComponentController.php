@@ -75,14 +75,16 @@ class ComponentController extends ActionController
     /**
      * Graph action
      *
-     * @return string SVG Graph
+     * @param string $component Component class
+     * @return string SVG component graph
+     * @todo Add a dummy graph telling that GraphViz isn't available
      */
-    public function graphAction()
+    public function graphAction($component = null)
     {
         $graphvizService = GeneralUtility::makeInstanceService('graphviz', 'svg');
         if ($graphvizService instanceof AbstractService) {
             $graph = new Graph(Scanner::discoverAll());
-            return $graphvizService->createGraph($graph());
+            return $graphvizService->createGraph($graph($component));
         }
         return '';
     }

@@ -50,11 +50,11 @@ $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCON
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \Tollwerk\TwComponentlibrary\Command\ComponentCommandController::class;
 
 // Override the environment service when in CLI mode
-if (PHP_SAPI === 'cli') {
+//if (PHP_SAPI === 'cli') {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\View\\TemplateView'] = array(
         'className' => 'Tollwerk\\TwComponentlibrary\\Component\\TemplateView',
     );
-}
+//}
 
 // Exclude the component GET parameter from cHash calculation
 $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'] = ltrim(

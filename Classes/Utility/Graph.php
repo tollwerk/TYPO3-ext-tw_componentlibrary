@@ -97,7 +97,6 @@ class Graph
      */
     protected function buildGraphComponents(array $components)
     {
-        $components = Scanner::discoverAll();
         $graphComponents = array_fill_keys(
             array_column($components, 'class'),
             [
@@ -177,11 +176,27 @@ class Graph
         $graph = new Digraph('Components');
         $graph->attr('node', array('shape' => 'Mrecord', 'style' => 'radial', 'penwidth' => .5))
             ->set('rankdir', 'TB')
+            ->set('bgcolor', 'transparent')
 //            ->set('ranksep', '0.5')
 //            ->set('nodesep', '.1')
             ->node('/');
 
-        return $this->addComponents($graph, $this->graphComponentTree, $graph->get('/'))->render();
+        // If the complete component graph should be rendered
+        if ($rootComponent === null) {
+            $graphComponentTree = $this->graphComponentTree;
+
+            // Else: Build a component tree subset
+        } else {
+            $graphComponentTree = [];
+            $graphComponentTreePointer =& $graphComponentTree;
+            foreach ($this->graphComponents[$rootComponent]['path'] as $node) {
+                $graphComponentTreePointer[$node] = [];
+                $graphComponentTreePointer =& $graphComponentTreePointer[$node];
+            }
+            $graphComponentTreePointer[] = $rootComponent;
+        }
+
+        return $this->addComponents($graph, $graphComponentTree, $graph->get('/'))->render();
     }
 
     /**
@@ -264,17 +279,35 @@ class Graph
      */
     protected function addComponent(BaseGraph $graph, $componentId, Node $parentNode = null)
     {
-        $component =& $this->graphComponents[$componentId];
-        $componentLabel = '<b>'.$component['label'].'</b><br align="left"/>';
+        $component = $origComponent = $this->graphComponents[$componentId];
+
+        // If this is a variant: Redirect to the master component
+        if ($component['master']) {
+            $component = $component['master'];
+            $componentLabel = $component['label'];
+
+            // Else: This is a master component
+        } else {
+            $componentLabel = '<b>'.$component['label'].'</b>';
+        }
+
+        $componentLabel .= '<br align="left"/>';
         $escaped = false;
         $dependencyNodes = [];
 
         if (count($component['variants'])) {
-            $componentLabel .= '<br align="left"/>';
+            uasort($component['variants'], function (array $variant1, array $variant2) {
+                return strnatcasecmp($variant1['label'], $variant2['label']);
+            });
 
             // Run through all variants
-            foreach ($component['variants'] as $variant) {
-                $componentLabel .= '&bull; '.$variant['label'].'<br align="left"/>';
+            $variantCount = count($component['variants']);
+            foreach (array_values($component['variants']) as $index => $variant) {
+                $variantLabel = $variant['label'];
+                if ($variant['class'] === $origComponent['class']) {
+                    $variantLabel = "<b>$variantLabel</b>";
+                }
+                $componentLabel .= (($index >= $variantCount - 1) ? '└' : '├').' '.$variantLabel.'<br align="left"/>';
                 foreach ($variant['dependencies'] as $dependency) {
                     $dependencyNodes[$dependency['class']] = true;
                 }

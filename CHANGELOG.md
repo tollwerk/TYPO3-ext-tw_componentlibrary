@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added content component type ([#5](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/5))
 - Improved error reporting in case of component rendering issues ([#6](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/6))
 - Introduced component dependencies ([#4](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/4))
+- Introduced GraphViz based component graphs ([#4](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/4))
 
 ## [0.2.6] - 2017-10-15
 ### Added
