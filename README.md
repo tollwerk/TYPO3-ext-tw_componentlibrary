@@ -497,11 +497,31 @@ Use the exposed JSON data in any way that makes sense for you. The [Fractal-TYPO
 
 ### Rendering components
 
-The extension introduces the new `type` parameter value (`2400`) that is used for calling TYPO3 as rendering engine for single components. The request
+The extension introduces the new `type` parameter value `2400` which is used for calling TYPO3 as rendering engine for single components. The request
 
 http://example.com/?type=2400&tx_twcomponentlibrary_component%5Bcomponent%5D=Vendor%5CExtKey%5CComponent%5CMyWidgetComponent
 
 will exclusively render the component `\Vendor\ExtKey\Component\MyWidgetComponent` and return the generated source code without surrounding page level HTML.
+
+### Component dependency graphs
+
+The extension introduces the new `type` parameter value `2401` which is used for dynamically rendering component dependency graphs. The request
+
+http://example.com/?type=2401&tx_twcomponentlibrary_component%5Bcomponent%5D=Vendor%5CExtKey%5CComponent%5CMyWidgetComponent
+
+will create a single component dependency graph like this one:
+
+![Single component dependency graph](https://rawgit.com/tollwerk/TYPO3-ext-tw_componentlibrary/master/Docs/component-dependency-graph-single.svg)
+
+To create an overview graph of all registered components, simply omit the component argument. The URL
+
+http://example.com/?type=2401
+
+will create a graph like this one:
+
+![Overview component dependency graph](https://rawgit.com/tollwerk/TYPO3-ext-tw_componentlibrary/master/Docs/component-dependency-graph-all.svg)
+
+You can use these graphs for documentation purposes or to [display them in the Fractal component library tool](https://github.com/tollwerk/fractal-typo3#component-dependency-graphs).
 
 TYPO3 Backend integration
 -------------------------
