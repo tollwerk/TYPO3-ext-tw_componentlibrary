@@ -34,5 +34,18 @@
       "cms-package-dir": "{$vendor-dir}/typo3/cms",
       "web-dir": ".Build/Web"
     }
-  }
+  },
+  "keywords": [
+    "fractal",
+    "fractal-adapter",
+    "fractal-plugin",
+    "frctl",
+    "typo3",
+    "fluid",
+    "extbase",
+    "typoscript",
+    "component",
+    "library",
+    "inventory"
+  ]
 }
