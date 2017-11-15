@@ -51,6 +51,17 @@ use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 class Graph
 {
     /**
+     * Component type colors
+     *
+     * @var array
+     */
+    protected static $colors = [
+        ComponentInterface::TYPE_TYPOSCRIPT => 'khaki',
+        ComponentInterface::TYPE_FLUID => 'lightblue',
+        ComponentInterface::TYPE_EXTBASE => 'palegreen',
+        ComponentInterface::TYPE_CONTENT => 'lightpink',
+    ];
+    /**
      * Graph components
      *
      * @var array
@@ -62,17 +73,6 @@ class Graph
      * @var array
      */
     protected $graphComponentTree = [];
-    /**
-     * Component type colors
-     *
-     * @var array
-     */
-    protected static $colors = [
-        ComponentInterface::TYPE_TYPOSCRIPT => 'khaki',
-        ComponentInterface::TYPE_FLUID => 'lightblue',
-        ComponentInterface::TYPE_EXTBASE => 'palegreen',
-        ComponentInterface::TYPE_CONTENT => 'lightpink',
-    ];
 
     /**
      * Constructor
@@ -174,14 +174,14 @@ class Graph
      */
     public function __invoke($rootComponent = null)
     {
-        $graph = new Digraph('G');
+        $graph = new Digraph('Components');
         $graph->attr('node', array('shape' => 'Mrecord', 'style' => 'radial', 'penwidth' => .5))
             ->set('rankdir', 'TB')
-            ->set('ranksep', '0.5')
-            ->set('nodesep', '.1')
-            ->node(md5('/'), ['label' => '/']);
+//            ->set('ranksep', '0.5')
+//            ->set('nodesep', '.1')
+            ->node('/');
 
-        return $this->addComponents($graph, $this->graphComponentTree, $graph->get(md5('/')))->render();
+        return $this->addComponents($graph, $this->graphComponentTree, $graph->get('/'))->render();
     }
 
     /**
@@ -194,6 +194,21 @@ class Graph
      */
     protected function addComponents(BaseGraph $graph, array $components, Node $parentNode = null)
     {
+        // Sort the components
+//        uasort($components, function($component1, $component2) {
+//            $isNode1 = is_array($component1);
+//            $isNode2 = is_array($component2);
+//
+//            // If both are of the same type
+//            if ($isNode1 == $isNode2) {
+//                return 0;
+//
+//                // Else
+//            } else {
+//                return $isNode1 ? 1 : -1;
+//            }
+//        });
+
         // Run through all components
         foreach ($components as $name => $component) {
             // If this is a subnode
@@ -220,7 +235,7 @@ class Graph
      */
     protected function addNode(BaseGraph $graph, $nodeId, array $components, Node $parentNode = null)
     {
-        $absNodeId = md5((($parentNode instanceof Node) ? $parentNode->getId() : md5('/')).$nodeId);
+        $absNodeId = (($parentNode instanceof Node) ? $parentNode->getId() : '/').$nodeId;
         $graph->node(
             $absNodeId,
             [
@@ -231,7 +246,9 @@ class Graph
         );
 
         if ($parentNode instanceof Node) {
-            $graph->edge([$parentNode->getId(), $absNodeId], ['arrowhead' => 'none', 'color' => 'darkgrey', 'penwidth' => .5]);
+            $graph->edge(
+                [$parentNode->getId(), $absNodeId], ['arrowhead' => 'none', 'color' => 'darkgrey', 'penwidth' => .5]
+            );
         }
 
         return $this->addComponents($graph, $components, $graph->get($absNodeId));
@@ -248,7 +265,6 @@ class Graph
     protected function addComponent(BaseGraph $graph, $componentId, Node $parentNode = null)
     {
         $component =& $this->graphComponents[$componentId];
-        $componentId = md5($componentId);
         $componentLabel = '<b>'.$component['label'].'</b><br align="left"/>';
         $escaped = false;
         $dependencyNodes = [];
@@ -260,14 +276,14 @@ class Graph
             foreach ($component['variants'] as $variant) {
                 $componentLabel .= '&bull; '.$variant['label'].'<br align="left"/>';
                 foreach ($variant['dependencies'] as $dependency) {
-                    $dependencyNodes[md5($dependency['class'])] = true;
+                    $dependencyNodes[$dependency['class']] = true;
                 }
             }
         }
 
         // Add the component node
         $graph->node(
-            $componentId,
+            $this->getComponentTitle($componentId),
             [
                 'label' => "<$componentLabel>",
                 '_escaped' => $escaped,
@@ -278,17 +294,34 @@ class Graph
 
         // Add an edge from the parent node
         if ($parentNode instanceof Node) {
-            $graph->edge([$parentNode->getId(), $componentId], ['arrowhead' => 'none', 'color' => 'darkgrey', 'penwidth' => .5]);
+            $graph->edge(
+                [$parentNode->getId(), $this->getComponentTitle($componentId)],
+                ['arrowhead' => 'none', 'color' => 'darkgrey', 'penwidth' => .5]
+            );
         }
 
         // Add dependency edges
         foreach ($component['dependencies'] as $dependency) {
-            $dependencyNodes[md5($dependency['class'])] = true;
+            $dependencyNodes[$dependency['class']] = true;
         }
         foreach (array_keys($dependencyNodes) as $dependencyNode) {
-            $graph->edge([$componentId, $dependencyNode]);
+            $graph->edge([$this->getComponentTitle($componentId), $this->getComponentTitle($dependencyNode)]);
         }
 
         return $graph;
+    }
+
+    /**
+     * Create and return an component title
+     *
+     * @param string $componentId Component ID
+     * @return string Component title
+     */
+    protected function getComponentTitle($componentId)
+    {
+        $component =& $this->graphComponents[$componentId];
+        $componentTitle = implode('/', array_filter(array_merge($component['path'], [$component['id']])));
+        $componentTitle .= ' ('.$component['class'].')';
+        return $componentTitle;
     }
 }
