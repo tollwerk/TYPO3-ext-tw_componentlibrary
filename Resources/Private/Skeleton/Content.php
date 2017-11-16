@@ -42,8 +42,6 @@ class ###label###Component extends ContentComponent
     /**
      * Configure the component
      *
-     * Gets called immediately after construction. Override this method in components to set their properties.
-     *
      * @return void
      */
     protected function configure()

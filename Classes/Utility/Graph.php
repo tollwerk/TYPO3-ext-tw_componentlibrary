@@ -73,6 +73,12 @@ class Graph
      * @var array
      */
     protected $graphComponentTree = [];
+    /**
+     * Root component
+     *
+     * @var null|string
+     */
+    protected $rootComponent = null;
 
     /**
      * Constructor
@@ -182,21 +188,59 @@ class Graph
             ->node('/');
 
         // If the complete component graph should be rendered
-        if ($rootComponent === null) {
+        $this->rootComponent = trim($rootComponent) ?: null;
+        if ($this->rootComponent === null) {
             $graphComponentTree = $this->graphComponentTree;
 
             // Else: Build a component tree subset
         } else {
+            $componentIds = [$this->rootComponent];
+            $registeredComponentIds = [];
             $graphComponentTree = [];
-            $graphComponentTreePointer =& $graphComponentTree;
-            foreach ($this->graphComponents[$rootComponent]['path'] as $node) {
-                $graphComponentTreePointer[$node] = [];
-                $graphComponentTreePointer =& $graphComponentTreePointer[$node];
-            }
-            $graphComponentTreePointer[] = $rootComponent;
+            do {
+                $graphComponentTreePointer =& $graphComponentTree;
+                $componentId = $registeredComponentIds[] = array_shift($componentIds);
+                $componentIds = array_diff(
+                    array_unique(
+                        array_merge(
+                            $componentIds,
+                            $this->addToComponentTreeSubset($graphComponentTreePointer, $componentId)
+                        )
+                    ),
+                    $registeredComponentIds
+                );
+
+            } while (count($componentIds));
         }
 
         return $this->addComponents($graph, $graphComponentTree, $graph->get('/'))->render();
+    }
+
+    /**
+     * Recursively add a single component to a component tree subset
+     *
+     * @param array $pointer Component tree subset
+     * @param string $componentId Component class
+     * @return array Component dependencies
+     */
+    protected function addToComponentTreeSubset(array &$pointer, $componentId)
+    {
+        foreach ($this->graphComponents[$componentId]['path'] as $node) {
+            $pointer[$node] = [];
+            $pointer =& $pointer[$node];
+        }
+        $pointer[] = $componentId;
+
+
+        if ($this->graphComponents[$componentId]['master']) {
+            $dependencies = array_column($this->graphComponents[$componentId]['master']['dependencies'], 'class');
+            foreach ($this->graphComponents[$componentId]['master']['variants'] as $variant) {
+                $dependencies += array_column($variant['dependencies'], 'class');
+            }
+        } else {
+            $dependencies = array_column($this->graphComponents[$componentId]['dependencies'], 'class');
+        }
+        return array_unique($dependencies);
     }
 
     /**
@@ -279,7 +323,8 @@ class Graph
      */
     protected function addComponent(BaseGraph $graph, $componentId, Node $parentNode = null)
     {
-        $component = $origComponent = $this->graphComponents[$componentId];
+        $component = $this->graphComponents[$componentId];
+        $origComponentClass = $component['class'];
 
         // If this is a variant: Redirect to the master component
         if ($component['master']) {
@@ -296,23 +341,28 @@ class Graph
         $dependencyNodes = [];
 
         if (count($component['variants'])) {
-            uasort($component['variants'], function (array $variant1, array $variant2) {
-                return strnatcasecmp($variant1['label'], $variant2['label']);
-            });
+            uasort(
+                $component['variants'],
+                function (array $variant1, array $variant2) {
+                    return strnatcasecmp($variant1['label'], $variant2['label']);
+                }
+            );
 
             // Run through all variants
             $variantCount = count($component['variants']);
             foreach (array_values($component['variants']) as $index => $variant) {
-                $variantLabel = $variant['label'];
-                if ($variant['class'] === $origComponent['class']) {
+                $variantLabel = '• '.$variant['label'];
+                if ($variant['class'] === $origComponentClass) {
                     $variantLabel = "<b>$variantLabel</b>";
                 }
-                $componentLabel .= (($index >= $variantCount - 1) ? '└' : '├').' '.$variantLabel.'<br align="left"/>';
+                $componentLabel .= $variantLabel.'<br align="left"/>';
                 foreach ($variant['dependencies'] as $dependency) {
                     $dependencyNodes[$dependency['class']] = true;
                 }
             }
         }
+
+        $isCurrent = $this->rootComponent === $origComponentClass;
 
         // Add the component node
         $graph->node(
@@ -322,6 +372,7 @@ class Graph
                 '_escaped' => $escaped,
                 'margin' => '.15,.15',
                 'fillcolor' => self::$colors[$component['type']],
+                'penwidth' => $isCurrent ? 1.5 : .5,
             ]
         );
 

@@ -169,7 +169,7 @@ class ExampleExtbaseComponent extends ExtbaseComponent
 
 #### Content component
 
-Use the `setContentRecordId()` method to specify the UID of the content element (`tt_content` table) you want to render as component output.
+Use the `setContentRecordId()` method to specify the UID of an existing content element (`tt_content` table) that you want to render as a component (please make sure the content element is accessible / isn't hidden by any means).
 
 ```php
 <?php
@@ -223,6 +223,7 @@ There are a couple of **protected** object properties you can override in your c
 |`$status`            | `string` | `"wip"` | Arbitrary component status label for use in external systems |
 |`$request`            | `Request`¹ | `Request`¹ | Web request object used for requesting the component. You can add arguments with `$request->setArgument('name', 'value')` |
 |`$preview`            | `TemplateInterface`² | `BasicTemplate`³ | Preview template used for rendering the component for external systems. Supports a couple of configuration methods, [see below](#preview-templates). |
+|`$dependencies`            | `array` | Empty array | List of class names of components the current component depends on (by nesting). CSS and JavaScript resources required by nested components will automatically be pulled into the rendering process. The [component dependency graph](#component-dependency-graphs) will show a visual connection to all registered dependencies. |
 
 * ¹ `\TYPO3\CMS\Extbase\Mvc\Web\Request`
 * ² `\Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface`
