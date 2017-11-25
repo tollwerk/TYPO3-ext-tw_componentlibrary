@@ -386,7 +386,7 @@ class Graph
 
         // Add dependency edges
         foreach ($component['dependencies'] as $dependency) {
-            $dependencyNodes[$dependency['class']] = true;
+            $dependencyNodes[$dependency['master'] ? $dependency['master']['class'] : $dependency['class']] = true;
         }
         foreach (array_keys($dependencyNodes) as $dependencyNode) {
             $graph->edge([$this->getComponentTitle($componentId), $this->getComponentTitle($dependencyNode)]);
