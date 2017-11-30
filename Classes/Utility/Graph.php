@@ -226,16 +226,17 @@ class Graph
     protected function addToComponentTreeSubset(array &$pointer, $componentId)
     {
         foreach ($this->graphComponents[$componentId]['path'] as $node) {
-            $pointer[$node] = [];
+            if (empty($pointer[$node])) {
+                $pointer[$node] = [];
+            }
             $pointer =& $pointer[$node];
         }
         $pointer[] = $componentId;
 
-
         if ($this->graphComponents[$componentId]['master']) {
             $dependencies = array_column($this->graphComponents[$componentId]['master']['dependencies'], 'class');
             foreach ($this->graphComponents[$componentId]['master']['variants'] as $variant) {
-                $dependencies += array_column($variant['dependencies'], 'class');
+                $dependencies = array_column($variant['dependencies'], 'class');
             }
         } else {
             $dependencies = array_column($this->graphComponents[$componentId]['dependencies'], 'class');

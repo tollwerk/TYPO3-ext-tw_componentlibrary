@@ -37,9 +37,9 @@ namespace Tollwerk\TwComponentlibrary\Controller;
 
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use Tollwerk\TwComponentlibrary\Service\GraphvizService;
 use Tollwerk\TwComponentlibrary\Utility\Graph;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
-use TYPO3\CMS\Core\Service\AbstractService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -82,7 +82,7 @@ class ComponentController extends ActionController
     public function graphAction($component = null)
     {
         $graphvizService = GeneralUtility::makeInstanceService('graphviz', 'svg');
-        if ($graphvizService instanceof AbstractService) {
+        if ($graphvizService instanceof GraphvizService) {
             $graph = new Graph(Scanner::discoverAll());
             return $graphvizService->createGraph($graph($component));
         }
