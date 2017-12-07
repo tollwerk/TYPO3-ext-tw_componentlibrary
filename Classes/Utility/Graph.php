@@ -330,6 +330,7 @@ class Graph
         // If this is a variant: Redirect to the master component
         if ($component['master']) {
             $component = $component['master'];
+            $componentId = $component['class'];
             $componentLabel = $component['label'];
 
             // Else: This is a master component
