@@ -331,11 +331,11 @@ class Graph
         if ($component['master']) {
             $component = $component['master'];
             $componentId = $component['class'];
-            $componentLabel = $component['label'];
+            $componentLabel = htmlspecialchars($component['label']);
 
             // Else: This is a master component
         } else {
-            $componentLabel = '<b>'.$component['label'].'</b>';
+            $componentLabel = '<b>'.htmlspecialchars($component['label']).'</b>';
         }
 
         $componentLabel .= '<br align="left"/>';
@@ -353,7 +353,7 @@ class Graph
             // Run through all variants
             $variantCount = count($component['variants']);
             foreach (array_values($component['variants']) as $index => $variant) {
-                $variantLabel = '• '.$variant['label'];
+                $variantLabel = '• '.htmlspecialchars($variant['label']);
                 if ($variant['class'] === $origComponentClass) {
                     $variantLabel = "<b>$variantLabel</b>";
                 }
