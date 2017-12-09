@@ -380,7 +380,11 @@ abstract class AbstractComponent implements ComponentInterface
     protected function exportNotice($notice)
     {
         $docDirectoryPath = strtr($this->getDocumentationDirectory(true), [DIRECTORY_SEPARATOR => '/']).'/';
-        return preg_replace('/\[([^\]]*?)\]\(([^\)]*?)\)/', "[$1]($docDirectoryPath$2)", $notice);
+        return preg_replace_callback('/\[([^\]]*?)\]\(([^\)]*?)\)/', function ($match) use ($docDirectoryPath) {
+            return '['.$match[1].']('
+                .(preg_match('%^https?\:\/\/%i', $match[2]) ? '' : $docDirectoryPath)
+                .$match[2].')';
+        }, $notice);
     }
 
     /**
