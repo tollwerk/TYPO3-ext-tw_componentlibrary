@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.3.2] - unreleased
 
+### Changed
+
+- TYPO3 v9 compatibility
+
 ### Fixed
 
 - Dependency graph determination bug for single components

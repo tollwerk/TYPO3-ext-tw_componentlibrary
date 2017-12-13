@@ -5,7 +5,7 @@
   "homepage": "https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary",
   "license": "GPL-2.0+",
   "require": {
-    "typo3/cms": ">=7.6",
+    "typo3/cms-core": ">=7.6",
     "alom/graphviz": "~1.1"
   },
   "autoload": {
@@ -29,12 +29,6 @@
       "email": "joschi@tollwerk.de"
     }
   ],
-  "extra": {
-    "typo3/cms": {
-      "cms-package-dir": "{$vendor-dir}/typo3/cms",
-      "web-dir": ".Build/Web"
-    }
-  },
   "keywords": [
     "fractal",
     "fractal-adapter",
