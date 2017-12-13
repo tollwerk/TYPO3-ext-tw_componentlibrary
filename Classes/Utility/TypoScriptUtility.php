@@ -39,6 +39,7 @@ namespace Tollwerk\TwComponentlibrary\Utility;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
+use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**
  * TypoScript extractor
@@ -76,6 +77,55 @@ class TypoScriptUtility
         $lastKey = explode('.', $key);
         $lastKey = array_pop($lastKey);
         return [$lastKey => $name, $lastKey.'.' => $conf];
+    }
+
+    /**
+     * Instantiate a Frontend controller for the given configuration
+     *
+     * @param int $id Page ID
+     * @param int $typeNum Page Type
+     * @return TypoScriptFrontendController Frontend controller
+     */
+    public static function getTSFE($id, $typeNum)
+    {
+        // Initialize the tracker if necessary
+        if (!is_object($GLOBALS['TT'])) {
+            $GLOBALS['TT'] = new TimeTracker(false);
+            $GLOBALS['TT']->start();
+        }
+
+        if (!array_key_exists("$id/$typeNum", self::$frontendControllers)) {
+
+            /** @var TypoScriptFrontendController $TSFE */
+            $TSFE = GeneralUtility::makeInstance(
+                TypoScriptFrontendController::class,
+                $GLOBALS['TYPO3_CONF_VARS'],
+                $id,
+                $typeNum
+            );
+            $TSFE->sys_page = GeneralUtility::makeInstance(PageRepository::class);
+            $TSFE->sys_page->init(true);
+            $TSFE->connectToDB();
+            $TSFE->initFEuser();
+            $TSFE->determineId();
+            $TSFE->initTemplate();
+            $TSFE->rootLine = $TSFE->sys_page->getRootLine($id, '');
+            $TSFE->getConfigArray();
+
+            // Calculate the absolute path prefix
+            if (!empty($TSFE->config['config']['absRefPrefix'])) {
+                $absRefPrefix = trim($TSFE->config['config']['absRefPrefix']);
+                $TSFE->absRefPrefix = ($absRefPrefix === 'auto') ? GeneralUtility::getIndpEnv(
+                    'TYPO3_SITE_PATH'
+                ) : $absRefPrefix;
+            } else {
+                $TSFE->absRefPrefix = '';
+            }
+
+            self::$frontendControllers["$id/$typeNum"] = $TSFE;
+        }
+
+        return self::$frontendControllers["$id/$typeNum"];
     }
 
     /**
@@ -120,52 +170,5 @@ class TypoScriptUtility
         }
 
         return implode(PHP_EOL, $serialized);
-    }
-
-    /**
-     * Instantiate a Frontend controller for the given configuration
-     *
-     * @param int $id Page ID
-     * @param int $typeNum Page Type
-     * @return TypoScriptFrontendController Frontend controller
-     */
-    public static function getTSFE($id, $typeNum)
-    {
-        // Initialize the tracker if necessary
-        if (!is_object($GLOBALS['TT'])) {
-            $GLOBALS['TT'] = new \TYPO3\CMS\Core\TimeTracker\NullTimeTracker;
-            $GLOBALS['TT']->start();
-        }
-
-        if (!array_key_exists("$id/$typeNum", self::$frontendControllers)) {
-
-            /** @var TypoScriptFrontendController $TSFE */
-            $TSFE = GeneralUtility::makeInstance(
-                'TYPO3\\CMS\\Frontend\\Controller\\TypoScriptFrontendController',
-                $GLOBALS['TYPO3_CONF_VARS'],
-                $id,
-                $typeNum
-            );
-            $TSFE->sys_page = GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
-            $TSFE->sys_page->init(true);
-            $TSFE->connectToDB();
-            $TSFE->initFEuser();
-            $TSFE->determineId();
-            $TSFE->initTemplate();
-            $TSFE->rootLine = $TSFE->sys_page->getRootLine($id, '');
-            $TSFE->getConfigArray();
-
-            // Calculate the absolute path prefix
-            if (!empty($TSFE->config['config']['absRefPrefix'])) {
-                $absRefPrefix = trim($TSFE->config['config']['absRefPrefix']);
-                $TSFE->absRefPrefix = ($absRefPrefix === 'auto') ? GeneralUtility::getIndpEnv('TYPO3_SITE_PATH') : $absRefPrefix;
-            } else {
-                $TSFE->absRefPrefix = '';
-            }
-
-            self::$frontendControllers["$id/$typeNum"] = $TSFE;
-        }
-
-        return self::$frontendControllers["$id/$typeNum"];
     }
 }
