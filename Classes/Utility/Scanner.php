@@ -131,12 +131,8 @@ class Scanner
             $componentDirectory = $componentDirectories[] = dirname($componentDirectory);
         }
 
-        $localConfig = [];
         foreach (array_reverse($componentDirectories) as $componentDirectory) {
-            $localConfig = $component['local'][] = array_replace(
-                $localConfig,
-                self::getLocalConfiguration($componentDirectory)
-            );
+            $component['local'][] = self::getLocalConfiguration($componentDirectory);
         }
 
         return $component;
