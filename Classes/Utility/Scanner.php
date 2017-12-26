@@ -49,6 +49,13 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 class Scanner
 {
     /**
+     * Local configuration extensions
+     *
+     * @var array
+     */
+    protected static $localConfigurations = [];
+
+    /**
      * Discover all components
      *
      * @return array Components
@@ -101,12 +108,54 @@ class Scanner
                 // Test if this is a component class
                 $classReflection = new \ReflectionClass($className);
                 if ($classReflection->implementsInterface(ComponentInterface::class)) {
-                    $components[] = self::discoverComponent($className);
+                    $components[] = self::addLocalConfiguration($component[0], self::discoverComponent($className));
                 }
             }
         }
 
         return $components;
+    }
+
+    /**
+     * Amend the directory specific local configuration
+     *
+     * @param string $componentDirectory Component directory
+     * @param array $component Component
+     * @return array Amended component
+     */
+    protected static function addLocalConfiguration($componentDirectory, array $component)
+    {
+        $component['local'] = [];
+        $componentDirectories = [];
+        for ($dir = 0; $dir < count($component['path']); ++$dir) {
+            $componentDirectory = $componentDirectories[] = dirname($componentDirectory);
+        }
+
+        $localConfig = [];
+        foreach (array_reverse($componentDirectories) as $componentDirectory) {
+            $localConfig = $component['local'][] = array_replace(
+                $localConfig,
+                self::getLocalConfiguration($componentDirectory)
+            );
+        }
+
+        return $component;
+    }
+
+    /**
+     * Read, cache and return a directory specific local configuration
+     *
+     * @param string $dirname Directory name
+     * @return array Directory specific local configuration
+     */
+    protected static function getLocalConfiguration($dirname)
+    {
+        if (is_dir($dirname) && empty(self::$localConfigurations[$dirname])) {
+            $localConfig = $dirname.DIRECTORY_SEPARATOR.'local.json';
+            self::$localConfigurations[$dirname] = file_exists($localConfig) ?
+                (array)@\json_decode(file_get_contents($localConfig)) : [];
+        }
+        return self::$localConfigurations[$dirname];
     }
 
     /**
