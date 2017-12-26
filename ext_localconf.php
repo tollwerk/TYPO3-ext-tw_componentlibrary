@@ -46,9 +46,6 @@ $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCON
     ['Component' => 'render']
 );
 
-// Register the component service command controller
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \Tollwerk\TwComponentlibrary\Command\ComponentCommandController::class;
-
 // Override the environment service when in CLI mode
 //if (PHP_SAPI === 'cli') {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\View\\TemplateView'] = array(

@@ -36,7 +36,6 @@
 namespace Tollwerk\TwComponentlibrary\Utility;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Exception\CommandException;
 
 /**
  * Component Kickstarter
@@ -54,7 +53,8 @@ class Kickstarter
      * @param string $name Component name
      * @param string $type Component type
      * @param string $extension Host extension
-     * @throws CommandException If the provider extension is invalid
+     * @return boolean Success
+     * @throws \RuntimeException If the provider extension is invalid
      */
     public static function create($name, $type, $extension, $vendor)
     {
@@ -71,7 +71,7 @@ class Kickstarter
             .implode(DIRECTORY_SEPARATOR, $name)
         );
         if (!is_dir($componentAbsPath) && !mkdir($componentAbsPath, 06775, true)) {
-            throw new CommandException('Could not create component directory', 1507997978);
+            throw new \RuntimeException('Could not create component directory', 1507997978);
         }
 
         // Prepare the component namespace
@@ -94,7 +94,6 @@ class Kickstarter
         );
         $skeletonString = strtr(file_get_contents($skeletonTemplate), $substitute);
         $skeletonFile = $componentAbsPath.DIRECTORY_SEPARATOR.$componentName.'.php';
-        file_put_contents($skeletonFile, $skeletonString);
-        chmod($skeletonString, 0664);
+        return file_put_contents($skeletonFile, $skeletonString) && chmod($skeletonString, 0664);
     }
 }
