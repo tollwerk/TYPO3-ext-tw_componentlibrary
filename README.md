@@ -421,6 +421,19 @@ You can add documentation to your components in two ways:
     ```
     
     During component extraction, linked files in the documentation (including images) will be rewritten to their root relative path starting at your TYPO3 main directory.
+
+##### Directory configuration
+
+As of version 0.3.2, you can add directory specific configuration values to your component directory layout. When exporting a component, the values for each of its parent directories will be exported as well. Add configuration values to a directory by creating a file called `local.json` containing an arbitrary JSON data structure, e.g.
+
+```json
+{
+  "dirsort": 4
+}
+```
+
+It's up to the consuming application to use these values for particular purposes. The [TYPO3-Fractal-bridge](https://github.com/tollwerk/fractal-typo3) for example uses the `dirsort` value for ordering the directories other than alphabetically.
+    
     
 ### Command line component kickstarter
 
@@ -564,6 +577,6 @@ Credits
 License
 -------
 
-Copyright © 2017 [Joschi Kuphal][author-url] / joschi@kuphal.net. Licensed under the terms of the  [GPL v2](LICENSE.txt) license.
+Copyright © 2018 [Joschi Kuphal][author-url] / joschi@kuphal.net. Licensed under the terms of the  [GPL v2](LICENSE.txt) license.
 
 [author-url]: https://jkphl.is
