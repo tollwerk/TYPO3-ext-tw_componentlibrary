@@ -42,12 +42,12 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
 
 /**
- * Extbase component
+ * Abstract Extbase component
  *
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
-class ExtbaseComponent extends AbstractComponent
+abstract class ExtbaseComponent extends AbstractComponent
 {
     /**
      * Component type

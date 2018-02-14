@@ -38,12 +38,12 @@ namespace Tollwerk\TwComponentlibrary\Component;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 
 /**
- * TypoScript component
+ * Abstract TypoScript component
  *
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
-class TypoScriptComponent extends AbstractComponent
+abstract class TypoScriptComponent extends AbstractComponent
 {
     /**
      * Component type
