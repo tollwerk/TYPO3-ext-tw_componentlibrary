@@ -233,10 +233,15 @@ abstract class ExtbaseComponent extends AbstractComponent
             $extendedControllerClassName = $this->extbaseController.'ComponentController_'.md5(
                     $this->extbaseControllerClass
                 );
-            $extendedControllerPhp = 'class '.$extendedControllerClassName.' extends '.$this->extbaseControllerClass;
-            $extendedControllerPhp .= ' implements '.ComponentControllerInterface::class;
-            $extendedControllerPhp .= ' { use '.ComponentControllerTrait::class.'; }';
-            eval($extendedControllerPhp);
+
+            // One-off class declaration
+            if (!class_exists($extendedControllerClassName, false)) {
+                $extendedControllerPhp = 'class ' . $extendedControllerClassName . ' extends ' . $this->extbaseControllerClass;
+                $extendedControllerPhp .= ' implements ' . ComponentControllerInterface::class;
+                $extendedControllerPhp .= ' { use ' . ComponentControllerTrait::class . '; }';
+                eval($extendedControllerPhp);
+            }
+
             $this->controllerInstance = $this->objectManager->get($extendedControllerClassName);
         }
 
