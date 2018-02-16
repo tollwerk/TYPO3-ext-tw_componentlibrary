@@ -37,6 +37,7 @@ namespace Tollwerk\TwComponentlibrary\Component;
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
@@ -167,6 +168,15 @@ abstract class ExtbaseComponent extends AbstractComponent
                 'action' => $this->extbaseAction,
             ]
         );
+
+        // Determine the default controller settings
+        /** @var ConfigurationManagerInterface $configurationManager */
+        $configurationManager = $this->objectManager->get(ConfigurationManagerInterface::class);
+        $this->controllerSettings = $configurationManager->getConfiguration(
+            ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
+            GeneralUtility::underscoredToUpperCamelCase($this->extbaseExtensionName),
+            $this->extbasePlugin
+        );
     }
 
     /**
@@ -190,10 +200,11 @@ abstract class ExtbaseComponent extends AbstractComponent
      * Set the controller settings
      *
      * @param array $settings Controller settings
+     * @param bool $override Override current settings (instead of amending them)
      */
-    public function setControllerSettings(array $settings)
+    public function setControllerSettings(array $settings, $override = false)
     {
-        $this->controllerSettings = $settings;
+        $this->controllerSettings = $override ? $settings : array_replace($this->controllerSettings, $settings);
     }
 
     /**
@@ -236,9 +247,9 @@ abstract class ExtbaseComponent extends AbstractComponent
 
             // One-off class declaration
             if (!class_exists($extendedControllerClassName, false)) {
-                $extendedControllerPhp = 'class ' . $extendedControllerClassName . ' extends ' . $this->extbaseControllerClass;
-                $extendedControllerPhp .= ' implements ' . ComponentControllerInterface::class;
-                $extendedControllerPhp .= ' { use ' . ComponentControllerTrait::class . '; }';
+                $extendedControllerPhp = 'class '.$extendedControllerClassName.' extends '.$this->extbaseControllerClass;
+                $extendedControllerPhp .= ' implements '.ComponentControllerInterface::class;
+                $extendedControllerPhp .= ' { use '.ComponentControllerTrait::class.'; }';
                 eval($extendedControllerPhp);
             }
 

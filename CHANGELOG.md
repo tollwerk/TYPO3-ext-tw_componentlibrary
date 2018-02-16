@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Make component base classes abstract
 - Add validation error support to Fluid components 
 - Ensure one-off extbase controller class declaration
+- Use default plugin settings for extbase controller components
 
 ## [0.3.2] - 2018-01-11
 
