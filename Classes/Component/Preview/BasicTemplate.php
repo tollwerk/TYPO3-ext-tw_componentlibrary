@@ -37,6 +37,10 @@
 namespace Tollwerk\TwComponentlibrary\Component\Preview;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Basic preview template
@@ -116,42 +120,41 @@ class BasicTemplate implements TemplateInterface
      */
     public function __toString()
     {
-        $html = '<!DOCTYPE html><html lang="en"><head><script>document.documentElement.className+=\'js\'</script>';
-        $html .= implode('', $this->headerIncludes);
-        $html .= '<meta charset="UTF-8"><title>{{ _target.label }} — Preview Layout</title>';
-
-        // Include the registered CSS stylesheets
-        foreach (array_unique(array_merge(self::$commonStylesheets, $this->stylesheets)) as $cssUrl) {
-            if (preg_match('%^https?\:\/\/%', $cssUrl)) {
-                $html .= ' <link media="all" rel="stylesheet" href="'.htmlspecialchars($cssUrl).'">';
-            } else {
-                $html .= ' <link media="all" rel="stylesheet" href="{{ path \'/'.ltrim($cssUrl, '/').'\' }}">';
+        /** @var ObjectManagerInterface $objectManager */
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        /** @var ConfigurationManagerInterface $configurationManager */
+        $configurationManager = $objectManager->get(ConfigurationManagerInterface::class);
+        /** @var StandaloneView $standaloneView */
+        $standaloneView = $objectManager->get(StandaloneView::class);
+        $extbaseFrameworkConfiguration = $configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
+        $templatePathAndFileName = null;
+        foreach (array_reverse($extbaseFrameworkConfiguration['view']['templateRootPaths']) as $templateRootPath) {
+            $templatePathAndFileName = GeneralUtility::getFileAbsFileName($templateRootPath.'Preview/Fractal.html');
+            if (file_exists($templatePathAndFileName)) {
+                $standaloneView->setTemplatePathAndFilename($templatePathAndFileName);
+                break;
             }
+            $templatePathAndFileName = null;
+        }
+        if (!$templatePathAndFileName) {
+            throw new \InvalidArgumentException(sprintf('Couldn\'t find standalone template "%s" for basic preview rendering',
+                $templatePathAndFileName), 1518958675);
         }
 
-        // Include the registered header JavaScripts
-        foreach (array_unique(array_merge(self::$commonHeaderScripts, $this->headerScripts)) as $jsUrl) {
-            if (preg_match('%^https?\:\/\/%', $jsUrl)) {
-                $html .= ' <script src="'.htmlspecialchars($jsUrl).'"></script>';
-            } else {
-                $html .= ' <script src="{{ path \'/'.ltrim($jsUrl, '/').'\' }}"></script>';
-            }
-        }
+        $standaloneView->setLayoutRootPaths($extbaseFrameworkConfiguration['view']['layoutRootPaths']);
+        $standaloneView->setTemplateRootPaths($extbaseFrameworkConfiguration['view']['templateRootPaths']);
+        $standaloneView->setPartialRootPaths($extbaseFrameworkConfiguration['view']['partialRootPaths']);
 
-        $html .= '</head><body>{{{ yield }}}';
+        // Assign rendering parameters
+        $standaloneView->assignMultiple([
+            'headerIncludes' => implode('', $this->headerIncludes),
+            'headerCss' => array_unique(array_merge(self::$commonStylesheets, $this->stylesheets)),
+            'headerJs' => array_unique(array_merge(self::$commonHeaderScripts, $this->headerScripts)),
+            'footerJs' => array_unique(array_merge(self::$commonFooterScripts, $this->footerScripts)),
+            'footerIncludes' => implode('', $this->footerIncludes),
+        ]);
 
-        // Include the registered footer JavaScripts
-        foreach (array_unique(array_merge(self::$commonFooterScripts, $this->footerScripts)) as $jsUrl) {
-            if (preg_match('%^https?\:\/\/%', $jsUrl)) {
-                $html .= ' <script src="'.htmlspecialchars($jsUrl).'"></script>';
-            } else {
-                $html .= ' <script src="{{ path \'/'.ltrim($jsUrl, '/').'\' }}" async defer></script>';
-            }
-        }
-
-        $html .= implode('', $this->footerIncludes);
-        $html .= '</body></html>';
-        return $html;
+        return $standaloneView->render();
     }
 
     /**

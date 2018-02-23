@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script>document.documentElement.className += 'js'</script>
+        <f:render section="HeaderIncludes"/>
+        <meta charset="UTF-8">
+        <title>{{ _target.label }} — Preview Layout</title>
+        <f:render section="HeaderCss"/>
+        <f:render section="HeaderJs"/>
+    </head>
+    <body>
+        <f:render section="Main"/>
+        <f:render section="FooterJs"/>
+        <f:render section="FooterIncludes"/>
+    </body>
+</html>

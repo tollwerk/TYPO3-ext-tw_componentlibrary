@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add validation error support to Fluid components 
 - Ensure one-off extbase controller class declaration
 - Use default plugin settings for extbase controller components
+- Switched to Fluid template / layout for Fractal preview rendering 
 
 ## [0.3.2] - 2018-01-11
 
