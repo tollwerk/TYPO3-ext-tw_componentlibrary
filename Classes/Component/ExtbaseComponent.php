@@ -256,7 +256,9 @@ abstract class ExtbaseComponent extends AbstractComponent
             $this->controllerInstance = $this->objectManager->get($extendedControllerClassName);
         }
 
-        return $this->controllerInstance->setSettings($this->controllerSettings);
+        $settings = $this->controllerSettings ? : [];
+
+        return $this->controllerInstance->setSettings($settings);
     }
 
     /**
