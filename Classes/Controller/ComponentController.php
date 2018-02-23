@@ -36,7 +36,7 @@
 namespace Tollwerk\TwComponentlibrary\Controller;
 
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
-use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate;
 use Tollwerk\TwComponentlibrary\Service\GraphvizService;
 use Tollwerk\TwComponentlibrary\Utility\Graph;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
@@ -60,9 +60,9 @@ class ComponentController extends ActionController
     public function renderAction($component)
     {
         // Register common stylesheets & scripts
-        BasicTemplate::addCommonStylesheets($this->settings['stylesheets']);
-        BasicTemplate::addCommonHeaderScripts($this->settings['headerScripts']);
-        BasicTemplate::addCommonFooterScripts($this->settings['footerScripts']);
+        FluidTemplate::addCommonStylesheets($this->settings['stylesheets']);
+        FluidTemplate::addCommonHeaderScripts($this->settings['headerScripts']);
+        FluidTemplate::addCommonFooterScripts($this->settings['footerScripts']);
 
         $componentInstance = $this->objectManager->get($component);
         if ($componentInstance instanceof ComponentInterface) {

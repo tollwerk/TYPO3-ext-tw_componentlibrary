@@ -37,7 +37,7 @@
 namespace Tollwerk\TwComponentlibrary\Command;
 
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
-use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate;
 use Tollwerk\TwComponentlibrary\Utility\Graph;
 use Tollwerk\TwComponentlibrary\Utility\Kickstarter;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
@@ -68,9 +68,9 @@ class ComponentCommandController extends CommandController
         $config = $typoscriptService->convertTypoScriptArrayToPlainArray($setup['plugin.']['tx_twcomponentlibrary.']);
 
         // Register common stylesheets & scripts
-        BasicTemplate::addCommonStylesheets($config['settings']['stylesheets']);
-        BasicTemplate::addCommonHeaderScripts($config['settings']['headerScripts']);
-        BasicTemplate::addCommonFooterScripts($config['settings']['footerScripts']);
+        FluidTemplate::addCommonStylesheets($config['settings']['stylesheets']);
+        FluidTemplate::addCommonHeaderScripts($config['settings']['headerScripts']);
+        FluidTemplate::addCommonFooterScripts($config['settings']['footerScripts']);
 
         echo json_encode(Scanner::discoverAll(), JSON_PRETTY_PRINT);
     }

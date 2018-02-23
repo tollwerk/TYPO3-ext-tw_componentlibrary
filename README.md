@@ -222,12 +222,12 @@ There are a couple of **protected** object properties you can override in your c
 | `$label`             | `string` | Empty   | Alternative label for the component (might be used by external systems)              |
 |`$status`            | `string` | `"wip"` | Arbitrary component status label for use in external systems |
 |`$request`            | `Request`¹ | `Request`¹ | Web request object used for requesting the component. You can add arguments with `$request->setArgument('name', 'value')` |
-|`$preview`            | `TemplateInterface`² | `BasicTemplate`³ | Preview template used for rendering the component for external systems. Supports a couple of configuration methods, [see below](#preview-templates). |
+|`$preview`            | `TemplateInterface`² | `FluidTemplate`³ | Preview template used for rendering the component for external systems. Supports a couple of configuration methods, [see below](#preview-templates). |
 |`$dependencies`            | `array` | Empty array | List of class names of components the current component depends on (by nesting). CSS and JavaScript resources required by nested components will automatically be pulled into the rendering process. The [component dependency graph](#component-dependency-graphs) will show a visual connection to all registered dependencies. |
 
 * ¹ `\TYPO3\CMS\Extbase\Mvc\Web\Request`
 * ² `\Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface`
-* ³ `\Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate`
+* ³ `\Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate`
 
 Example usage:
 
@@ -305,7 +305,7 @@ abstract class AbstractComponent implements ComponentInterface
 
 ##### Preview templates
   
-By default, the builtin `BasicTemplate` is used for rendering components for external systems. You can use your custom template as long as you implement the `TemplateInterface`. The default `BasicTemplates` supports a couple of configuration methods:
+By default, the builtin `FluidTemplate` is used for rendering components for external systems. You can use your custom template as long as you implement the `TemplateInterface`. The default `FluidTemplate` supports a couple of configuration methods:
  
 ```php
 <?php
@@ -320,7 +320,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
-class BasicTemplate implements TemplateInterface
+class FluidTemplate implements TemplateInterface
 {
     /**
      * Add a CSS stylesheet

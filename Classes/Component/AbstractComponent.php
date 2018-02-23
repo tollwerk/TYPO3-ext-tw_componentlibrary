@@ -35,7 +35,7 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
-use Tollwerk\TwComponentlibrary\Component\Preview\BasicTemplate;
+use Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
@@ -182,7 +182,7 @@ abstract class AbstractComponent implements ComponentInterface
     {
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->request = $this->objectManager->get(Request::class);
-        $this->preview = new BasicTemplate($this->getDependencyTemplateResources());
+        $this->preview = new FluidTemplate($this->getDependencyTemplateResources());
 
         $this->determineExtensionName();
         $this->determineNameAndVariant();
@@ -559,6 +559,8 @@ abstract class AbstractComponent implements ComponentInterface
      * Initialize a global Frontend renderer and return a content object renderer instance
      *
      * @return ContentObjectRenderer Content object renderer
+     * @throws \Exception
+     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
      */
     protected function initializeTSFE()
     {

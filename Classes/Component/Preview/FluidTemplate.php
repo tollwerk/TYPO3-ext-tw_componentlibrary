@@ -48,7 +48,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
-class BasicTemplate implements TemplateInterface
+class FluidTemplate implements TemplateInterface
 {
     /**
      * CSS stylesheets
@@ -98,6 +98,12 @@ class BasicTemplate implements TemplateInterface
      * @var array
      */
     protected $footerIncludes = [];
+    /**
+     * Fluid template name
+     *
+     * @var string
+     */
+    protected $templateName = 'Default';
 
     /**
      * Constructor
@@ -129,7 +135,7 @@ class BasicTemplate implements TemplateInterface
         $extbaseFrameworkConfiguration = $configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
         $templatePathAndFileName = null;
         foreach (array_reverse($extbaseFrameworkConfiguration['view']['templateRootPaths']) as $templateRootPath) {
-            $templatePathAndFileName = GeneralUtility::getFileAbsFileName($templateRootPath.'Preview/Fractal.html');
+            $templatePathAndFileName = GeneralUtility::getFileAbsFileName($templateRootPath.'Preview/'.$this->templateName.'.html');
             if (file_exists($templatePathAndFileName)) {
                 $standaloneView->setTemplatePathAndFilename($templatePathAndFileName);
                 break;
@@ -335,5 +341,27 @@ class BasicTemplate implements TemplateInterface
         $this->headerIncludes = array_merge($this->headerIncludes, $templateResources->getHeaderIncludes());
         $this->footerScripts = array_merge($this->footerScripts, $templateResources->getFooterScripts());
         $this->footerIncludes = array_merge($this->footerIncludes, $templateResources->getFooterIncludes());
+    }
+
+    /**
+     * Get the configured Fluid template name
+     *
+     * @return string Fluid template name
+     */
+    public function getTemplateName()
+    {
+        return $this->templateName;
+    }
+
+    /**
+     * Set the configured Fluid Template name
+     *
+     * @param string $templateName Fluid template name
+     * @return FluidTemplate Self reference
+     */
+    public function setTemplateName($templateName)
+    {
+        $this->templateName = ucfirst(strtolower($templateName));
+        return $this;
     }
 }
