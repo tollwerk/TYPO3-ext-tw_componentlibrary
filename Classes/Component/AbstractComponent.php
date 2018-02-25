@@ -41,6 +41,7 @@ use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
@@ -174,12 +175,20 @@ abstract class AbstractComponent implements ComponentInterface
      * @var array
      */
     protected $dependencies = [];
+    /**
+     * Controller context
+     *
+     * @var null|ControllerContext
+     */
+    protected $controllerContext;
 
     /**
      * Component constructor
+     * @param ControllerContext|null $controllerContext Controller context
      */
-    public function __construct()
+    public function __construct(ControllerContext $controllerContext = null)
     {
+        $this->controllerContext = $controllerContext;
         $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $this->request = $this->objectManager->get(Request::class);
         $this->preview = new FluidTemplate($this->getDependencyTemplateResources());

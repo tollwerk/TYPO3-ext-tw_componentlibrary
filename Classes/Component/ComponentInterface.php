@@ -92,6 +92,12 @@ interface ComponentInterface
      */
     const TYPE_CONTENT = 'content';
     /**
+     * Form component type
+     *
+     * @var string
+     */
+    const TYPE_FORM = 'form';
+    /**
      * Valid component types
      *
      * @var array

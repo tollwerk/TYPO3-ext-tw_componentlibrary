@@ -64,7 +64,7 @@ class ComponentController extends ActionController
         FluidTemplate::addCommonHeaderScripts($this->settings['headerScripts']);
         FluidTemplate::addCommonFooterScripts($this->settings['footerScripts']);
 
-        $componentInstance = $this->objectManager->get($component);
+        $componentInstance = $this->objectManager->get($component, $this->controllerContext);
         if ($componentInstance instanceof ComponentInterface) {
             return trim($componentInstance->render());
         }
