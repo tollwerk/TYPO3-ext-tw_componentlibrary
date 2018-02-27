@@ -47,7 +47,7 @@ class ###label###Component extends FormComponent
     protected function configure()
     {
         $this->setTemplate('EXT:###extension###/Resources/Private/Partials/###path###/###label###.html');
-//        $this->createElement('text-1', '###label###')
+//        $this->createElement('###label###')
 //            ->setProperty('fluidAdditionalAttributes', [
 //                'placeholder' => 'Your name ...'
 //            ]);
