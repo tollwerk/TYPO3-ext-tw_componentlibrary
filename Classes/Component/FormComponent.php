@@ -86,6 +86,12 @@ abstract class FormComponent extends AbstractComponent
      * @var FormElementInterface
      */
     protected $element = null;
+    /**
+     * Translation file for form elements
+     *
+     * @var string
+     */
+    protected $translationFile = null;
 
     /**
      * Render this component
@@ -140,9 +146,15 @@ abstract class FormComponent extends AbstractComponent
     {
         parent::initialize();
 
+        // Use the standard language file as fallback
+        if ($this->translationFile === null) {
+            $this->translationFile = 'EXT:'.$this->extensionKey.'/Resources/Private/Language/locallang.xlf';
+        }
+
         $configurationService = $this->objectManager->get(ConfigurationService::class);
         $prototypeConfiguration = $configurationService->getPrototypeConfiguration('standard');
         $this->form = $this->objectManager->get(FormDefinition::class, 'ComponentForm', $prototypeConfiguration);
+        $this->form->setRenderingOption('translation', ['translationFile' => $this->translationFile]);
         $this->page = $this->form->createPage('page');
 
         $this->preview->setTemplateName('Form');

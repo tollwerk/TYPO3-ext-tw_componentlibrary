@@ -116,7 +116,13 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected $label = null;
     /**
-     * Extension name
+     * Extension key
+     *
+     * @var string
+     */
+    protected $extensionKey;
+    /**
+     * Extbase extension name
      *
      * @var string
      */
@@ -245,7 +251,8 @@ abstract class AbstractComponent implements ComponentInterface
             throw new \RuntimeException(sprintf('Unknown extension key "%s"', $extensionKey), 1481361198);
         }
 
-        // Register the extension name
+        // Register the extension key & name
+        $this->extensionKey = $extensionKey;
         $this->extensionName = GeneralUtility::underscoredToUpperCamelCase($extensionKey);
 
         // Process the component path
