@@ -43,6 +43,7 @@ use TYPO3\CMS\Form\Domain\Exception\RenderingException;
 use TYPO3\CMS\Form\Domain\Model\FormDefinition;
 use TYPO3\CMS\Form\Domain\Model\FormElements\FormElementInterface;
 use TYPO3\CMS\Form\Domain\Model\FormElements\Page;
+use TYPO3\CMS\Form\Domain\Renderer\FluidFormRenderer;
 use TYPO3\CMS\Form\Domain\Renderer\RendererInterface;
 use TYPO3\CMS\Form\Domain\Runtime\FormRuntime;
 
@@ -60,12 +61,6 @@ abstract class FormComponent extends AbstractComponent
      * @var string
      */
     protected $type = self::TYPE_FORM;
-    /**
-     * Parameters
-     *
-     * @var array
-     */
-    protected $parameters = [];
     /**
      * Validation errors
      *
@@ -102,10 +97,9 @@ abstract class FormComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         try {
-            $response = $this->objectManager->get(Response::class, $this->controllerContext->getResponse());
-            /** @var FormRuntime $form */
-            $form = $this->form->bind($this->controllerContext->getRequest(), $response);
             $rendererClassName = $this->element->getRendererClassName();
+
+            /** @var FluidFormRenderer $renderer */
             $renderer = $this->objectManager->get($rendererClassName);
             if (!($renderer instanceof RendererInterface)) {
                 throw new RenderingException(
@@ -114,8 +108,13 @@ abstract class FormComponent extends AbstractComponent
                 );
             }
             $renderer->setControllerContext($this->controllerContext);
+
+            $response = $this->objectManager->get(Response::class, $this->controllerContext->getResponse());
+            /** @var FormRuntime $form */
+            $form = $this->form->bind($this->controllerContext->getRequest(), $response);
             $renderer->setFormRuntime($form);
-            $result = $renderer->render($this->element);
+
+            $result = $renderer->render();
 
             // In case of an error
         } catch (\Exception $e) {
@@ -132,6 +131,8 @@ abstract class FormComponent extends AbstractComponent
      * Gets called immediately after construction. Override this method in components to initialize the component.
      *
      * @return void
+     * @throws \TYPO3\CMS\Form\Domain\Configuration\Exception\PrototypeNotFoundException
+     * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
      */
     protected function initialize()
     {
@@ -139,9 +140,7 @@ abstract class FormComponent extends AbstractComponent
 
         $configurationService = $this->objectManager->get(ConfigurationService::class);
         $prototypeConfiguration = $configurationService->getPrototypeConfiguration('standard');
-
-//        $this->form = $this->objectManager->get(FormDefinition::class, 'CustomForm', $prototypeConfiguration, 'Text');
-        $this->form = $this->objectManager->get(FormDefinition::class, 'CustomForm', $prototypeConfiguration);
+        $this->form = $this->objectManager->get(FormDefinition::class, 'ComponentForm', $prototypeConfiguration);
         $this->page = $this->form->createPage('page');
 
         $this->validationErrors = new Result();
@@ -150,33 +149,18 @@ abstract class FormComponent extends AbstractComponent
     /**
      * Create a form element
      *
-     * @param string $identifier Identifier of the new form element
      * @param string $typeName type of the new form element
      * @return FormElementInterface
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotValidException
      */
-    protected function createElement($identifier, $typeName)
+    protected function createElement($typeName)
     {
-        $this->element = $this->page->createElement($identifier, $typeName);
+        $this->element = $this->page->createElement(
+            strtr(GeneralUtility::camelCaseToLowerCaseUnderscored($typeName), '_', '-').'-1',
+            $typeName
+        );
         return $this->element;
-    }
-
-    /**
-     * Set a rendering parameter
-     *
-     * @param string $param Parameter name
-     * @param mixed $value Parameter value
-     * @throws \RuntimeException If the parameter name is invalid
-     */
-    protected function setParameter($param, $value)
-    {
-        $param = trim($param);
-        if (!strlen($param)) {
-            throw new \RuntimeException(sprintf('Invalid fluid template parameter "%s"', $param), 1481551574);
-        }
-
-        $this->parameters[$param] = $value;
     }
 
     /**
@@ -205,9 +189,6 @@ abstract class FormComponent extends AbstractComponent
             $this->template = file_get_contents($templateFile);
         }
 
-        return array_merge(
-            ['parameters' => $this->parameters],
-            parent::exportInternal()
-        );
+        return parent::exportInternal();
     }
 }

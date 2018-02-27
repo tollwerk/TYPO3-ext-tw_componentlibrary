@@ -76,3 +76,11 @@ twComponentGraph {
         additionalHeaders.10.header = Content-Type: image/svg+xml
     }
 }
+
+plugin.tx_form {
+    settings {
+        yamlConfigurations {
+            999 = EXT:tw_componentlibrary/Configuration/Yaml/ComponentFormSetup.yaml
+        }
+    }
+}

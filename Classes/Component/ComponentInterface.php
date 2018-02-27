@@ -102,7 +102,13 @@ interface ComponentInterface
      *
      * @var array
      */
-    const TYPES = [self::TYPE_FLUID, self::TYPE_TYPOSCRIPT, self::TYPE_EXTBASE, self::TYPE_CONTENT];
+    const TYPES = [
+        self::TYPE_FLUID,
+        self::TYPE_FORM,
+        self::TYPE_TYPOSCRIPT,
+        self::TYPE_EXTBASE,
+        self::TYPE_CONTENT
+    ];
 
     /**
      * Export the component's properties
