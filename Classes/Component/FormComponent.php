@@ -164,17 +164,17 @@ abstract class FormComponent extends AbstractComponent
     /**
      * Create a form element
      *
-     * @param string $typeName type of the new form element
+     * @param string $typeName Type of the new form element
+     * @param string $identifier Form element identifier
      * @return FormElementInterface
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotValidException
      */
-    protected function createElement($typeName)
+    protected function createElement($typeName, $identifier = null)
     {
-        $this->element = $this->page->createElement(
-            strtr(GeneralUtility::camelCaseToLowerCaseUnderscored($typeName), '_', '-').'-1',
-            $typeName
-        );
+        $identifier = trim($identifier) ?:
+            strtr(GeneralUtility::camelCaseToLowerCaseUnderscored($typeName), '_', '-').'-1';
+        $this->element = $this->page->createElement($identifier, $typeName);
         return $this->element;
     }
 
