@@ -51,5 +51,6 @@ class ###label###Component extends FormComponent
 //            ->setProperty('fluidAdditionalAttributes', [
 //                'placeholder' => 'Your name ...'
 //            ]);
+//        $this->addError('Invalid entry');
     }
 }
