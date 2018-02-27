@@ -143,6 +143,7 @@ abstract class FormComponent extends AbstractComponent
         $this->form = $this->objectManager->get(FormDefinition::class, 'ComponentForm', $prototypeConfiguration);
         $this->page = $this->form->createPage('page');
 
+        $this->preview->setTemplateName('Form');
         $this->validationErrors = new Result();
     }
 

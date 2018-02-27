@@ -1,0 +1,36 @@
+<html xmlns:f="https://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers"
+      xmlns:tw="http://typo3.org/ns/Tollwerk/TwComponentlibrary/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+    <f:layout name="Basic"/>
+
+    <f:section name="HeaderIncludes">
+        <f:format.raw>{headerIncludes}</f:format.raw>
+    </f:section>
+
+    <f:section name="HeaderCss">
+        <f:for each="{headerCss}" as="css">
+            <link media="all" rel="stylesheet" href="{css -> tw:fractal.resource()}"/>
+        </f:for>
+    </f:section>
+
+    <f:section name="HeaderJs">
+        <f:for each="{headerJs}" as="js">
+            <script src="{js -> tw:fractal.resource()}"></script>
+        </f:for>
+    </f:section>
+
+    <f:section name="Main">
+        <form>{{{ yield }}}</form>
+    </f:section>
+
+    <f:section name="FooterJs">
+        <f:for each="{footerJs}" as="js">
+            <script src="{js -> tw:fractal.resource()}" async defer></script>
+        </f:for>
+    </f:section>
+
+    <f:section name="FooterIncludes">
+        <f:format.raw>{footerIncludes}</f:format.raw>
+    </f:section>
+</html>
