@@ -44,6 +44,7 @@ use TYPO3\CMS\Form\Domain\Exception\RenderingException;
 use TYPO3\CMS\Form\Domain\Model\FormDefinition;
 use TYPO3\CMS\Form\Domain\Model\FormElements\FormElementInterface;
 use TYPO3\CMS\Form\Domain\Model\FormElements\Page;
+use TYPO3\CMS\Form\Domain\Model\Renderable\AbstractRenderable;
 use TYPO3\CMS\Form\Domain\Renderer\FluidFormRenderer;
 use TYPO3\CMS\Form\Domain\Renderer\RendererInterface;
 use TYPO3\CMS\Form\Domain\Runtime\FormRuntime;
@@ -83,7 +84,7 @@ abstract class FormComponent extends AbstractComponent
     /**
      * Form element
      *
-     * @var FormElementInterface
+     * @var AbstractRenderable
      */
     protected $element = null;
     /**
@@ -166,7 +167,7 @@ abstract class FormComponent extends AbstractComponent
      *
      * @param string $typeName Type of the new form element
      * @param string $identifier Form element identifier
-     * @return FormElementInterface
+     * @return AbstractRenderable Renderable form element
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotValidException
      */
@@ -175,6 +176,7 @@ abstract class FormComponent extends AbstractComponent
         $identifier = trim($identifier) ?:
             strtr(GeneralUtility::camelCaseToLowerCaseUnderscored($typeName), '_', '-').'-1';
         $this->element = $this->page->createElement($identifier, $typeName);
+        $this->element->setProperty('fluidAdditionalAttributes', []);
         return $this->element;
     }
 
