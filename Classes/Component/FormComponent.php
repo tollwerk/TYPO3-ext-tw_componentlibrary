@@ -42,7 +42,6 @@ use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Form\Domain\Configuration\ConfigurationService;
 use TYPO3\CMS\Form\Domain\Exception\RenderingException;
 use TYPO3\CMS\Form\Domain\Model\FormDefinition;
-use TYPO3\CMS\Form\Domain\Model\FormElements\FormElementInterface;
 use TYPO3\CMS\Form\Domain\Model\FormElements\Page;
 use TYPO3\CMS\Form\Domain\Model\Renderable\AbstractRenderable;
 use TYPO3\CMS\Form\Domain\Renderer\FluidFormRenderer;
@@ -156,6 +155,7 @@ abstract class FormComponent extends AbstractComponent
         $prototypeConfiguration = $configurationService->getPrototypeConfiguration('standard');
         $this->form = $this->objectManager->get(FormDefinition::class, 'Component', $prototypeConfiguration);
         $this->form->setRenderingOption('translation', ['translationFile' => $this->translationFile]);
+        $this->form->setRenderingOption('honeypot', ['enable' => false]);
         $this->page = $this->form->createPage('page');
 
         $this->preview->setTemplateName('Form');
