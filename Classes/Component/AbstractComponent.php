@@ -585,4 +585,29 @@ abstract class AbstractComponent implements ComponentInterface
         $GLOBALS['TSFE']->cObj->start($GLOBALS['TSFE']->page, 'pages');
         return $GLOBALS['TSFE']->cObj;
     }
+
+    /**
+     * Beautify HTML source
+     *
+     * @param string $html HTML source code
+     * @return string Beautified HTML source code
+     */
+    protected function beautify($html)
+    {
+        if (class_exists('tidy')) {
+            $config = array(
+                'indent' => true,
+                'wrap' => 200,
+                'show-body-only' => true,
+            );
+
+            $tidy = new \tidy();
+            $tidy->parseString($html, $config, 'utf8');
+            $tidy->cleanRepair();
+
+            return strval($tidy);
+        } else {
+            return $html;
+        }
+    }
 }

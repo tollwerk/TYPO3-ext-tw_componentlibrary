@@ -130,7 +130,7 @@ abstract class FormComponent extends AbstractComponent
                 .$e->getTraceAsString().'</pre>';
         }
 
-        return $result;
+        return $this->beautify($result);
     }
 
     /**
