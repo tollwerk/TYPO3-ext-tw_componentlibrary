@@ -46,6 +46,7 @@ use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use XhtmlFormatter\Formatter;
 
 /**
  * Abstract component
@@ -594,20 +595,7 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function beautify($html)
     {
-        if (class_exists('tidy')) {
-            $config = array(
-                'indent' => true,
-                'wrap' => 200,
-                'show-body-only' => true,
-            );
-
-            $tidy = new \tidy();
-            $tidy->parseString($html, $config, 'utf8');
-            $tidy->cleanRepair();
-
-            return strval($tidy);
-        } else {
-            return $html;
-        }
+        $formatter = new Formatter();
+        return $formatter->format($html);
     }
 }
