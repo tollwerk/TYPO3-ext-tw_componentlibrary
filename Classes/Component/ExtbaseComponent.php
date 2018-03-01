@@ -221,7 +221,7 @@ abstract class ExtbaseComponent extends AbstractComponent
             /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
             $response = $this->objectManager->get(Response::class);
             $this->getControllerInstance()->processRequest($this->request, $response);
-            $result = $response->getContent();
+            $result = $this->beautify($response->getContent());
 
             // In case of an error
         } catch (\Exception $e) {

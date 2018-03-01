@@ -122,7 +122,7 @@ abstract class FormComponent extends AbstractComponent
             $form = $this->form->bind($this->controllerContext->getRequest(), $response);
             $renderer->setFormRuntime($form);
 
-            $result = $renderer->render();
+            $result = $this->beautify($renderer->render());
 
             // In case of an error
         } catch (\Exception $e) {
@@ -130,7 +130,7 @@ abstract class FormComponent extends AbstractComponent
                 .$e->getTraceAsString().'</pre>';
         }
 
-        return $this->beautify($result);
+        return $result;
     }
 
     /**

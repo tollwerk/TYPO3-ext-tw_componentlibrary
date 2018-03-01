@@ -64,7 +64,7 @@ abstract class ContentComponent extends AbstractComponent
 
         try {
             // Render the content element
-            $result = $GLOBALS['TSFE']->cObj->cObjGetSingle('RECORDS', $this->config);
+            $result = $this->beautify($GLOBALS['TSFE']->cObj->cObjGetSingle('RECORDS', $this->config));
 
             // In case of an error
         } catch (\Exception $e) {

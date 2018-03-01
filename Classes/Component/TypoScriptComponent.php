@@ -69,7 +69,7 @@ abstract class TypoScriptComponent extends AbstractComponent
             $this->config
         );
         try {
-            $result = call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript);
+            $result = $this->beautify(call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript));
 
             // In case of an error
         } catch (\Exception $e) {

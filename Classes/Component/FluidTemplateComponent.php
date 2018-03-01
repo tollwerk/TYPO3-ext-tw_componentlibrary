@@ -96,7 +96,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
             $view->assignMultiple($this->parameters);
             $view->getRequest()->setControllerExtensionName($this->extensionName);
             $view->getRequest()->setOriginalRequestMappingResults($this->validationErrors);
-            $result = $view->render();
+            $result = $this->beautify($view->render());
 
             // In case of an error
         } catch (\Exception $e) {
