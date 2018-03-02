@@ -63,6 +63,8 @@ abstract class ContentComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         try {
+            $this->controllerContext->getRequest()->setOriginalRequestMappingResults($this->validationErrors);
+
             // Render the content element
             $result = $this->beautify($GLOBALS['TSFE']->cObj->cObjGetSingle('RECORDS', $this->config));
 

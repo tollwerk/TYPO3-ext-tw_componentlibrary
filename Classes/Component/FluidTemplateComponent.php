@@ -37,7 +37,6 @@ namespace Tollwerk\TwComponentlibrary\Component;
 
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Result;
 
 /**
  * Abstract FLUIDTEMPLATE component
@@ -59,12 +58,6 @@ abstract class FluidTemplateComponent extends AbstractComponent
      * @var array
      */
     protected $parameters = [];
-    /**
-     * Validation errors
-     *
-     * @var Result
-     */
-    protected $validationErrors;
 
     /**
      * Render this component
@@ -117,8 +110,6 @@ abstract class FluidTemplateComponent extends AbstractComponent
     protected function initialize()
     {
         parent::initialize();
-
-        $this->validationErrors = new Result();
         $this->loadJsonParameters();
     }
 

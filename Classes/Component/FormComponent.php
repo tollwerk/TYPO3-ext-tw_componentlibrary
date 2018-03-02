@@ -36,9 +36,7 @@
 namespace Tollwerk\TwComponentlibrary\Component;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
-use TYPO3\CMS\Extbase\Validation\Error;
 use TYPO3\CMS\Form\Domain\Configuration\ConfigurationService;
 use TYPO3\CMS\Form\Domain\Exception\RenderingException;
 use TYPO3\CMS\Form\Domain\Model\FormDefinition;
@@ -62,12 +60,6 @@ abstract class FormComponent extends AbstractComponent
      * @var string
      */
     protected $type = self::TYPE_FORM;
-    /**
-     * Validation errors
-     *
-     * @var Result
-     */
-    protected $validationErrors;
     /**
      * Form definition
      *
@@ -159,7 +151,6 @@ abstract class FormComponent extends AbstractComponent
         $this->page = $this->form->createPage('page');
 
         $this->preview->setTemplateName('Form');
-        $this->validationErrors = new Result();
     }
 
     /**
@@ -181,17 +172,17 @@ abstract class FormComponent extends AbstractComponent
     }
 
     /**
-     * Register a validation error
+     * Register a validation error for the form element
      *
      * @param string $message Validation error message
      * @throws \RuntimeException If no element has been created prior to adding an error message
      */
-    protected function addError($message)
+    protected function addElementError($message)
     {
         if ($this->element === null) {
             throw new \RuntimeException('Create a form element prior to adding a validation error', 1519731421);
         }
-        $this->validationErrors->forProperty($this->element->getIdentifier())->addError(new Error($message, time()));
+        $this->addError($this->element->getIdentifier(), $message);
     }
 
     /**

@@ -69,6 +69,7 @@ abstract class TypoScriptComponent extends AbstractComponent
             $this->config
         );
         try {
+            $this->controllerContext->getRequest()->setOriginalRequestMappingResults($this->validationErrors);
             $result = $this->beautify(call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript));
 
             // In case of an error

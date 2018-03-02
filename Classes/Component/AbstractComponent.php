@@ -41,6 +41,8 @@ use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Error\Error;
+use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -68,6 +70,12 @@ abstract class AbstractComponent implements ComponentInterface
      * @var Request
      */
     protected $request;
+    /**
+     * Validation errors
+     *
+     * @var Result
+     */
+    protected $validationErrors;
     /**
      * System language for this request
      *
@@ -302,6 +310,7 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function initialize()
     {
+        $this->validationErrors = new Result();
         $this->addDocumentation();
     }
 
@@ -597,5 +606,16 @@ abstract class AbstractComponent implements ComponentInterface
     {
         $formatter = new Formatter();
         return $formatter->format($html);
+    }
+
+    /**
+     * Register a validation error
+     *
+     * @param string $property Property
+     * @param string $message Validation error message
+     */
+    protected function addError($property, $message)
+    {
+        $this->validationErrors->forProperty($property)->addError(new Error($message, time()));
     }
 }
