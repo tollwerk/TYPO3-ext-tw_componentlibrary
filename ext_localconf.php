@@ -49,12 +49,10 @@ $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCON
 // Register the component service command controller
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = \Tollwerk\TwComponentlibrary\Command\ComponentCommandController::class;
 
-// Override the environment service when in CLI mode
-//if (PHP_SAPI === 'cli') {
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\View\\TemplateView'] = array(
-        'className' => 'Tollwerk\\TwComponentlibrary\\Component\\TemplateView',
-    );
-//}
+// Override the default Extbase template view
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\View\\TemplateView'] = array(
+    'className' => 'Tollwerk\\TwComponentlibrary\\Component\\TemplateView',
+);
 
 // Exclude the component GET parameter from cHash calculation
 $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'] = ltrim(
@@ -101,16 +99,16 @@ if (
     // Service key
     'tx_twcomponentlibrary_graphviz',
     array(
-        'title' => 'GraphViz',
+        'title'       => 'GraphViz',
         'description' => 'Create an SVG graph uzing the GraphViz library',
 
         'subtype' => 'svg',
 
         'available' => true,
-        'priority' => 60,
-        'quality' => 80,
+        'priority'  => 60,
+        'quality'   => 80,
 
-        'os' => '',
+        'os'   => '',
         'exec' => 'ccomps,dot,gvpack,neato',
 
         'className' => \Tollwerk\TwComponentlibrary\Service\GraphvizService::class

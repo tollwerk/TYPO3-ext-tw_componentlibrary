@@ -8,16 +8,17 @@ About
 This TYPO3 extension
 
 1. encourages and supports the development of self-contained, re-usable function and design modules ("**components**") along with your TYPO3 project and
-2. exposes these components via a JSON API so that **component library, testing and styleguide tools** like [Fractal](http://fractal.build) can [extract and render](https://github.com/tollwerk/fractal-typo3) your components individually and independently of your TYPO3 frontend.
+2. exposes these components via a JSON API so that **component or pattern library, testing and styleguide tools** like [Fractal](http://fractal.build) can [extract and render](https://github.com/tollwerk/fractal-typo3) your components individually and independently of your TYPO3 frontend.
 
 ### Component types
 
-The extension distiguishes 4 main types of components:
+The extension distiguishes 5 main types of components:
 
 * **TypoScript components**: Require a [TypoScript](https://docs.typo3.org/typo3cms/TyposcriptReference/) path with an object definition to render (e.g. `lib.menu`, defined as `HMENU`).
 * **Fluid template components**: Require a [Fluid template file](https://github.com/TYPO3/Fluid) (e.g. an Extbase / Fluid partial or standalone Fluid template) and an optional set of rendering parameters / variables.
 * **Extbase plugin components**: Require an [Extbase controller](https://docs.typo3.org/typo3cms/ExtbaseGuide/Extbase/Step3Documentation/ActionController.html), a controller action to call and possibly a list of parameters to pass to the controller action. 
 * **Content components**: Convenient way to render existing TYPO3 content elements as components. Works with both default and custom content elements.
+* **Form components**: Hook into the [TYPO3 Form Framework](https://docs.typo3.org/typo3cms/extensions/form/) and treat standard and custom form elements as individual components.
 
 The extension **doesn't impose any requirements towards your TypoScript, Fluid templates or directory layout** except that every component must be individually addressable. That is, you cannot expose e.g. just a part of a rendered Fluid template as a component. In that case, you'd have to outsource the desired part as a partial file of its own.
 
@@ -189,6 +190,46 @@ class ExampleContentComponent extends ContentComponent
     protected function configure()
     {
         $this->setContentRecordId(123);
+    }
+}
+```
+
+#### Form component
+
+Inside your component definition, you must use the `createElement()` method to instantiate a renderable form element (`TYPO3\CMS\Form\Domain\Model\Renderable\AbstractRenderable`). This is basically the same object that you get via the Form Framework's [`Page::createElement()` method](https://docs.typo3.org/typo3cms/extensions/form/ApiReference/Index.html#typo3-cms-form-domain-model-formelements-page-createelement) during API form composition. You can further configure the form element using its native methods (as you would do in a form factory class). 
+
+To simulate a form validation error for your element, simply call `addElementError($message)` (the element must have been instantiated prior to adding errors). You can registrer multiple errors.
+
+It is advised but not mandatory to register the form field's Fluid template using `setTemplate()` for a nicer display in your component library.
+
+```php
+<?php
+
+namespace Vendor\ExtKey\Component;
+
+use Tollwerk\TwComponentlibrary\Component\FormComponent;
+
+/**
+ * Example form component
+ */
+class ExampleTextComponent extends FormComponent
+{
+    /**
+     * Configure the component
+     */
+    protected function configure()
+    {
+        $this->setTemplate('EXT:example/Resources/Private/Partials/Form/Text.html');
+        
+        $element = $this->createElement('Text', 'name');
+        $element->setProperty(
+            'fluidAdditionalAttributes',
+            [
+                'placeholder' => 'John Doe',
+            ]
+        );
+        
+        $this->addError('Please enter a name');
     }
 }
 ```
@@ -428,11 +469,12 @@ As of version 0.3.2, you can add directory specific configuration values to your
 
 ```json
 {
-  "dirsort": 4
+  "dirsort": 4,
+  "label": 'Icons & images'
 }
 ```
 
-It's up to the consuming application to use these values for particular purposes. The [TYPO3-Fractal-bridge](https://github.com/tollwerk/fractal-typo3) for example uses the `dirsort` value for ordering the directories other than alphabetically.
+It's up to the consuming application to use these values for particular purposes. The [TYPO3-Fractal-bridge](https://github.com/tollwerk/fractal-typo3) for example uses the `dirsort` value for ordering the directories other than alphabetically and `label` for component folder names that couldn't be achieved via real file system directory names.
     
     
 ### Command line component kickstarter
@@ -446,7 +488,7 @@ php typo3/cli_dispatch.phpsh extbase component:create Test/Button fluid tw_tollw
 The command takes 4 arguments (in the following order; you can also enter it with explicit argument names):
 
 * `--name`: Directory path and name of the component within the `Components` directory of your provider extension.
-* `--type`: Component type, must be one of `fluid`, `typoscript` or `extbase`
+* `--type`: Component type, must be one of `fluid`, `typoscript`, `extbase`, `content` or `form`
 * `--extension`: Provider extension key
 * `--vendor`: Provider extension vendor name
 

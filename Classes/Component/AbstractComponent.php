@@ -199,14 +199,15 @@ abstract class AbstractComponent implements ComponentInterface
 
     /**
      * Component constructor
+     *
      * @param ControllerContext|null $controllerContext Controller context
      */
     public function __construct(ControllerContext $controllerContext = null)
     {
         $this->controllerContext = $controllerContext;
-        $this->objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        $this->request = $this->objectManager->get(Request::class);
-        $this->preview = new FluidTemplate($this->getDependencyTemplateResources());
+        $this->objectManager     = GeneralUtility::makeInstance(ObjectManager::class);
+        $this->request           = $this->objectManager->get(Request::class);
+        $this->preview           = new FluidTemplate($this->getDependencyTemplateResources());
 
         $this->determineExtensionName();
         $this->determineNameAndVariant();
@@ -236,14 +237,15 @@ abstract class AbstractComponent implements ComponentInterface
      * Find the extension name the current component belongs to
      *
      * @throws \RuntimeException If the component path is invalid
+     * @throws \ReflectionException
      */
     protected function determineExtensionName()
     {
-        $reflectionClass = new \ReflectionClass($this);
+        $reflectionClass   = new \ReflectionClass($this);
         $componentFilePath = dirname($reflectionClass->getFileName());
 
         // If the file path is invalid
-        $extensionDirPosition = strpos($componentFilePath, 'ext'.DIRECTORY_SEPARATOR);
+        $extensionDirPosition = strpos($componentFilePath, 'ext' . DIRECTORY_SEPARATOR);
         if ($extensionDirPosition === false) {
             throw new \RuntimeException('Invalid component path', 1481360976);
         }
@@ -251,9 +253,9 @@ abstract class AbstractComponent implements ComponentInterface
         // Extract the extension key
         $componentPath = explode(
             DIRECTORY_SEPARATOR,
-            substr($componentFilePath, $extensionDirPosition + strlen('ext'.DIRECTORY_SEPARATOR))
+            substr($componentFilePath, $extensionDirPosition + strlen('ext' . DIRECTORY_SEPARATOR))
         );
-        $extensionKey = array_shift($componentPath);
+        $extensionKey  = array_shift($componentPath);
 
         // If the extension is unknown
         if (!in_array($extensionKey, ExtensionManagementUtility::getLoadedExtensionListArray())) {
@@ -261,7 +263,7 @@ abstract class AbstractComponent implements ComponentInterface
         }
 
         // Register the extension key & name
-        $this->extensionKey = $extensionKey;
+        $this->extensionKey  = $extensionKey;
         $this->extensionName = GeneralUtility::underscoredToUpperCamelCase($extensionKey);
 
         // Process the component path
@@ -277,9 +279,9 @@ abstract class AbstractComponent implements ComponentInterface
     protected function determineNameAndVariant()
     {
         $reflectionClass = new \ReflectionClass($this);
-        $componentName = preg_replace('/Component$/', '', $reflectionClass->getShortName());
+        $componentName   = preg_replace('/Component$/', '', $reflectionClass->getShortName());
         list($name, $variant) = preg_split('/_+/', $componentName, 2);
-        $this->name = self::expandComponentName($name);
+        $this->name    = self::expandComponentName($name);
         $this->variant = self::expandComponentName($variant);
     }
 
@@ -287,6 +289,7 @@ abstract class AbstractComponent implements ComponentInterface
      * Prepare a component path
      *
      * @param string $componentPath Component path
+     *
      * @return string Component name
      */
     public static function expandComponentName($componentPath)
@@ -326,31 +329,32 @@ abstract class AbstractComponent implements ComponentInterface
             $validIndexDocuments = [
                 'index.md',
                 'readme.md',
-                strtolower($this->name.'.md')
+                strtolower($this->name . '.md')
             ];
-            $indexDocument = null;
-            $documents = [];
+            $indexDocument       = null;
+            $documents           = [];
 
             // Run through all documentation files
             foreach (scandir($docDirectory) as $document) {
-                if (!is_file($docDirectory.DIRECTORY_SEPARATOR.$document)) {
+                if (!is_file($docDirectory . DIRECTORY_SEPARATOR . $document)) {
                     continue;
                 }
 
                 // If there's a valid documentation index file
                 if (in_array(strtolower($document), $validIndexDocuments)) {
                     if ($indexDocument === null) {
-                        $indexDocument = $docDirectory.DIRECTORY_SEPARATOR.$document;
+                        $indexDocument = $docDirectory . DIRECTORY_SEPARATOR . $document;
                     }
                     continue;
                 }
 
-                $documents[] = $docDirectory.DIRECTORY_SEPARATOR.$document;
+                $documents[] = $docDirectory . DIRECTORY_SEPARATOR . $document;
             }
 
             // If there's an index document
             if ($indexDocument !== null) {
                 $this->addNotice(file_get_contents($indexDocument));
+
                 return;
             }
 
@@ -361,8 +365,8 @@ abstract class AbstractComponent implements ComponentInterface
                 // Run through all documents
                 foreach ($documents as $document) {
                     $extension = strtolower(pathinfo($document, PATHINFO_EXTENSION));
-                    $listing[] = '* '.(in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg']) ? '!' : '').
-                        '['.pathinfo($document, PATHINFO_FILENAME).']('.basename($document).')';
+                    $listing[] = '* ' . (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg']) ? '!' : '') .
+                                 '[' . pathinfo($document, PATHINFO_FILENAME) . '](' . basename($document) . ')';
                 }
 
                 $this->addNotice(implode(PHP_EOL, $listing));
@@ -374,13 +378,15 @@ abstract class AbstractComponent implements ComponentInterface
      * Return the documentation directory for this component
      *
      * @param bool $rootRelative Return a root relative path
+     *
      * @return string Documentation directory
      */
     protected function getDocumentationDirectory($rootRelative = false)
     {
         $reflectionObject = new \ReflectionObject($this);
-        $componentFile = $reflectionObject->getFileName();
-        $docDirectory = dirname($componentFile).DIRECTORY_SEPARATOR.$this->name;
+        $componentFile    = $reflectionObject->getFileName();
+        $docDirectory     = dirname($componentFile) . DIRECTORY_SEPARATOR . $this->name;
+
         return $rootRelative ? substr($docDirectory, strlen(PATH_site) - 1) : $docDirectory;
     }
 
@@ -392,7 +398,7 @@ abstract class AbstractComponent implements ComponentInterface
     protected function addNotice($notice)
     {
         if (!$this->variant) {
-            $notice = trim($notice);
+            $notice       = trim($notice);
             $this->notice = strlen($notice) ? $this->exportNotice($notice) : null;
         }
     }
@@ -401,15 +407,17 @@ abstract class AbstractComponent implements ComponentInterface
      * Export a notice
      *
      * @param $notice
+     *
      * @return mixed
      */
     protected function exportNotice($notice)
     {
-        $docDirectoryPath = strtr($this->getDocumentationDirectory(true), [DIRECTORY_SEPARATOR => '/']).'/';
-        return preg_replace_callback('/\[([^\]]*?)\]\(([^\)]*?)\)/', function ($match) use ($docDirectoryPath) {
-            return '['.$match[1].']('
-                .(preg_match('%^https?\:\/\/%i', $match[2]) ? '' : $docDirectoryPath)
-                .$match[2].')';
+        $docDirectoryPath = strtr($this->getDocumentationDirectory(true), [DIRECTORY_SEPARATOR => '/']) . '/';
+
+        return preg_replace_callback('/\[([^\]]*?)\]\(([^\)]*?)\)/', function($match) use ($docDirectoryPath) {
+            return '[' . $match[1] . ']('
+                   . (preg_match('%^https?\:\/\/%i', $match[2]) ? '' : $docDirectoryPath)
+                   . $match[2] . ')';
         }, $notice);
     }
 
@@ -433,22 +441,22 @@ abstract class AbstractComponent implements ComponentInterface
     final public function export()
     {
         $properties = [
-            'status' => $this->status,
-            'name' => $this->name,
+            'status'  => $this->status,
+            'name'    => $this->name,
             'variant' => $this->variant,
-            'label' => $this->label,
-            'class' => get_class($this),
-            'type' => $this->type,
-            'valid' => false,
-            'path' => $this->componentPath,
-            'docs' => $this->getDocumentationDirectory(),
+            'label'   => $this->label,
+            'class'   => get_class($this),
+            'type'    => $this->type,
+            'valid'   => false,
+            'path'    => $this->componentPath,
+            'docs'    => $this->getDocumentationDirectory(),
         ];
 
         // Export the component properties
         try {
-            $properties = array_merge($properties, $this->exportInternal());
+            $properties            = array_merge($properties, $this->exportInternal());
             $properties['request'] = $this->exportRequest();
-            $properties['valid'] = true;
+            $properties['valid']   = true;
 
             // In case of an error
         } catch (\Exception $e) {
@@ -474,8 +482,8 @@ abstract class AbstractComponent implements ComponentInterface
             throw new \RuntimeException('Invalid configuration', 1481363496);
         }
 
-        $properties['config'] = $this->config;
-        $properties['template'] = $this->template;
+        $properties['config']    = $this->config;
+        $properties['template']  = $this->template;
         $properties['extension'] = $this->extension;
 
         // Export the associated resources
@@ -520,7 +528,7 @@ abstract class AbstractComponent implements ComponentInterface
         }
 
         return [
-            'method' => $this->request->getMethod(),
+            'method'    => $this->request->getMethod(),
             'arguments' => $this->request->getArguments(),
         ];
     }
@@ -590,9 +598,10 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function initializeTSFE()
     {
-        $GLOBALS['TSFE'] = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
+        $GLOBALS['TSFE']       = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
         $GLOBALS['TSFE']->cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
         $GLOBALS['TSFE']->cObj->start($GLOBALS['TSFE']->page, 'pages');
+
         return $GLOBALS['TSFE']->cObj;
     }
 
@@ -600,11 +609,16 @@ abstract class AbstractComponent implements ComponentInterface
      * Beautify HTML source
      *
      * @param string $html HTML source code
+     *
      * @return string Beautified HTML source code
      */
     protected function beautify($html)
     {
+        // TODO: Remove this hotfix. Necessary because the formater inserts whitespaces that break inline-block css!!!
+        return $html;
+
         $formatter = new Formatter();
+
         return $formatter->format($html);
     }
 
