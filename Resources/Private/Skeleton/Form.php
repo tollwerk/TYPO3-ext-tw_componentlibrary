@@ -38,6 +38,12 @@ class ###label###Component extends FormComponent
      * @var string
      */
     protected $label = '###label###';
+    /**
+     * Component status
+     *
+     * @var int
+     */
+    protected $status = self::STATUS_TBD;
 
     /**
      * Configure the component
