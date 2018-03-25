@@ -105,7 +105,7 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @var int
      */
-    protected $status = self::STATUS_WIP;
+    protected $status = self::STATUS_TBD;
     /**
      * Name
      *

@@ -44,17 +44,17 @@ namespace Tollwerk\TwComponentlibrary\Component;
 interface ComponentInterface
 {
     /**
+     * Component is to be done
+     *
+     * @var int
+     */
+    const STATUS_TBD = 'tbd';
+    /**
      * Component is work in progress
      *
      * @var int
      */
     const STATUS_WIP = 'wip';
-    /**
-     * Component is ready
-     *
-     * @var int
-     */
-    const STATUS_READY = 'ready';
     /**
      * Component is in draft state
      *
@@ -67,6 +67,12 @@ interface ComponentInterface
      * @var int
      */
     const STATUS_PROTOTYPE = 'prototype';
+    /**
+     * Component is ready
+     *
+     * @var int
+     */
+    const STATUS_READY = 'ready';
     /**
      * Fluid component type
      *
