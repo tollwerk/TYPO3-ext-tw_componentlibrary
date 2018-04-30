@@ -45,7 +45,7 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 /**
  * Basic preview template
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 class FluidTemplate implements TemplateInterface
@@ -131,11 +131,12 @@ class FluidTemplate implements TemplateInterface
         /** @var ConfigurationManagerInterface $configurationManager */
         $configurationManager = $objectManager->get(ConfigurationManagerInterface::class);
         /** @var StandaloneView $standaloneView */
-        $standaloneView = $objectManager->get(StandaloneView::class);
+        $standaloneView                = $objectManager->get(StandaloneView::class);
         $extbaseFrameworkConfiguration = $configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
-        $templatePathAndFileName = null;
+        $templatePathAndFileName       = null;
+        $templateName                  = $this->templateName.'.html';
         foreach (array_reverse($extbaseFrameworkConfiguration['view']['templateRootPaths']) as $templateRootPath) {
-            $templatePathAndFileName = GeneralUtility::getFileAbsFileName($templateRootPath.'Preview/'.$this->templateName.'.html');
+            $templatePathAndFileName = GeneralUtility::getFileAbsFileName($templateRootPath.'Preview/'.$templateName);
             if (file_exists($templatePathAndFileName)) {
                 $standaloneView->setTemplatePathAndFilename($templatePathAndFileName);
                 break;
@@ -144,7 +145,7 @@ class FluidTemplate implements TemplateInterface
         }
         if (!$templatePathAndFileName) {
             throw new \InvalidArgumentException(sprintf('Couldn\'t find standalone template "%s" for basic preview rendering',
-                $templatePathAndFileName), 1518958675);
+                $templateName), 1518958675);
         }
 
         $standaloneView->setLayoutRootPaths($extbaseFrameworkConfiguration['view']['layoutRootPaths']);
@@ -154,9 +155,9 @@ class FluidTemplate implements TemplateInterface
         // Assign rendering parameters
         $standaloneView->assignMultiple([
             'headerIncludes' => implode('', $this->headerIncludes),
-            'headerCss' => array_unique(array_merge(self::$commonStylesheets, $this->stylesheets)),
-            'headerJs' => array_unique(array_merge(self::$commonHeaderScripts, $this->headerScripts)),
-            'footerJs' => array_unique(array_merge(self::$commonFooterScripts, $this->footerScripts)),
+            'headerCss'      => array_unique(array_merge(self::$commonStylesheets, $this->stylesheets)),
+            'headerJs'       => array_unique(array_merge(self::$commonHeaderScripts, $this->headerScripts)),
+            'footerJs'       => array_unique(array_merge(self::$commonFooterScripts, $this->footerScripts)),
             'footerIncludes' => implode('', $this->footerIncludes),
         ]);
 
@@ -200,7 +201,7 @@ class FluidTemplate implements TemplateInterface
         if (strlen($path)) {
             $absPath = GeneralUtility::getFileAbsFileName($path);
             if (is_file($absPath)) {
-                $include = file_get_contents($absPath);
+                $include                                            = file_get_contents($absPath);
                 $this->headerIncludes[self::hashResource($include)] = $include;
             }
         }
@@ -230,7 +231,7 @@ class FluidTemplate implements TemplateInterface
         if (strlen($path)) {
             $absPath = GeneralUtility::getFileAbsFileName($path);
             if (is_file($absPath)) {
-                $include = file_get_contents($absPath);
+                $include                                            = file_get_contents($absPath);
                 $this->footerIncludes[self::hashResource($include)] = $include;
             }
         }
@@ -285,6 +286,7 @@ class FluidTemplate implements TemplateInterface
      * Resolve a URL
      *
      * @param string $url URL
+     *
      * @return bool|string Resolved URL
      */
     protected static function resolveUrl($url)
@@ -299,6 +301,7 @@ class FluidTemplate implements TemplateInterface
                 return substr($absScript, strlen(PATH_site));
             }
         }
+
         return null;
     }
 
@@ -306,6 +309,7 @@ class FluidTemplate implements TemplateInterface
      * Return an MD5 hash for a resource
      *
      * @param string $resource Resource
+     *
      * @return string MD5 resource hash
      */
     protected static function hashResource($resource)
@@ -336,10 +340,10 @@ class FluidTemplate implements TemplateInterface
      */
     protected function mergeTemplateResources(TemplateResources $templateResources)
     {
-        $this->stylesheets = array_merge($this->stylesheets, $templateResources->getStylesheets());
-        $this->headerScripts = array_merge($this->headerScripts, $templateResources->getHeaderScripts());
+        $this->stylesheets    = array_merge($this->stylesheets, $templateResources->getStylesheets());
+        $this->headerScripts  = array_merge($this->headerScripts, $templateResources->getHeaderScripts());
         $this->headerIncludes = array_merge($this->headerIncludes, $templateResources->getHeaderIncludes());
-        $this->footerScripts = array_merge($this->footerScripts, $templateResources->getFooterScripts());
+        $this->footerScripts  = array_merge($this->footerScripts, $templateResources->getFooterScripts());
         $this->footerIncludes = array_merge($this->footerIncludes, $templateResources->getFooterIncludes());
     }
 
@@ -357,11 +361,13 @@ class FluidTemplate implements TemplateInterface
      * Set the configured Fluid Template name
      *
      * @param string $templateName Fluid template name
+     *
      * @return FluidTemplate Self reference
      */
     public function setTemplateName($templateName)
     {
         $this->templateName = ucfirst(strtolower($templateName));
+
         return $this;
     }
 }

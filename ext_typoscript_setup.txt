@@ -1,8 +1,0 @@
-config.tx_extbase.view {
-    templateRootPaths.0 = EXT:tw_componentlibrary/Resources/Private/Templates/
-    templateRootPaths.1 = {$plugin.tx_twcomponentlibrary.view.templateRootPath}
-    partialRootPaths.0 = EXT:tw_componentlibrary/Resources/Private/Partials/
-    partialRootPaths.1 = {$plugin.tx_twcomponentlibrary.view.partialRootPath}
-    layoutRootPaths.0 = EXT:tw_componentlibrary/Resources/Private/Layouts/
-    layoutRootPaths.1 = {$plugin.tx_twcomponentlibrary.view.layoutRootPath}
-}
