@@ -65,7 +65,7 @@ class ComponentCommandController extends CommandController
         $setup = $this->objectManager->get(BackendConfigurationManager::class)->getTypoScriptSetup();
         /** @var TypoScriptService $typoscriptService */
         $typoscriptService = $this->objectManager->get(TypoScriptService::class);
-        $config = $typoscriptService->convertTypoScriptArrayToPlainArray($setup['plugin.']['tx_twcomponentlibrary.']);
+        $config = $typoscriptService->convertTypoScriptArrayToPlainArray((array)$setup['plugin.']['tx_twcomponentlibrary.']);
 
         // Register common stylesheets & scripts
         FluidTemplate::addCommonStylesheets($config['settings']['stylesheets']);
