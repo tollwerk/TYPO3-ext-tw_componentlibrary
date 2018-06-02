@@ -155,7 +155,7 @@ The key / value pairs inside the JSON file will be used as input for the `setPar
 
 #### Extbase plugin component
 
-To configure an Extbase plugin component, use the `setExtbaseConfiguration()` method to specify the plugin name, the controller class name and the controller action to be called. The output will be rendered using the Fluid template associated with the controller action. You can specify action arguments via `setControllerActionArgument()`.
+To configure an Extbase plugin component, use the `setExtbaseConfiguration()` method to specify the plugin name, the controller class name and the controller action to be called. The output will be rendered using the Fluid template associated with the controller action. You can specify action arguments via `setControllerActionArgument()` and simulate controller controller settings via `setControllerSettings()`.
 
 ```php
 <?php
@@ -176,6 +176,9 @@ class ExampleExtbaseComponent extends ExtbaseComponent
     {
         $this->setExtbaseConfiguration('PluginName', MyCustomController::class, 'action');
         $this->setControllerActionArgument('param', [1, 2, 3]);
+        
+        $overrideExistingSettings = true;
+        $this->setControllerSettings(['category' => 1], $overrideExistingSettings);
     }
 }
 ```
