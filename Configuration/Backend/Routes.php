@@ -22,14 +22,15 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***********************************************************************************/
 
-$routes = [];
+$routes                 = [];
 $extensionConfiguration = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary'];
 if (!empty($extensionConfiguration['componentlibrary'])) {
-    $componentLibrary = $extensionConfiguration['componentlibrary'];
+    $componentLibrary          = $extensionConfiguration['componentlibrary'];
     $routes[$componentLibrary] = [
-        'path' => '/'.$componentLibrary,
+        'path'   => '/'.$componentLibrary,
         'access' => 'public',
         'target' => \Tollwerk\TwComponentlibrary\Controller\FractalController::class.'::updateAction'
     ];
 }
+
 return $routes;

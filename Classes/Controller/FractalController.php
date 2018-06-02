@@ -3,12 +3,12 @@
 /**
  * Fractal controller
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Controller
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2018 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2018 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -35,17 +35,29 @@
 
 namespace Tollwerk\TwComponentlibrary\Controller;
 
+use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Http\Stream;
+
 /**
  * Fractal controller
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Controller
  */
 class FractalController
 {
-    public function updateAction()
+    /**
+     * Update the fractal component library
+     *
+     * @param ServerRequest $request
+     * @param Response $response
+     *
+     * @return bool
+     */
+    public function updateAction(ServerRequest $request, Response $response)
     {
-        $script = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['script'];
+        $script         = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['script'];
         $descriptorspec = array(
             0 => array('pipe', 'r'),
             1 => array('pipe', 'w'),
@@ -56,6 +68,12 @@ class FractalController
         stream_get_contents($pipes[1]);
         fclose($pipes[1]);
         $status = proc_get_status($process);
-        return !$status['exitcode'];
+
+        // If an error occured
+        if ($status['exitcode']) {
+            return $response->withStatus(500);
+        }
+
+        return $response;
     }
 }
