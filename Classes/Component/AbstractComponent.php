@@ -201,6 +201,8 @@ abstract class AbstractComponent implements ComponentInterface
      * Component constructor
      *
      * @param ControllerContext|null $controllerContext Controller context
+     *
+     * @throws \ReflectionException
      */
     public function __construct(ControllerContext $controllerContext = null)
     {
