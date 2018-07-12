@@ -3,12 +3,12 @@
 /**
  * FLUIDTEMPLATE component
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2018 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2018 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -41,7 +41,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Abstract FLUIDTEMPLATE component
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 abstract class FluidTemplateComponent extends AbstractComponent
@@ -52,6 +52,18 @@ abstract class FluidTemplateComponent extends AbstractComponent
      * @var string
      */
     protected $type = self::TYPE_FLUID;
+    /**
+     * Template
+     *
+     * @var string|null
+     */
+    protected $template = null;
+    /**
+     * Section
+     *
+     * @var string|null
+     */
+    protected $section = null;
     /**
      * Parameters
      *
@@ -85,16 +97,19 @@ abstract class FluidTemplateComponent extends AbstractComponent
             $view->setLayoutRootPaths($layoutRootPaths);
             $view->setTemplateRootPaths($templateRootPaths);
             $view->setPartialRootPaths($partialRootPaths);
-            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->config));
-            $view->assignMultiple($this->parameters);
+            $view->setTemplatePathAndFilename(GeneralUtility::getFileAbsFileName($this->template));
             $view->getRequest()->setControllerExtensionName($this->extensionName);
             $view->getRequest()->setOriginalRequestMappingResults($this->validationErrors);
-            $result = $this->beautify($view->render());
+            $view->assignMultiple($this->parameters);
+            $view->assignMultiple($this->parameters);
+            $result = $this->beautify(
+                $this->section ? $view->renderSection($this->section, $this->parameters) : $view->render()
+            );
 
             // In case of an error
         } catch (\Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
-                .$e->getTraceAsString().'</pre>';
+                      .$e->getTraceAsString().'</pre>';
         }
 
         return $result;
@@ -119,8 +134,8 @@ abstract class FluidTemplateComponent extends AbstractComponent
     protected function loadJsonParameters()
     {
         $reflectionObject = new \ReflectionObject($this);
-        $componentFile = $reflectionObject->getFileName();
-        $parameterFile = dirname($componentFile).DIRECTORY_SEPARATOR.pathinfo(
+        $componentFile    = $reflectionObject->getFileName();
+        $parameterFile    = dirname($componentFile).DIRECTORY_SEPARATOR.pathinfo(
                 $componentFile,
                 PATHINFO_FILENAME
             ).'.json';
@@ -141,7 +156,8 @@ abstract class FluidTemplateComponent extends AbstractComponent
      * Set a rendering parameter
      *
      * @param string $param Parameter name
-     * @param mixed $value Parameter value
+     * @param mixed $value  Parameter value
+     *
      * @throws \RuntimeException If the parameter name is invalid
      */
     protected function setParameter($param, $value)
@@ -157,11 +173,21 @@ abstract class FluidTemplateComponent extends AbstractComponent
     /**
      * Set the fluid template
      *
-     * @param $template
+     * @param string $template Fluid template
      */
     protected function setTemplate($template)
     {
-        $this->config = trim($template) ?: null;
+        $this->template = trim($template) ?: null;
+    }
+
+    /**
+     * Set the fluid template section
+     *
+     * @param string $section Fluid template section
+     */
+    protected function setSection($section)
+    {
+        $this->section = trim($section) ?: null;
     }
 
     /**
@@ -172,8 +198,12 @@ abstract class FluidTemplateComponent extends AbstractComponent
     protected function exportInternal()
     {
         // Read the linked TypoScript
-        if ($this->config !== null) {
-            $templateFile = GeneralUtility::getFileAbsFileName($this->config);
+        if ($this->template !== null) {
+            $this->config = [
+                'template' => $this->template,
+                'section'  => $this->section,
+            ];
+            $templateFile = GeneralUtility::getFileAbsFileName($this->template);
             if (!strlen($templateFile) || !is_file($templateFile)) {
                 throw new \RuntimeException(sprintf('Invalid template file "%s"', $templateFile), 1481552328);
             }
