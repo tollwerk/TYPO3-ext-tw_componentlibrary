@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 }
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
-    'TwComponentlibrary',
+    'tw_componentlibrary',
     'Configuration/TypoScript',
-    'Component Library'
+    'TYPO3 Component Library'
 );
