@@ -22,5 +22,8 @@ plugin.tx_twcomponentlibrary {
 
         # cat=plugin.tx_twcomponentlibrary//c; type=string; label=Common footer scripts
         footerScripts =
+
+        # cat=plugin.tx_twcomponentlibrary//d; type=string; label=Icon directories
+        iconDirectories =
     }
 }
