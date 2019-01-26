@@ -7,12 +7,12 @@
  * @package Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Controller
  * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2018 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @license http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
- *  Copyright © 2018 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2019 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  All rights reserved
  *

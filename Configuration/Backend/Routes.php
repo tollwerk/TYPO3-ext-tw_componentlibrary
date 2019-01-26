@@ -1,7 +1,7 @@
 <?php
 
 /***********************************************************************************
- *  Copyright © 2018 Joschi Kuphal <joschi@kuphal.net> / @jkphl
+ *  Copyright © 2019 Joschi Kuphal <joschi@kuphal.net> / @jkphl
  *
  *  All rights reserved
  *
