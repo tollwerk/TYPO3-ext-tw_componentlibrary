@@ -3,12 +3,12 @@
 /**
  * Component Kickstarter
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2018 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2018 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -41,9 +41,10 @@ use TYPO3\CMS\Extbase\Mvc\Exception\CommandException;
 /**
  * Component Kickstarter
  *
- * `typo3/cli_dispatch.phpsh extbase component:create --name Component --type fluid|typoscript|extbase --extension my_extension`
+ * `typo3/cli_dispatch.phpsh extbase component:create --name Component --type fluid|typoscript|extbase --extension
+ * my_extension`
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility
  */
 class Kickstarter
@@ -51,9 +52,10 @@ class Kickstarter
     /**
      * Kickstart a new component
      *
-     * @param string $name Component name
-     * @param string $type Component type
+     * @param string $name      Component name
+     * @param string $type      Component type
      * @param string $extension Host extension
+     *
      * @throws CommandException If the provider extension is invalid
      */
     public static function create($name, $type, $extension, $vendor)
@@ -65,7 +67,7 @@ class Kickstarter
         }
 
         // Prepare the component directory
-        $componentPath = implode(DIRECTORY_SEPARATOR, $name);
+        $componentPath    = implode(DIRECTORY_SEPARATOR, $name);
         $componentAbsPath = GeneralUtility::getFileAbsFileName(
             'EXT:'.$extension.DIRECTORY_SEPARATOR.'Components'.DIRECTORY_SEPARATOR
             .implode(DIRECTORY_SEPARATOR, $name)
@@ -82,19 +84,19 @@ class Kickstarter
         );
 
         // Copy the skeleton template
-        $substitute = [
+        $substitute       = [
             '###extension###' => $extension,
             '###namespace###' => $componentNamespace,
-            '###label###' => $componentLabel,
-            '###tspath###' => strtolower(implode('.', array_merge($name, [$componentLabel]))),
-            '###path###' => $componentPath,
+            '###label###'     => $componentLabel,
+            '###tspath###'    => strtolower(implode('.', array_merge($name, [$componentLabel]))),
+            '###path###'      => $componentPath,
         ];
         $skeletonTemplate = GeneralUtility::getFileAbsFileName(
             'EXT:tw_componentlibrary/Resources/Private/Skeleton/'.ucfirst($type).'.php'
         );
-        $skeletonString = strtr(file_get_contents($skeletonTemplate), $substitute);
-        $skeletonFile = $componentAbsPath.DIRECTORY_SEPARATOR.$componentName.'.php';
+        $skeletonString   = strtr(file_get_contents($skeletonTemplate), $substitute);
+        $skeletonFile     = $componentAbsPath.DIRECTORY_SEPARATOR.$componentName.'.php';
         file_put_contents($skeletonFile, $skeletonString);
-        chmod($skeletonString, 0664);
+        chmod($skeletonFile, 0664);
     }
 }

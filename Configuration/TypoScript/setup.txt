@@ -16,6 +16,7 @@ plugin.tx_twcomponentlibrary {
         stylesheets = {$plugin.tx_twcomponentlibrary.settings.stylesheets}
         headerScripts = {$plugin.tx_twcomponentlibrary.settings.headerScripts}
         footerScripts = {$plugin.tx_twcomponentlibrary.settings.footerScripts}
+        iconDirectories = {$plugin.tx_twcomponentlibrary.settings.iconDirectories}
     }
 }
 

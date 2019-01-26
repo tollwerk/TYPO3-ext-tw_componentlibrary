@@ -45,7 +45,7 @@ use TYPO3\CMS\Frontend\Page\PageRepository;
 /**
  * TypoScript extractor
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility
  */
 class TypoScriptUtility
@@ -60,9 +60,10 @@ class TypoScriptUtility
     /**
      * Extract and return a TypoScript key for a particular page and type
      *
-     * @param int $id Page ID
+     * @param int $id      Page ID
      * @param int $typeNum Page type
-     * @param string $key TypoScript key
+     * @param string $key  TypoScript key
+     *
      * @return array TypoScript values
      * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
      * @throws \Exception If the TypoScript key is invalid
@@ -79,14 +80,16 @@ class TypoScriptUtility
         list($name, $conf) = GeneralUtility::makeInstance(TypoScriptParser::class)->getVal($key, $TSFE->tmpl->setup);
         $lastKey = explode('.', $key);
         $lastKey = array_pop($lastKey);
+
         return [$lastKey => $name, $lastKey.'.' => $conf];
     }
 
     /**
      * Instantiate a Frontend controller for the given configuration
      *
-     * @param int $id Page ID
+     * @param int $id      Page ID
      * @param int $typeNum Page Type
+     *
      * @return TypoScriptFrontendController Frontend controller
      * @throws \Exception
      * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
@@ -100,34 +103,40 @@ class TypoScriptUtility
         }
 
         if (!array_key_exists("$id/$typeNum", self::$frontendControllers)) {
-
-            /** @var TypoScriptFrontendController $TSFE */
-            $TSFE = GeneralUtility::makeInstance(
+            $tsfeBackup      = empty($GLOBALS['TSFE']) ? null : $GLOBALS['TSFE'];
+            $GLOBALS['TSFE'] = GeneralUtility::makeInstance(
                 TypoScriptFrontendController::class,
                 $GLOBALS['TYPO3_CONF_VARS'],
                 $id,
                 $typeNum
             );
-            $TSFE->sys_page = GeneralUtility::makeInstance(PageRepository::class);
-            $TSFE->sys_page->init(true);
-            $TSFE->connectToDB();
-            $TSFE->initFEuser();
-            $TSFE->determineId();
-            $TSFE->initTemplate();
-            $TSFE->rootLine = $TSFE->sys_page->getRootLine($id, '');
-            $TSFE->getConfigArray();
+
+            $GLOBALS['TSFE']->sys_page = GeneralUtility::makeInstance(PageRepository::class);
+            $GLOBALS['TSFE']->sys_page->init(true);
+            $GLOBALS['TSFE']->connectToDB();
+            $GLOBALS['TSFE']->initFEuser();
+            $GLOBALS['TSFE']->determineId();
+            $GLOBALS['TSFE']->initTemplate();
+            $GLOBALS['TSFE']->rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($id, '');
+            $GLOBALS['TSFE']->getConfigArray();
 
             // Calculate the absolute path prefix
-            if (!empty($TSFE->config['config']['absRefPrefix'])) {
-                $absRefPrefix = trim($TSFE->config['config']['absRefPrefix']);
-                $TSFE->absRefPrefix = ($absRefPrefix === 'auto') ? GeneralUtility::getIndpEnv(
+            if (!empty($GLOBALS['TSFE']->config['config']['absRefPrefix'])) {
+                $absRefPrefix                  = trim($GLOBALS['TSFE']->config['config']['absRefPrefix']);
+                $GLOBALS['TSFE']->absRefPrefix = ($absRefPrefix === 'auto') ? GeneralUtility::getIndpEnv(
                     'TYPO3_SITE_PATH'
                 ) : $absRefPrefix;
             } else {
-                $TSFE->absRefPrefix = '';
+                $GLOBALS['TSFE']->absRefPrefix = '';
             }
 
-            self::$frontendControllers["$id/$typeNum"] = $TSFE;
+            self::$frontendControllers["$id/$typeNum"] = $GLOBALS['TSFE'];
+
+            if ($tsfeBackup) {
+                $GLOBALS['TSFE'] = $tsfeBackup;
+            } else {
+                unset($GLOBALS['TSFE']);
+            }
         }
 
         return self::$frontendControllers["$id/$typeNum"];
@@ -136,9 +145,10 @@ class TypoScriptUtility
     /**
      * Serialize a TypoScript fragment
      *
-     * @param string $prefix Key prefix
+     * @param string $prefix    Key prefix
      * @param array $typoscript TypoScript fragment
-     * @param int $indent Indentation level
+     * @param int $indent       Indentation level
+     *
      * @return string Serialized TypoScript
      */
     public static function serialize($prefix, array $typoscript, $indent = 0)
