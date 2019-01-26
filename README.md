@@ -10,18 +10,6 @@ This TYPO3 extension
 1. encourages and supports the development of self-contained, re-usable function and design modules ("**components**") along with your TYPO3 project and
 2. exposes these components via a JSON API so that **component or pattern library, testing and styleguide tools** like [Fractal](http://fractal.build) can [extract and render](https://github.com/tollwerk/fractal-typo3) your components individually and independently of your TYPO3 frontend.
 
-### Component types
-
-The extension distiguishes 5 main types of components:
-
-* **TypoScript components**: Require a [TypoScript](https://docs.typo3.org/typo3cms/TyposcriptReference/) path with an object definition to render (e.g. `lib.menu`, defined as `HMENU`).
-* **Fluid template components**: Require a [Fluid template file](https://github.com/TYPO3/Fluid) (e.g. an Extbase / Fluid partial or standalone Fluid template) and an optional set of rendering parameters / variables.
-* **Extbase plugin components**: Require an [Extbase controller](https://docs.typo3.org/typo3cms/ExtbaseGuide/Extbase/Step3Documentation/ActionController.html), a controller action to call and possibly a list of parameters to pass to the controller action. 
-* **Content components**: Convenient way to render existing TYPO3 content elements as components. Works with both default and custom content elements.
-* **Form components**: Hook into the [TYPO3 Form Framework](https://docs.typo3.org/typo3cms/extensions/form/) and treat standard and custom form elements as individual components.
-
-The extension **doesn't impose any requirements towards your TypoScript, Fluid templates or directory layout** except that every component must be individually addressable. That is, you cannot expose e.g. just a part of a rendered Fluid template as a component. In that case, you'd have to outsource the desired part as a partial file of its own.
-
 Usage
 -----
 
@@ -50,6 +38,17 @@ to the parameter list
 $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters']
 ```
 
+### Component types
+
+The extension distiguishes 5 main types of components:
+
+- **TypoScript components**: Require a [TypoScript](https://docs.typo3.org/typo3cms/TyposcriptReference/) path with an object definition to render (e.g. `lib.menu`, defined as `HMENU`).
+- **Fluid template components**: Require a [Fluid template file](https://github.com/TYPO3/Fluid) (e.g. an Extbase / Fluid partial or standalone Fluid template) and an optional set of rendering parameters / variables.
+- **Extbase plugin components**: Require an [Extbase controller](https://docs.typo3.org/typo3cms/ExtbaseGuide/Extbase/Step3Documentation/ActionController.html), a controller action to call and possibly a list of parameters to pass to the controller action. 
+- **Content components**: Convenient way to render existing TYPO3 content elements as components. Works with both default and custom content elements.
+- **Form components**: Hook into the [TYPO3 Form Framework](https://docs.typo3.org/typo3cms/extensions/form/) and treat standard and custom form elements as individual components.
+
+The extension **doesn't impose any requirements towards your TypoScript, Fluid templates or directory layout** except that every component must be individually addressable. That is, you cannot expose e.g. just a part of a rendered Fluid template as a component. In that case, you'd have to outsource the desired part as a partial file of its own.
 
 ### Declaring components
 
@@ -252,7 +251,7 @@ class ExampleTextComponent extends FormComponent
 #### Common properties
 
 There's a bunch of component properties and methods that are common to all component types. Some of them are controlled via [TypoScript constants](#typoscript-constants), others by overriding [component class properties](#component-properties) or calling [shared configuration methods](#configuration-methods).
- 
+
 ##### TypoScript constants
 
 Use the TypoScript constants to globally configure the HTML documents wrapped around your components when rendered by external systems. You can add base files, web fonts and libraries this way (`global.css`, jQuery, etc.). All resources can be referenced absolutely (starting with `http://` or `https://`), relatively (`/fileadmin/css/...`) or using a TYPO3 extension prefix (`EXT:ext_key/Resources/...`).
@@ -360,9 +359,9 @@ abstract class AbstractComponent implements ComponentInterface
 ```
 
 ##### Preview templates
-  
+
 By default, the builtin `FluidTemplate` is used for rendering components for external systems. You can use your custom template as long as you implement the `TemplateInterface`. The default `FluidTemplate` supports a couple of configuration methods:
- 
+
 ```php
 <?php
 
@@ -428,7 +427,7 @@ class FluidTemplate implements TemplateInterface
     public function addFooterInclude($path) {}
 }
 ```
-  
+
 Example usage:
 
 ```php
@@ -528,7 +527,7 @@ php typo3/cli_dispatch.phpsh extbase component:create Test/Button fluid
 ### Extracting components
 
 The extension adds an Extbase CLI command that lets you **discover the declared components in JSON format** on the command line:
- 
+
 ```bash
 typo3/cli_dispatch.phpsh extbase component:discover
 ```
@@ -593,6 +592,20 @@ will create a graph like this one:
 ![Overview component dependency graph](https://rawgit.com/tollwerk/TYPO3-ext-tw_componentlibrary/master/Docs/component-dependency-graph-all.svg)
 
 You can use these graphs for documentation purposes or to [display them in the Fractal component library tool](https://github.com/tollwerk/fractal-typo3#component-dependency-graphs).
+
+### Utilities
+
+#### SvgIconUtility
+
+The included class `\Tollwerk\TwComponentlibrary\Utility\SvgIconUtility` helps you with listing SVG graphics in backend forms and custom applications. Provide a comma-separated list of directories using the TypoScript constant `plugin.tx_twcomponentlibrary.settings.iconDirectories`. The following two methods will then find and return all `*.svg` files in these directories.
+
+##### `SvgIconUtility::getIcons(int $id = 1, int $typeNum = 0): array`
+
+Returns an array of SVG graphics, with the file base names as values and the absolute file paths as keys. Optionally provide a page ID and type for which the icon directories should be determined.
+
+##### `SvgIconUtility::getIconTcaSelectItems(int $id = 1, int $typeNum = 0): array`
+
+Similar to `getIcons()`, but returns the graphics ready for use in TCA `select` fields.
 
 TYPO3 Backend integration
 -------------------------
