@@ -26,18 +26,6 @@ Alternatively, [download the latest source package](https://github.com/tollwerk/
 
 Enable the extension via the TYPO3 extension manager.
 
-In order to allow requests from Fractal to TYPO3, enter the Install Tool (TYPO3 <9.0) respectively enter "Settings › Configure installation-wide options" (TYPO3 >=9.0) and add
-
-```
-tx_twcomponentlibrary_component[component]
-```
-
-to the parameter list
-
-```
-$GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters']
-```
-
 ### Component types
 
 The extension distiguishes 5 main types of components:
