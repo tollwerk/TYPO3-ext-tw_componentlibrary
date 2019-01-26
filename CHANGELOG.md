@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.5.2] - 2019-01-26
 
-## Changed
+### Changed
 
 - Automatically append the necessary `cHashExcludedParameters`
 
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.5.1] - 2018-12-05
 
-## Changed
+### Changed
 
 - Moved static template inclusion to Overrides ([#10](https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary/issues/10))
 
