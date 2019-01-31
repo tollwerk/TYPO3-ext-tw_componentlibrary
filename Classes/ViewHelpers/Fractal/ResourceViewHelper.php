@@ -36,8 +36,8 @@
 
 namespace Tollwerk\TwComponentlibrary\ViewHelpers\Fractal;
 
-use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithRenderStatic;
 
 class ResourceViewHelper extends AbstractViewHelper
@@ -57,6 +57,7 @@ class ResourceViewHelper extends AbstractViewHelper
      * @param array $arguments
      * @param \Closure $renderChildrenClosure
      * @param RenderingContextInterface $renderingContext
+     *
      * @return string
      */
     public static function renderStatic(
@@ -65,6 +66,7 @@ class ResourceViewHelper extends AbstractViewHelper
         RenderingContextInterface $renderingContext
     ) {
         $content = trim($renderChildrenClosure());
+
         return preg_match('%^https?\:\/\/%', $content) ?
             htmlspecialchars($content) : '{{ path \'/'.ltrim($content, '/').'\' }}';
     }
