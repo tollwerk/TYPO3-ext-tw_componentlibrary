@@ -37,6 +37,8 @@ namespace Tollwerk\TwComponentlibrary\Component;
 
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * Abstract FLUIDTEMPLATE component
@@ -82,8 +84,10 @@ abstract class FluidTemplateComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         try {
-            // Instantiate a frontend controller
-            $typoScriptParser = GeneralUtility::makeInstance(TypoScriptParser::class);
+
+            // Instantiate a TypoScript parser
+            $configurationManager = $this->objectManager->get(ConfigurationManager::class);
+            $typoScriptParser     = GeneralUtility::makeInstance(TypoScriptParser::class);
             list(, $viewConfig) = $typoScriptParser->getVal(
                 'plugin.tx_'.strtolower($this->extensionName).'.view',
                 $GLOBALS['TSFE']->tmpl->setup
@@ -93,7 +97,14 @@ abstract class FluidTemplateComponent extends AbstractComponent
             list(, $partialRootPaths) = $typoScriptParser->getVal('partialRootPaths', $viewConfig);
 
             /** @var \TYPO3\CMS\Fluid\View\StandaloneView $view */
-            $view = $this->objectManager->get('TYPO3\\CMS\\Fluid\\View\\StandaloneView');
+            $view = $this->objectManager->get(StandaloneView::class);
+            $view->getRenderingContext()->getVariableProvider()->add(
+                'settings',
+                $configurationManager->getConfiguration(
+                    ConfigurationManager::CONFIGURATION_TYPE_SETTINGS,
+                    $this->extensionName
+                )
+            );
             $view->setLayoutRootPaths($layoutRootPaths);
             $view->setTemplateRootPaths($templateRootPaths);
             $view->setPartialRootPaths($partialRootPaths);
