@@ -3,12 +3,12 @@
 /**
  * Abstract component base
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -53,7 +53,7 @@ use XhtmlFormatter\Formatter;
 /**
  * Abstract component
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 abstract class AbstractComponent implements ComponentInterface
@@ -247,7 +247,7 @@ abstract class AbstractComponent implements ComponentInterface
         $componentFilePath = dirname($reflectionClass->getFileName());
 
         // If the file path is invalid
-        $extensionDirPosition = strpos($componentFilePath, 'ext' . DIRECTORY_SEPARATOR);
+        $extensionDirPosition = strpos($componentFilePath, 'ext'.DIRECTORY_SEPARATOR);
         if ($extensionDirPosition === false) {
             throw new \RuntimeException('Invalid component path', 1481360976);
         }
@@ -255,7 +255,7 @@ abstract class AbstractComponent implements ComponentInterface
         // Extract the extension key
         $componentPath = explode(
             DIRECTORY_SEPARATOR,
-            substr($componentFilePath, $extensionDirPosition + strlen('ext' . DIRECTORY_SEPARATOR))
+            substr($componentFilePath, $extensionDirPosition + strlen('ext'.DIRECTORY_SEPARATOR))
         );
         $extensionKey  = array_shift($componentPath);
 
@@ -331,26 +331,26 @@ abstract class AbstractComponent implements ComponentInterface
             $validIndexDocuments = [
                 'index.md',
                 'readme.md',
-                strtolower($this->name . '.md')
+                strtolower($this->name.'.md')
             ];
             $indexDocument       = null;
             $documents           = [];
 
             // Run through all documentation files
             foreach (scandir($docDirectory) as $document) {
-                if (!is_file($docDirectory . DIRECTORY_SEPARATOR . $document)) {
+                if (!is_file($docDirectory.DIRECTORY_SEPARATOR.$document)) {
                     continue;
                 }
 
                 // If there's a valid documentation index file
                 if (in_array(strtolower($document), $validIndexDocuments)) {
                     if ($indexDocument === null) {
-                        $indexDocument = $docDirectory . DIRECTORY_SEPARATOR . $document;
+                        $indexDocument = $docDirectory.DIRECTORY_SEPARATOR.$document;
                     }
                     continue;
                 }
 
-                $documents[] = $docDirectory . DIRECTORY_SEPARATOR . $document;
+                $documents[] = $docDirectory.DIRECTORY_SEPARATOR.$document;
             }
 
             // If there's an index document
@@ -367,8 +367,8 @@ abstract class AbstractComponent implements ComponentInterface
                 // Run through all documents
                 foreach ($documents as $document) {
                     $extension = strtolower(pathinfo($document, PATHINFO_EXTENSION));
-                    $listing[] = '* ' . (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg']) ? '!' : '') .
-                                 '[' . pathinfo($document, PATHINFO_FILENAME) . '](' . basename($document) . ')';
+                    $listing[] = '* '.(in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'svg']) ? '!' : '').
+                                 '['.pathinfo($document, PATHINFO_FILENAME).']('.basename($document).')';
                 }
 
                 $this->addNotice(implode(PHP_EOL, $listing));
@@ -387,7 +387,7 @@ abstract class AbstractComponent implements ComponentInterface
     {
         $reflectionObject = new \ReflectionObject($this);
         $componentFile    = $reflectionObject->getFileName();
-        $docDirectory     = dirname($componentFile) . DIRECTORY_SEPARATOR . $this->name;
+        $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->name;
 
         return $rootRelative ? substr($docDirectory, strlen(PATH_site) - 1) : $docDirectory;
     }
@@ -414,12 +414,12 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function exportNotice($notice)
     {
-        $docDirectoryPath = strtr($this->getDocumentationDirectory(true), [DIRECTORY_SEPARATOR => '/']) . '/';
+        $docDirectoryPath = strtr($this->getDocumentationDirectory(true), [DIRECTORY_SEPARATOR => '/']).'/';
 
         return preg_replace_callback('/\[([^\]]*?)\]\(([^\)]*?)\)/', function($match) use ($docDirectoryPath) {
-            return '[' . $match[1] . ']('
-                   . (preg_match('%^https?\:\/\/%i', $match[2]) ? '' : $docDirectoryPath)
-                   . $match[2] . ')';
+            return '['.$match[1].']('
+                   .(preg_match('%^https?\:\/\/%i', $match[2]) ? '' : $docDirectoryPath)
+                   .$match[2].')';
         }, $notice);
     }
 
@@ -628,7 +628,7 @@ abstract class AbstractComponent implements ComponentInterface
      * Register a validation error
      *
      * @param string $property Property
-     * @param string $message Validation error message
+     * @param string $message  Validation error message
      */
     protected function addError($property, $message)
     {

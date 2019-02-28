@@ -74,10 +74,10 @@ class TemplateResources
     /**
      * Constructor
      *
-     * @param array $stylesheets Stylesheets
-     * @param array $headerScripts Header scripts
+     * @param array $stylesheets    Stylesheets
+     * @param array $headerScripts  Header scripts
      * @param array $headerIncludes Header includes
-     * @param array $footerScripts Footer scripts
+     * @param array $footerScripts  Footer scripts
      * @param array $footerIncludes Footer includes
      */
     public function __construct(
@@ -87,10 +87,10 @@ class TemplateResources
         array $footerScripts,
         array $footerIncludes
     ) {
-        $this->stylesheets = $stylesheets;
-        $this->headerScripts = $headerScripts;
+        $this->stylesheets    = $stylesheets;
+        $this->headerScripts  = $headerScripts;
         $this->headerIncludes = $headerIncludes;
-        $this->footerScripts = $footerScripts;
+        $this->footerScripts  = $footerScripts;
         $this->footerIncludes = $footerIncludes;
     }
 

@@ -39,7 +39,7 @@ namespace Tollwerk\TwComponentlibrary\Component;
 /**
  * Extended fluid template view
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 class TemplateView extends \TYPO3\CMS\Fluid\View\TemplateView
@@ -48,7 +48,8 @@ class TemplateView extends \TYPO3\CMS\Fluid\View\TemplateView
      * Return the template source content
      *
      * @param string $controller Controller name
-     * @param string $action Action name
+     * @param string $action     Action name
+     *
      * @return string Template source
      */
     public function getComponentTemplate($controller, $action)

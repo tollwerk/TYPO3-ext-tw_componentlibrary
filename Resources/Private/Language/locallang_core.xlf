@@ -8,7 +8,8 @@
                 <source>Update Fractal components</source>
             </trans-unit>
             <trans-unit id="cache.fractal.description">
-                <source>Extracts and updates the component definitions in your external Fractal component library.</source>
+                <source>Extracts and updates the component definitions in your external Fractal component library.
+                </source>
             </trans-unit>
         </body>
     </file>

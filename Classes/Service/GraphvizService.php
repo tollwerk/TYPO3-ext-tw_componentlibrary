@@ -36,6 +36,7 @@ class GraphvizService extends AbstractService
      * Create an SVG component graph
      *
      * @param string $graph GraphViz graph
+     *
      * @return string SVG component graph
      * @see https://stackoverflow.com/questions/8002352/how-to-control-subgraphs-layout-in-dot
      */
@@ -49,8 +50,9 @@ class GraphvizService extends AbstractService
         // Create component graph
 //        $dotCommand = 'ccomps -x '.CommandUtility::escapeShellArgument($tempDot).' | dot -Nfontname=sans-serif -Efontname=sans-serif | gvpack -array_1 | neato -Tsvg ';
         $dotCommand = 'dot -Tsvg -Nfontname=sans-serif -Efontname=sans-serif '.CommandUtility::escapeShellArgument($tempDot);
-        $output = $returnValue = null;
+        $output     = $returnValue = null;
         CommandUtility::exec($dotCommand, $output, $returnValue);
+
         return $returnValue ? '' : implode('', (array)$output);
     }
 }

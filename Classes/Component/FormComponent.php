@@ -3,12 +3,12 @@
 /**
  * FLUIDTEMPLATE component
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -49,7 +49,7 @@ use TYPO3\CMS\Form\Domain\Runtime\FormRuntime;
 /**
  * Abstract FLUIDTEMPLATE component
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 abstract class FormComponent extends AbstractComponent
@@ -119,7 +119,7 @@ abstract class FormComponent extends AbstractComponent
             // In case of an error
         } catch (\Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
-                .$e->getTraceAsString().'</pre>';
+                      .$e->getTraceAsString().'</pre>';
         }
 
         return $result;
@@ -143,9 +143,10 @@ abstract class FormComponent extends AbstractComponent
             $this->translationFile = 'EXT:'.$this->extensionKey.'/Resources/Private/Language/locallang.xlf';
         }
 
-        $configurationService = $this->objectManager->get(ConfigurationService::class);
+        $configurationService   = $this->objectManager->get(ConfigurationService::class);
         $prototypeConfiguration = $configurationService->getPrototypeConfiguration('standard');
-        $this->form = $this->objectManager->get(FormDefinition::class, 'Component', $prototypeConfiguration);
+        $this->form             = $this->objectManager->get(FormDefinition::class, 'Component',
+            $prototypeConfiguration);
         $this->form->setRenderingOption('translation', ['translationFile' => $this->translationFile]);
         $this->form->setRenderingOption('honeypot', ['enable' => false]);
         $this->page = $this->form->createPage('page');
@@ -156,18 +157,20 @@ abstract class FormComponent extends AbstractComponent
     /**
      * Create a form element
      *
-     * @param string $typeName Type of the new form element
+     * @param string $typeName   Type of the new form element
      * @param string $identifier Form element identifier
+     *
      * @return AbstractRenderable Renderable form element
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotValidException
      */
     protected function createElement($typeName, $identifier = null)
     {
-        $identifier = trim($identifier) ?:
+        $identifier    = trim($identifier) ?:
             strtr(GeneralUtility::camelCaseToLowerCaseUnderscored($typeName), '_', '-').'-1';
         $this->element = $this->page->createElement($identifier, $typeName);
         $this->element->setProperty('fluidAdditionalAttributes', []);
+
         return $this->element;
     }
 
@@ -175,6 +178,7 @@ abstract class FormComponent extends AbstractComponent
      * Register a validation error for the form element
      *
      * @param string $message Validation error message
+     *
      * @throws \RuntimeException If no element has been created prior to adding an error message
      */
     protected function addElementError($message)

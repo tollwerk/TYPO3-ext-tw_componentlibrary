@@ -39,11 +39,32 @@ namespace Tollwerk\TwComponentlibrary\Component\Preview;
 /**
  * Preview template interface
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 interface TemplateInterface
 {
+    /**
+     * Add common stylesheets
+     *
+     * @param string $commonStylesheets Common stylesheets
+     */
+    public static function addCommonStylesheets($commonStylesheets);
+
+    /**
+     * Add common header scripts
+     *
+     * @param string $commonHeaderScripts Common header scripts
+     */
+    public static function addCommonHeaderScripts($commonHeaderScripts);
+
+    /**
+     * Add common footer scripts
+     *
+     * @param string $commonFooterScripts Common footer scripts
+     */
+    public static function addCommonFooterScripts($commonFooterScripts);
+
     /**
      * Serialize the template
      *
@@ -92,25 +113,4 @@ interface TemplateInterface
      * @return TemplateResources Template resources
      */
     public function getTemplateResources();
-
-    /**
-     * Add common stylesheets
-     *
-     * @param string $commonStylesheets Common stylesheets
-     */
-    public static function addCommonStylesheets($commonStylesheets);
-
-    /**
-     * Add common header scripts
-     *
-     * @param string $commonHeaderScripts Common header scripts
-     */
-    public static function addCommonHeaderScripts($commonHeaderScripts);
-
-    /**
-     * Add common footer scripts
-     *
-     * @param string $commonFooterScripts Common footer scripts
-     */
-    public static function addCommonFooterScripts($commonFooterScripts);
 }

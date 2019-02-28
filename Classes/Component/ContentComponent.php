@@ -3,12 +3,12 @@
 /**
  * Content component
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -40,7 +40,7 @@ use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 /**
  * Abstract content component
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 abstract class ContentComponent extends AbstractComponent
@@ -71,7 +71,7 @@ abstract class ContentComponent extends AbstractComponent
             // In case of an error
         } catch (\Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
-                .$e->getTraceAsString().'</pre>';
+                      .$e->getTraceAsString().'</pre>';
         }
 
         return $result;
@@ -85,9 +85,9 @@ abstract class ContentComponent extends AbstractComponent
     protected function setContentRecordId($id)
     {
         $this->config = intval($id) ? [
-            'source' => $id,
+            'source'       => $id,
             'dontCheckPid' => 1,
-            'tables' => 'tt_content'
+            'tables'       => 'tt_content'
         ] : null;
     }
 

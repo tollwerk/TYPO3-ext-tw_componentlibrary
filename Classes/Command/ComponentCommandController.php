@@ -51,7 +51,7 @@ use TYPO3\CMS\Extbase\Mvc\Exception\CommandException;
 /**
  * Component command controller
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Command
  * @cli
  */
@@ -65,7 +65,7 @@ class ComponentCommandController extends CommandController
         $setup = $this->objectManager->get(BackendConfigurationManager::class)->getTypoScriptSetup();
         /** @var TypoScriptService $typoscriptService */
         $typoscriptService = $this->objectManager->get(TypoScriptService::class);
-        $config = $typoscriptService->convertTypoScriptArrayToPlainArray((array)$setup['plugin.']['tx_twcomponentlibrary.']);
+        $config            = $typoscriptService->convertTypoScriptArrayToPlainArray((array)$setup['plugin.']['tx_twcomponentlibrary.']);
 
         // Register common stylesheets & scripts
         FluidTemplate::addCommonStylesheets($config['settings']['stylesheets']);
@@ -78,10 +78,11 @@ class ComponentCommandController extends CommandController
     /**
      * Create a new component
      *
-     * @param string $name Component path and name
-     * @param string $type Component type
+     * @param string $name      Component path and name
+     * @param string $type      Component type
      * @param string $extension Host extension
-     * @param string $vendor Host extension vendor name
+     * @param string $vendor    Host extension vendor name
+     *
      * @throws CommandException If the component name is empty / invalid
      * @throws CommandException If the component type is invalid
      * @throws CommandException If the provider extension is invalid

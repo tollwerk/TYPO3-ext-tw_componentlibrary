@@ -1,12 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
 <xliff version="1.0">
-    <file source-language="en" datatype="plaintext" original="messages" date="2017-09-22T17:04:19Z" product-name="tw_componentlibrary">
+    <file source-language="en" datatype="plaintext" original="messages" date="2017-09-22T17:04:19Z"
+          product-name="tw_componentlibrary">
         <header/>
         <body>
             <trans-unit id="cache.fractal.title" approved="no">
-                <source>Update Fractal component library</source> <target state="needs-translation">Fractal-Komponenten aktualisieren</target></trans-unit>
+                <source>Update Fractal component library</source>
+                <target state="needs-translation">Fractal-Komponenten aktualisieren</target>
+            </trans-unit>
             <trans-unit id="cache.fractal.description" approved="no">
-                <source>Extracts and updates the component definitions in your external Fractal component library.</source> <target state="needs-translation">Extrahiert und aktualisiert die Komponentenstruktur in einer externen Fractal-Komponentenbibliothek</target></trans-unit>
+                <source>Extracts and updates the component definitions in your external Fractal component library.
+                </source>
+                <target state="needs-translation">Extrahiert und aktualisiert die Komponentenstruktur in einer externen
+                    Fractal-Komponentenbibliothek
+                </target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -51,29 +51,35 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
 class FluidTemplate implements TemplateInterface
 {
     /**
-     * CSS stylesheets
-     *
-     * @var array
-     */
-    protected $stylesheets = [];
-    /**
      * Common CSS stylesheets
      *
      * @var array
      */
     protected static $commonStylesheets = [];
     /**
-     * JavaScripts to include in the header
-     *
-     * @var array
-     */
-    protected $headerScripts = [];
-    /**
      * Common header scripts
      *
      * @var array
      */
     protected static $commonHeaderScripts = [];
+    /**
+     * Common footer scripts
+     *
+     * @var array
+     */
+    protected static $commonFooterScripts = [];
+    /**
+     * CSS stylesheets
+     *
+     * @var array
+     */
+    protected $stylesheets = [];
+    /**
+     * JavaScripts to include in the header
+     *
+     * @var array
+     */
+    protected $headerScripts = [];
     /**
      * Resources to be included in the file header
      *
@@ -86,12 +92,6 @@ class FluidTemplate implements TemplateInterface
      * @var array
      */
     protected $footerScripts = [];
-    /**
-     * Common footer scripts
-     *
-     * @var array
-     */
-    protected static $commonFooterScripts = [];
     /**
      * Resources to be included in the file footer
      *
@@ -116,6 +116,65 @@ class FluidTemplate implements TemplateInterface
         /** @var TemplateResources $templateResource */
         foreach ($templateResources as $templateResource) {
             $this->mergeTemplateResources($templateResource);
+        }
+    }
+
+    /**
+     * Merge a set of template resources
+     *
+     * @param TemplateResources $templateResources Template resources
+     */
+    protected function mergeTemplateResources(TemplateResources $templateResources)
+    {
+        $this->stylesheets    = array_merge($this->stylesheets, $templateResources->getStylesheets());
+        $this->headerScripts  = array_merge($this->headerScripts, $templateResources->getHeaderScripts());
+        $this->headerIncludes = array_merge($this->headerIncludes, $templateResources->getHeaderIncludes());
+        $this->footerScripts  = array_merge($this->footerScripts, $templateResources->getFooterScripts());
+        $this->footerIncludes = array_merge($this->footerIncludes, $templateResources->getFooterIncludes());
+    }
+
+    /**
+     * Add common stylesheets
+     *
+     * @param string $commonStylesheets Common stylesheets
+     */
+    public static function addCommonStylesheets($commonStylesheets)
+    {
+        foreach (GeneralUtility::trimExplode(',', $commonStylesheets, true) as $commonStylesheet) {
+            $commonStylesheet = self::resolveUrl($commonStylesheet);
+            if ($commonStylesheet) {
+                self::$commonStylesheets[] = $commonStylesheet;
+            }
+        }
+    }
+
+    /**
+     * Add common header scripts
+     *
+     * @param string $commonHeaderScripts Common header scripts
+     */
+    public static function addCommonHeaderScripts($commonHeaderScripts)
+    {
+        foreach (GeneralUtility::trimExplode(',', $commonHeaderScripts, true) as $commonHeaderScript) {
+            $commonHeaderScript = self::resolveUrl($commonHeaderScript);
+            if ($commonHeaderScript) {
+                self::$commonHeaderScripts[] = $commonHeaderScript;
+            }
+        }
+    }
+
+    /**
+     * Add common footer scripts
+     *
+     * @param string $commonFooterScripts Common footer scripts
+     */
+    public static function addCommonFooterScripts($commonFooterScripts)
+    {
+        foreach (GeneralUtility::trimExplode(',', $commonFooterScripts, true) as $commonFooterScript) {
+            $commonFooterScript = self::resolveUrl($commonFooterScript);
+            if ($commonFooterScript) {
+                self::$commonFooterScripts[] = $commonFooterScript;
+            }
         }
     }
 
@@ -175,6 +234,41 @@ class FluidTemplate implements TemplateInterface
         if ($url) {
             $this->stylesheets[self::hashResource($url)] = $url;
         }
+    }
+
+    /**
+     * Resolve a URL
+     *
+     * @param string $url URL
+     *
+     * @return bool|string Resolved URL
+     */
+    protected static function resolveUrl($url)
+    {
+        $url = trim($url);
+        if (strlen($url)) {
+            if (preg_match('%^https?\:\/\/%', $url)) {
+                return $url;
+            }
+            $absScript = GeneralUtility::getFileAbsFileName($url);
+            if (is_file($absScript)) {
+                return substr($absScript, strlen(PATH_site));
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return an MD5 hash for a resource
+     *
+     * @param string $resource Resource
+     *
+     * @return string MD5 resource hash
+     */
+    protected static function hashResource($resource)
+    {
+        return md5($resource);
     }
 
     /**
@@ -238,86 +332,6 @@ class FluidTemplate implements TemplateInterface
     }
 
     /**
-     * Add common stylesheets
-     *
-     * @param string $commonStylesheets Common stylesheets
-     */
-    public static function addCommonStylesheets($commonStylesheets)
-    {
-        foreach (GeneralUtility::trimExplode(',', $commonStylesheets, true) as $commonStylesheet) {
-            $commonStylesheet = self::resolveUrl($commonStylesheet);
-            if ($commonStylesheet) {
-                self::$commonStylesheets[] = $commonStylesheet;
-            }
-        }
-    }
-
-    /**
-     * Add common header scripts
-     *
-     * @param string $commonHeaderScripts Common header scripts
-     */
-    public static function addCommonHeaderScripts($commonHeaderScripts)
-    {
-        foreach (GeneralUtility::trimExplode(',', $commonHeaderScripts, true) as $commonHeaderScript) {
-            $commonHeaderScript = self::resolveUrl($commonHeaderScript);
-            if ($commonHeaderScript) {
-                self::$commonHeaderScripts[] = $commonHeaderScript;
-            }
-        }
-    }
-
-    /**
-     * Add common footer scripts
-     *
-     * @param string $commonFooterScripts Common footer scripts
-     */
-    public static function addCommonFooterScripts($commonFooterScripts)
-    {
-        foreach (GeneralUtility::trimExplode(',', $commonFooterScripts, true) as $commonFooterScript) {
-            $commonFooterScript = self::resolveUrl($commonFooterScript);
-            if ($commonFooterScript) {
-                self::$commonFooterScripts[] = $commonFooterScript;
-            }
-        }
-    }
-
-    /**
-     * Resolve a URL
-     *
-     * @param string $url URL
-     *
-     * @return bool|string Resolved URL
-     */
-    protected static function resolveUrl($url)
-    {
-        $url = trim($url);
-        if (strlen($url)) {
-            if (preg_match('%^https?\:\/\/%', $url)) {
-                return $url;
-            }
-            $absScript = GeneralUtility::getFileAbsFileName($url);
-            if (is_file($absScript)) {
-                return substr($absScript, strlen(PATH_site));
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Return an MD5 hash for a resource
-     *
-     * @param string $resource Resource
-     *
-     * @return string MD5 resource hash
-     */
-    protected static function hashResource($resource)
-    {
-        return md5($resource);
-    }
-
-    /**
      * Return all template resources
      *
      * @return TemplateResources Template resources
@@ -331,20 +345,6 @@ class FluidTemplate implements TemplateInterface
             $this->footerScripts,
             $this->footerIncludes
         );
-    }
-
-    /**
-     * Merge a set of template resources
-     *
-     * @param TemplateResources $templateResources Template resources
-     */
-    protected function mergeTemplateResources(TemplateResources $templateResources)
-    {
-        $this->stylesheets    = array_merge($this->stylesheets, $templateResources->getStylesheets());
-        $this->headerScripts  = array_merge($this->headerScripts, $templateResources->getHeaderScripts());
-        $this->headerIncludes = array_merge($this->headerIncludes, $templateResources->getHeaderIncludes());
-        $this->footerScripts  = array_merge($this->footerScripts, $templateResources->getFooterScripts());
-        $this->footerIncludes = array_merge($this->footerIncludes, $templateResources->getFooterIncludes());
     }
 
     /**

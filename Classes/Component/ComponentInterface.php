@@ -3,12 +3,12 @@
 /**
  * Component interface
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -38,7 +38,7 @@ namespace Tollwerk\TwComponentlibrary\Component;
 /**
  * Component interface
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 interface ComponentInterface
@@ -117,19 +117,20 @@ interface ComponentInterface
     ];
 
     /**
+     * Prepare a component path
+     *
+     * @param string $componentPath Component path
+     *
+     * @return string Component name
+     */
+    public static function expandComponentName($componentPath);
+
+    /**
      * Export the component's properties
      *
      * @return array Properties
      */
     public function export();
-
-    /**
-     * Prepare a component path
-     *
-     * @param string $componentPath Component path
-     * @return string Component name
-     */
-    public static function expandComponentName($componentPath);
 
     /**
      * Render this component

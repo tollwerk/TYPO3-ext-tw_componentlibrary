@@ -3,12 +3,12 @@
 /**
  * TypoScript component
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -40,7 +40,7 @@ use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 /**
  * Abstract TypoScript component
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 abstract class TypoScriptComponent extends AbstractComponent
@@ -75,7 +75,7 @@ abstract class TypoScriptComponent extends AbstractComponent
             // In case of an error
         } catch (\Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
-                .$e->getTraceAsString().'</pre>';
+                      .$e->getTraceAsString().'</pre>';
         }
 
         return $result;
@@ -100,7 +100,7 @@ abstract class TypoScriptComponent extends AbstractComponent
     {
         // Read the linked TypoScript
         if ($this->config !== null) {
-            $typoScript = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
+            $typoScript     = TypoScriptUtility::extractTypoScriptKeyForPidAndType(
                 $this->page,
                 $this->typeNum,
                 $this->config

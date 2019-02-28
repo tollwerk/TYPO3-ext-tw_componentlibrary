@@ -3,12 +3,12 @@
 /**
  * Component dependency graph utility
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -45,7 +45,7 @@ use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
  *
  * `typo3/cli_dispatch.phpsh extbase component:graph
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility
  */
 class Graph
@@ -57,9 +57,9 @@ class Graph
      */
     protected static $colors = [
         ComponentInterface::TYPE_TYPOSCRIPT => 'khaki',
-        ComponentInterface::TYPE_FLUID => 'lightblue',
-        ComponentInterface::TYPE_EXTBASE => 'palegreen',
-        ComponentInterface::TYPE_CONTENT => 'lightpink',
+        ComponentInterface::TYPE_FLUID      => 'lightblue',
+        ComponentInterface::TYPE_EXTBASE    => 'palegreen',
+        ComponentInterface::TYPE_CONTENT    => 'lightpink',
     ];
     /**
      * Graph components
@@ -99,6 +99,7 @@ class Graph
      * Prepare the list of graph components
      *
      * @param array $components Components
+     *
      * @return array Graph components
      */
     protected function buildGraphComponents(array $components)
@@ -106,27 +107,27 @@ class Graph
         $graphComponents = array_fill_keys(
             array_column($components, 'class'),
             [
-                'class' => null,
-                'id' => null,
-                'type' => null,
-                'label' => null,
-                'variant' => null,
-                'master' => null,
-                'variants' => [],
+                'class'        => null,
+                'id'           => null,
+                'type'         => null,
+                'label'        => null,
+                'variant'      => null,
+                'master'       => null,
+                'variants'     => [],
                 'dependencies' => [],
-                'path' => [],
+                'path'         => [],
             ]
         );
 
         // Run through all components
         /** @var array $component */
         foreach ($components as $component) {
-            $graphComponents[$componentClass]['class'] = $componentClass = $component['class'];
-            $graphComponents[$componentClass]['id'] = $component['name'];
-            $graphComponents[$componentClass]['type'] = $component['type'];
-            $graphComponents[$componentClass]['label'] = $component['label'] ?: $component['name'];
+            $graphComponents[$componentClass]['class']   = $componentClass = $component['class'];
+            $graphComponents[$componentClass]['id']      = $component['name'];
+            $graphComponents[$componentClass]['type']    = $component['type'];
+            $graphComponents[$componentClass]['label']   = $component['label'] ?: $component['name'];
             $graphComponents[$componentClass]['variant'] = $component['variant'];
-            $graphComponents[$componentClass]['path'] = $component['path'];
+            $graphComponents[$componentClass]['path']    = $component['path'];
 
             // Link the component dependencies
             foreach ((new $componentClass)->getDependencies() as $componentDependency) {
@@ -140,7 +141,7 @@ class Graph
                 list ($masterClass) = explode('_', $componentClass, 2);
                 $masterClass .= 'Component';
                 if (isset($graphComponents[$masterClass])) {
-                    $graphComponents[$componentClass]['master'] =& $graphComponents[$masterClass];
+                    $graphComponents[$componentClass]['master']                 =& $graphComponents[$masterClass];
                     $graphComponents[$masterClass]['variants'][$componentClass] =& $graphComponents[$componentClass];
                 }
             }
@@ -152,9 +153,9 @@ class Graph
     /**
      * Add a component to the component tree
      *
-     * @param string $componentId Component ID
+     * @param string $componentId  Component ID
      * @param array $componentPath Component path
-     * @param array $tree Component base tree
+     * @param array $tree          Component base tree
      */
     protected function addToComponentTree($componentId, array $componentPath, array &$tree)
     {
@@ -165,6 +166,7 @@ class Graph
                 $tree[$subpath] = [];
             }
             $this->addToComponentTree($componentId, $componentPath, $tree[$subpath]);
+
             return;
         }
 
@@ -175,17 +177,18 @@ class Graph
      * Create or update the dependency graph for a component
      *
      * @param null $rootComponent Optional: Root component
+     *
      * @return Digraph GraphViz digraph
      */
     public function __invoke($rootComponent = null)
     {
         $graph = new Digraph('Components');
         $graph->attr('node', array('shape' => 'Mrecord', 'style' => 'radial', 'penwidth' => .5))
-            ->set('rankdir', 'TB')
-            ->set('bgcolor', 'transparent')
+              ->set('rankdir', 'TB')
+              ->set('bgcolor', 'transparent')
 //            ->set('ranksep', '0.5')
 //            ->set('nodesep', '.1')
-            ->node('/');
+              ->node('/');
 
         // If the complete component graph should be rendered
         $this->rootComponent = trim($rootComponent) ?: null;
@@ -194,13 +197,13 @@ class Graph
 
             // Else: Build a component tree subset
         } else {
-            $componentIds = [$this->rootComponent];
+            $componentIds           = [$this->rootComponent];
             $registeredComponentIds = [];
-            $graphComponentTree = [];
+            $graphComponentTree     = [];
             do {
                 $graphComponentTreePointer =& $graphComponentTree;
-                $componentId = $registeredComponentIds[] = array_shift($componentIds);
-                $componentIds = array_diff(
+                $componentId               = $registeredComponentIds[] = array_shift($componentIds);
+                $componentIds              = array_diff(
                     array_unique(
                         array_merge(
                             $componentIds,
@@ -219,8 +222,9 @@ class Graph
     /**
      * Recursively add a single component to a component tree subset
      *
-     * @param array $pointer Component tree subset
+     * @param array $pointer      Component tree subset
      * @param string $componentId Component class
+     *
      * @return array Component dependencies
      */
     protected function addToComponentTreeSubset(array &$pointer, $componentId)
@@ -241,15 +245,17 @@ class Graph
         } else {
             $dependencies = array_column($this->graphComponents[$componentId]['dependencies'], 'class');
         }
+
         return array_unique($dependencies);
     }
 
     /**
      * Add a list of components to a graph
      *
-     * @param BaseGraph $graph Graph
+     * @param BaseGraph $graph  Graph
      * @param array $components Component list
-     * @param Node $parentNode Parent node
+     * @param Node $parentNode  Parent node
+     *
      * @return BaseGraph Graph
      */
     protected function addComponents(BaseGraph $graph, array $components, Node $parentNode = null)
@@ -287,10 +293,11 @@ class Graph
     /**
      * Add a node to a graph
      *
-     * @param BaseGraph $graph Graph
-     * @param string $nodeId Node ID
+     * @param BaseGraph $graph  Graph
+     * @param string $nodeId    Node ID
      * @param array $components Component list
-     * @param Node $parentNode Parent node
+     * @param Node $parentNode  Parent node
+     *
      * @return BaseGraph Graph
      */
     protected function addNode(BaseGraph $graph, $nodeId, array $components, Node $parentNode = null)
@@ -317,20 +324,21 @@ class Graph
     /**
      * Add a component to a graph
      *
-     * @param BaseGraph $graph Graph
+     * @param BaseGraph $graph    Graph
      * @param string $componentId Component ID
-     * @param Node $parentNode Parent node
+     * @param Node $parentNode    Parent node
+     *
      * @return BaseGraph Graph
      */
     protected function addComponent(BaseGraph $graph, $componentId, Node $parentNode = null)
     {
-        $component = $this->graphComponents[$componentId];
+        $component          = $this->graphComponents[$componentId];
         $origComponentClass = $component['class'];
 
         // If this is a variant: Redirect to the master component
         if ($component['master']) {
-            $component = $component['master'];
-            $componentId = $component['class'];
+            $component      = $component['master'];
+            $componentId    = $component['class'];
             $componentLabel = htmlspecialchars($component['label']);
 
             // Else: This is a master component
@@ -338,14 +346,14 @@ class Graph
             $componentLabel = '<b>'.htmlspecialchars($component['label']).'</b>';
         }
 
-        $componentLabel .= '<br align="left"/>';
-        $escaped = false;
+        $componentLabel  .= '<br align="left"/>';
+        $escaped         = false;
         $dependencyNodes = [];
 
         if (count($component['variants'])) {
             uasort(
                 $component['variants'],
-                function (array $variant1, array $variant2) {
+                function(array $variant1, array $variant2) {
                     return strnatcasecmp($variant1['label'], $variant2['label']);
                 }
             );
@@ -370,11 +378,11 @@ class Graph
         $graph->node(
             $this->getComponentTitle($componentId),
             [
-                'label' => "<$componentLabel>",
-                '_escaped' => $escaped,
-                'margin' => '.15,.15',
+                'label'     => "<$componentLabel>",
+                '_escaped'  => $escaped,
+                'margin'    => '.15,.15',
                 'fillcolor' => self::$colors[$component['type']],
-                'penwidth' => $isCurrent ? 1.5 : .5,
+                'penwidth'  => $isCurrent ? 1.5 : .5,
             ]
         );
 
@@ -401,13 +409,15 @@ class Graph
      * Create and return an component title
      *
      * @param string $componentId Component ID
+     *
      * @return string Component title
      */
     protected function getComponentTitle($componentId)
     {
-        $component =& $this->graphComponents[$componentId];
+        $component      =& $this->graphComponents[$componentId];
         $componentTitle = implode('/', array_filter(array_merge($component['path'], [$component['id']])));
         $componentTitle .= ' ('.$component['class'].')';
+
         return $componentTitle;
     }
 }

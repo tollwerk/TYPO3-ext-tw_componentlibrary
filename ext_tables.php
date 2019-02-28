@@ -3,11 +3,11 @@
 /**
  * Tables configuration
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @category  Tollwerk
+ * @package   Tollwerk\TwComponentlibrary
+ * @author    Joschi Kuphal <joschi@tollwerk.de> / @jkphl
  * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************

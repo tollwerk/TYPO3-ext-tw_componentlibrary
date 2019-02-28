@@ -9,22 +9,22 @@
  ***************************************************************/
 
 $EM_CONF[$_EXTKEY] = array(
-    'title' => 'tollwerk TYPO3 Component Library',
-    'description' => 'TYPO3 Component Library',
-    'category' => 'misc',
-    'author' => 'Joschi Kuphal',
-    'author_email' => 'joschi@tollwerk.de',
-    'state' => 'beta',
-    'internal' => '',
-    'uploadfolder' => '0',
-    'createDirs' => '',
+    'title'            => 'tollwerk TYPO3 Component Library',
+    'description'      => 'Component library features for your TYPO3 project',
+    'category'         => 'misc',
+    'author'           => 'Joschi Kuphal',
+    'author_email'     => 'joschi@tollwerk.de',
+    'state'            => 'beta',
+    'internal'         => '',
+    'uploadfolder'     => '0',
+    'createDirs'       => '',
     'clearCacheOnLoad' => 0,
-    'version' => '0.3.3',
-    'constraints' => array(
-        'depends' => array(
+    'version'          => '0.5.3',
+    'constraints'      => array(
+        'depends'   => array(
             'typo3' => '7.6.0-9.99.99',
         ),
         'conflicts' => array(),
-        'suggests' => array(),
+        'suggests'  => array(),
     ),
 );

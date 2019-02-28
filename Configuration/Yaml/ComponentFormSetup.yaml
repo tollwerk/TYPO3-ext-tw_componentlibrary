@@ -1,10 +1,10 @@
 TYPO3:
-  CMS:
-    Form:
-      prototypes:
-        standard:
-          formElementsDefinition:
-            Form:
-              renderingOptions:
-                templateRootPaths:
-                  999: 'EXT:tw_componentlibrary/Resources/Private/Templates/'
+    CMS:
+        Form:
+            prototypes:
+                standard:
+                    formElementsDefinition:
+                        Form:
+                            renderingOptions:
+                                templateRootPaths:
+                                    999: 'EXT:tw_componentlibrary/Resources/Private/Templates/'

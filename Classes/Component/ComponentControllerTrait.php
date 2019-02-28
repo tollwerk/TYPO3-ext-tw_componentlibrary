@@ -42,7 +42,7 @@ use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 /**
  * Component controller trait
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  * @property ViewInterface $view
  * @property array $settings
@@ -84,6 +84,7 @@ trait ComponentControllerTrait
     public function setSettings(array $settings)
     {
         $this->settings = $settings;
+
         return $this;
     }
 

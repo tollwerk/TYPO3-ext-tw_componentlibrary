@@ -39,14 +39,15 @@ namespace Tollwerk\TwComponentlibrary\ViewHelpers;
 /**
  * Customized CObjectViewHelper respecting Fractal rendering
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\ViewHelpers
  */
 class CObjectViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\CObjectViewHelper
 {
     /**
      * Sets the $TSFE->cObjectDepthCounter in Backend mode
-     * This somewhat hacky work-around is currently needed because the cObjGetSingle() function of \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer relies on this setting
+     * This somewhat hacky work-around is currently needed because the cObjGetSingle() function of
+     * \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer relies on this setting
      *
      * @return void
      */

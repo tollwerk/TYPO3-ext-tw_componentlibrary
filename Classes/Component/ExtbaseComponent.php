@@ -3,12 +3,12 @@
 /**
  * Extbase component
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -45,7 +45,7 @@ use TYPO3\CMS\Extbase\Mvc\Web\Response;
 /**
  * Abstract Extbase component
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 abstract class ExtbaseComponent extends AbstractComponent
@@ -108,9 +108,9 @@ abstract class ExtbaseComponent extends AbstractComponent
     /**
      * Set the extbase configuration
      *
-     * @param string $pluginName Plugin name
-     * @param string $controllerClass Controller name
-     * @param string $actionName Action name
+     * @param string $pluginName         Plugin name
+     * @param string $controllerClass    Controller name
+     * @param string $actionName         Action name
      * @param string|null $extensionName Extension name
      */
     public function setExtbaseConfiguration($pluginName, $controllerClass, $actionName, $extensionName = null)
@@ -142,7 +142,7 @@ abstract class ExtbaseComponent extends AbstractComponent
             throw new \RuntimeException(sprintf('Invalid controller class "%s"', $controllerClass), 1481646376);
         }
         $this->extbaseControllerClass = $controllerClass;
-        $this->extbaseController = preg_replace('/Controller$/', '', $controllerReflection->getShortName());
+        $this->extbaseController      = preg_replace('/Controller$/', '', $controllerReflection->getShortName());
 
         // Validate the controller action
         $actionName = trim($actionName);
@@ -153,7 +153,7 @@ abstract class ExtbaseComponent extends AbstractComponent
 
         // Construct the controller argument request prefix
         $this->controllerArgumentRequestPrefix = 'tx_'.strtolower(str_replace('_', '', $this->extbaseExtensionName)).
-            '_'.strtolower($this->extbasePlugin);
+                                                 '_'.strtolower($this->extbasePlugin);
 
         // Construct and set the controller request arguments
         $this->request->setControllerObjectName($this->extbaseControllerClass);
@@ -165,13 +165,13 @@ abstract class ExtbaseComponent extends AbstractComponent
             $this->controllerArgumentRequestPrefix,
             [
                 'controller' => $this->extbaseController,
-                'action' => $this->extbaseAction,
+                'action'     => $this->extbaseAction,
             ]
         );
 
         // Determine the default controller settings
         /** @var ConfigurationManagerInterface $configurationManager */
-        $configurationManager = $this->objectManager->get(ConfigurationManagerInterface::class);
+        $configurationManager     = $this->objectManager->get(ConfigurationManagerInterface::class);
         $this->controllerSettings = $configurationManager->getConfiguration(
             ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
             GeneralUtility::underscoredToUpperCamelCase($this->extbaseExtensionName),
@@ -200,7 +200,7 @@ abstract class ExtbaseComponent extends AbstractComponent
      * Set the controller settings
      *
      * @param array $settings Controller settings
-     * @param bool $override Override current settings (instead of amending them)
+     * @param bool $override  Override current settings (instead of amending them)
      */
     public function setControllerSettings(array $settings, $override = false)
     {
@@ -227,7 +227,7 @@ abstract class ExtbaseComponent extends AbstractComponent
             // In case of an error
         } catch (\Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
-                .$e->getTraceAsString().'</pre>';
+                      .$e->getTraceAsString().'</pre>';
         }
 
         return $result;
@@ -257,7 +257,7 @@ abstract class ExtbaseComponent extends AbstractComponent
             $this->controllerInstance = $this->objectManager->get($extendedControllerClassName);
         }
 
-        $settings = $this->controllerSettings ? : [];
+        $settings = $this->controllerSettings ?: [];
 
         return $this->controllerInstance->setSettings($settings);
     }
@@ -285,11 +285,11 @@ abstract class ExtbaseComponent extends AbstractComponent
         // Compose a configuration string
         if ($this->extbaseExtensionName && $this->extbasePlugin && $this->extbaseController && $this->extbaseAction) {
             $this->config = [
-                'extension' => $this->extbaseExtensionName,
-                'plugin' => $this->extbasePlugin,
+                'extension'  => $this->extbaseExtensionName,
+                'plugin'     => $this->extbasePlugin,
                 'controller' => $this->extbaseController,
-                'action' => $this->extbaseAction,
-                'settings' => $this->controllerSettings,
+                'action'     => $this->extbaseAction,
+                'settings'   => $this->controllerSettings,
             ];
 
             $controllerInstance = $this->getControllerInstance();
@@ -300,7 +300,7 @@ abstract class ExtbaseComponent extends AbstractComponent
             $controllerInstance->processRequest($this->request, $response);
 
             $this->template = $controllerInstance->getView()
-                ->getComponentTemplate($this->extbaseController, $this->extbaseAction);
+                                                 ->getComponentTemplate($this->extbaseController, $this->extbaseAction);
         }
 
         return parent::exportInternal();

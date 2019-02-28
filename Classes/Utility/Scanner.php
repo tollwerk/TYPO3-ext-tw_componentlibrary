@@ -3,12 +3,12 @@
 /**
  * Component scanner
  *
- * @category Tollwerk
- * @package Tollwerk\TwComponentlibrary
+ * @category   Tollwerk
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility
- * @author Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @copyright Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
- * @license http://opensource.org/licenses/MIT The MIT License (MIT)
+ * @author     Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @copyright  Copyright © 2019 Joschi Kuphal <joschi@tollwerk.de> / @jkphl
+ * @license    http://opensource.org/licenses/MIT The MIT License (MIT)
  */
 
 /***********************************************************************************
@@ -43,7 +43,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
  *
  * `typo3/cli_dispatch.phpsh extbase component:discover`
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility
  */
 class Scanner
@@ -81,6 +81,7 @@ class Scanner
     {
         // Test if the extension contains a component directory
         $extCompRootDirectory = ExtensionManagementUtility::extPath($extensionKey, 'Components');
+
         return is_dir($extCompRootDirectory) ? self::discoverExtensionComponentDirectory($extCompRootDirectory) : [];
     }
 
@@ -88,14 +89,15 @@ class Scanner
      * Recursively scan a directory for components and return a component list
      *
      * @param string $directory Directory path
+     *
      * @return array Components
      */
     protected static function discoverExtensionComponentDirectory($directory)
     {
-        $components = [];
+        $components        = [];
         $directoryIterator = new \RecursiveDirectoryIterator($directory);
         $recursiveIterator = new \RecursiveIteratorIterator($directoryIterator);
-        $regexIterator = new \RegexIterator(
+        $regexIterator     = new \RegexIterator(
             $recursiveIterator,
             PATH_SEPARATOR.'^'.preg_quote($directory.DIRECTORY_SEPARATOR).'.+Component\.php$'.PATH_SEPARATOR,
             \RecursiveRegexIterator::GET_MATCH
@@ -117,56 +119,19 @@ class Scanner
     }
 
     /**
-     * Amend the directory specific local configuration
-     *
-     * @param string $componentDirectory Component directory
-     * @param array $component Component
-     * @return array Amended component
-     */
-    protected static function addLocalConfiguration($componentDirectory, array $component)
-    {
-        $component['local'] = [];
-        $componentDirectories = [];
-        for ($dir = 0; $dir < count($component['path']); ++$dir) {
-            $componentDirectory = $componentDirectories[] = dirname($componentDirectory);
-        }
-
-        foreach (array_reverse($componentDirectories) as $componentDirectory) {
-            $component['local'][] = self::getLocalConfiguration($componentDirectory);
-        }
-
-        return $component;
-    }
-
-    /**
-     * Read, cache and return a directory specific local configuration
-     *
-     * @param string $dirname Directory name
-     * @return array Directory specific local configuration
-     */
-    protected static function getLocalConfiguration($dirname)
-    {
-        if (is_dir($dirname) && empty(self::$localConfigurations[$dirname])) {
-            $localConfig = $dirname.DIRECTORY_SEPARATOR.'local.json';
-            self::$localConfigurations[$dirname] = file_exists($localConfig) ?
-                (array)@\json_decode(file_get_contents($localConfig)) : [];
-        }
-        return self::$localConfigurations[$dirname];
-    }
-
-    /**
      * Discover the classes declared in a file
      *
      * @param string $phpCode PHP code
+     *
      * @return array Class names
      */
     protected static function discoverClassesInFile($phpCode)
     {
-        $classes = array();
-        $tokens = token_get_all($phpCode);
+        $classes          = array();
+        $tokens           = token_get_all($phpCode);
         $gettingClassname = $gettingNamespace = false;
-        $namespace = '';
-        $lastToken = null;
+        $namespace        = '';
+        $lastToken        = null;
 
         // Run through all tokens
         for ($t = 0, $tokenCount = count($tokens); $t < $tokenCount; ++$t) {
@@ -174,7 +139,7 @@ class Scanner
 
             // If this is a namespace token
             if (is_array($token) && ($token[0] == T_NAMESPACE)) {
-                $namespace = '';
+                $namespace        = '';
                 $gettingNamespace = true;
                 continue;
             }
@@ -197,26 +162,70 @@ class Scanner
                 // Else if we're getting the class name
             } elseif ($gettingClassname === true) {
                 if (is_array($token) && ($token[0] == T_STRING)) {
-                    $classes[] = ($namespace ? $namespace.'\\' : '').$token[1];
+                    $classes[]        = ($namespace ? $namespace.'\\' : '').$token[1];
                     $gettingClassname = false;
                 }
             }
 
             $lastToken = $token;
         }
+
         return $classes;
+    }
+
+    /**
+     * Amend the directory specific local configuration
+     *
+     * @param string $componentDirectory Component directory
+     * @param array $component           Component
+     *
+     * @return array Amended component
+     */
+    protected static function addLocalConfiguration($componentDirectory, array $component)
+    {
+        $component['local']   = [];
+        $componentDirectories = [];
+        for ($dir = 0; $dir < count($component['path']); ++$dir) {
+            $componentDirectory = $componentDirectories[] = dirname($componentDirectory);
+        }
+
+        foreach (array_reverse($componentDirectories) as $componentDirectory) {
+            $component['local'][] = self::getLocalConfiguration($componentDirectory);
+        }
+
+        return $component;
+    }
+
+    /**
+     * Read, cache and return a directory specific local configuration
+     *
+     * @param string $dirname Directory name
+     *
+     * @return array Directory specific local configuration
+     */
+    protected static function getLocalConfiguration($dirname)
+    {
+        if (is_dir($dirname) && empty(self::$localConfigurations[$dirname])) {
+            $localConfig                         = $dirname.DIRECTORY_SEPARATOR.'local.json';
+            self::$localConfigurations[$dirname] = file_exists($localConfig) ?
+                (array)@\json_decode(file_get_contents($localConfig)) : [];
+        }
+
+        return self::$localConfigurations[$dirname];
     }
 
     /**
      * Discover a single component class
      *
      * @param string $componentClass Component class
+     *
      * @return array Component profile
      */
     public static function discoverComponent($componentClass)
     {
         /** @var ComponentInterface $component */
         $component = new $componentClass;
+
         return $component->export();
     }
 }

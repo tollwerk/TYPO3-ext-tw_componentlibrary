@@ -1,6 +1,5 @@
-<html xmlns:f="https://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers"
-      xmlns:tw="http://typo3.org/ns/Tollwerk/TwComponentlibrary/ViewHelpers"
-      data-namespace-typo3-fluid="true">
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="https://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers">
 
     <f:layout name="Fractal/Basic"/>
 
@@ -9,13 +8,13 @@
     </f:section>
 
     <f:section name="HeaderCss">
-        <f:for each="{headerCss}" as="css">
-            <link media="all" rel="stylesheet" href="{css -> tw:fractal.resource()}"/>
+        <f:for as="css" each="{headerCss}">
+            <link href="{css -> tw:fractal.resource()}" media="all" rel="stylesheet"/>
         </f:for>
     </f:section>
 
     <f:section name="HeaderJs">
-        <f:for each="{headerJs}" as="js">
+        <f:for as="js" each="{headerJs}">
             <script src="{js -> tw:fractal.resource()}"></script>
         </f:for>
     </f:section>
@@ -25,7 +24,7 @@
     </f:section>
 
     <f:section name="FooterJs">
-        <f:for each="{footerJs}" as="js">
+        <f:for as="js" each="{footerJs}">
             <script src="{js -> tw:fractal.resource()}"></script>
         </f:for>
     </f:section>

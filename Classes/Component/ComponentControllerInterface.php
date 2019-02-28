@@ -42,7 +42,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
 /**
  * Component controller interface
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Component
  */
 interface ComponentControllerInterface extends ControllerInterface
@@ -65,6 +65,7 @@ interface ComponentControllerInterface extends ControllerInterface
      * Set the controller settings
      *
      * @param array $settings Controller settings
+     *
      * @return ActionController|ComponentControllerInterface Self reference
      */
     public function setSettings(array $settings);

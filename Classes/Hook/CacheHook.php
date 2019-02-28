@@ -29,7 +29,7 @@ use TYPO3\CMS\Backend\Toolbar\ClearCacheActionsHookInterface;
 /**
  * Hook for extending the backend cache menu
  *
- * @package Tollwerk\TwComponentlibrary
+ * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Controller
  */
 class CacheHook implements ClearCacheActionsHookInterface
@@ -38,18 +38,19 @@ class CacheHook implements ClearCacheActionsHookInterface
      * Add an entry to the CacheMenuItems array
      *
      * @param array $cacheActions Array of CacheMenuItems
-     * @param array $optionValues Array of AccessConfigurations-identifiers (typically  used by userTS with options.clearCache.identifier)
+     * @param array $optionValues Array of AccessConfigurations-identifiers (typically  used by userTS with
+     *                            options.clearCache.identifier)
      */
     public function manipulateCacheActions(&$cacheActions, &$optionValues)
     {
         $extensionConfiguration = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary'];
         if ($GLOBALS['BE_USER']->isAdmin() && !empty($extensionConfiguration['componentlibrary'])) {
             $componentLibrary = $extensionConfiguration['componentlibrary'];
-            $cacheActions[] = array(
-                'id' => $componentLibrary,
-                'title' => 'LLL:EXT:tw_componentlibrary/Resources/Private/Language/locallang_core.xlf:cache.'.$componentLibrary.'.title',
-                'description' => 'LLL:EXT:tw_componentlibrary/Resources/Private/Language/locallang_core.xlf:cache.'.$componentLibrary.'.description',
-                'href' => '/typo3/index.php?route=%2F'.$componentLibrary,
+            $cacheActions[]   = array(
+                'id'             => $componentLibrary,
+                'title'          => 'LLL:EXT:tw_componentlibrary/Resources/Private/Language/locallang_core.xlf:cache.'.$componentLibrary.'.title',
+                'description'    => 'LLL:EXT:tw_componentlibrary/Resources/Private/Language/locallang_core.xlf:cache.'.$componentLibrary.'.description',
+                'href'           => '/typo3/index.php?route=%2F'.$componentLibrary,
                 'iconIdentifier' => 'tx_twcomponentlibrary_cache'
             );
         }

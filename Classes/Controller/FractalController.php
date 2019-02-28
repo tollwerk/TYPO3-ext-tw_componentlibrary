@@ -37,7 +37,6 @@ namespace Tollwerk\TwComponentlibrary\Controller;
 
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
-use TYPO3\CMS\Core\Http\Stream;
 
 /**
  * Fractal controller
