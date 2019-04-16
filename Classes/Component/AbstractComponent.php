@@ -107,6 +107,12 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected $status = self::STATUS_TBD;
     /**
+     * Basename
+     *
+     * @var string
+     */
+    protected $basename = null;
+    /**
      * Name
      *
      * @var string
@@ -282,8 +288,8 @@ abstract class AbstractComponent implements ComponentInterface
     {
         $reflectionClass = new \ReflectionClass($this);
         $componentName   = preg_replace('/Component$/', '', $reflectionClass->getShortName());
-        list($name, $variant) = preg_split('/_+/', $componentName, 2);
-        $this->name    = self::expandComponentName($name);
+        list($this->basename, $variant) = preg_split('/_+/', $componentName, 2);
+        $this->name    = self::expandComponentName($this->basename);
         $this->variant = self::expandComponentName($variant);
     }
 
@@ -331,7 +337,7 @@ abstract class AbstractComponent implements ComponentInterface
             $validIndexDocuments = [
                 'index.md',
                 'readme.md',
-                strtolower($this->name.'.md')
+                strtolower($this->basename.'.md')
             ];
             $indexDocument       = null;
             $documents           = [];
@@ -387,7 +393,7 @@ abstract class AbstractComponent implements ComponentInterface
     {
         $reflectionObject = new \ReflectionObject($this);
         $componentFile    = $reflectionObject->getFileName();
-        $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->name;
+        $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->basename;
 
         return $rootRelative ? substr($docDirectory, strlen(PATH_site) - 1) : $docDirectory;
     }
