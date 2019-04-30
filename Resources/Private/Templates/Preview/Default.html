@@ -10,13 +10,13 @@
 
     <f:section name="HeaderCss">
         <f:for as="css" each="{headerCss}">
-            <link href="{css -> clib:fractal.resource()}" media="all" rel="stylesheet"/>
+            <link href="{css -> clib:fractal.resource() -> f:format.raw()}" media="all" rel="stylesheet"/>
         </f:for>
     </f:section>
 
     <f:section name="HeaderJs">
         <f:for as="js" each="{headerJs}">
-            <script src="{js -> clib:fractal.resource()}"></script>
+            <script src="{js -> clib:fractal.resource() -> f:format.raw()}"></script>
         </f:for>
     </f:section>
 
@@ -26,7 +26,7 @@
 
     <f:section name="FooterJs">
         <f:for as="js" each="{footerJs}">
-            <script src="{js -> clib:fractal.resource()}"></script>
+            <script src="{js -> clib:fractal.resource() -> f:format.raw()}"></script>
         </f:for>
     </f:section>
 
