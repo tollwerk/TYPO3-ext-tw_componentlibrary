@@ -145,8 +145,11 @@ abstract class FormComponent extends AbstractComponent
 
         $configurationService   = $this->objectManager->get(ConfigurationService::class);
         $prototypeConfiguration = $configurationService->getPrototypeConfiguration('standard');
-        $this->form             = $this->objectManager->get(FormDefinition::class, 'Component',
-            $prototypeConfiguration);
+        $this->form             = $this->objectManager->get(
+            FormDefinition::class,
+            'form',
+            $prototypeConfiguration
+        );
         $this->form->setRenderingOption('translation', ['translationFile' => $this->translationFile]);
         $this->form->setRenderingOption('honeypot', ['enable' => false]);
         $this->page = $this->form->createPage('page');

@@ -35,7 +35,8 @@
 
 namespace Tollwerk\TwComponentlibrary\Controller;
 
-use TYPO3\CMS\Core\Http\Response;
+use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Http\ServerRequest;
 
 /**
@@ -49,12 +50,11 @@ class FractalController
     /**
      * Update the fractal component library
      *
-     * @param ServerRequest $request
-     * @param Response $response
+     * @param ServerRequest $request Request
      *
-     * @return bool
+     * @return ResponseInterface Response
      */
-    public function updateAction(ServerRequest $request, Response $response)
+    public function updateAction(ServerRequest $request): ResponseInterface
     {
         $script         = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['script'];
         $descriptorspec = array(
@@ -64,15 +64,16 @@ class FractalController
         );
 
         $process = proc_open($script, $descriptorspec, $pipes);
-        stream_get_contents($pipes[1]);
+        fclose($pipes[0]);
+        $message = stream_get_contents($pipes[1]);
         fclose($pipes[1]);
-        $status = proc_get_status($process);
+        $error = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $status = proc_close($process);
 
-        // If an error occured
-        if ($status['exitcode']) {
-            return $response->withStatus(500);
-        }
-
-        return $response;
+        return new JsonResponse(
+            ['message' => $message, 'error' => $error, 'status' => $status],
+            $status ? 500 : 200
+        );
     }
 }

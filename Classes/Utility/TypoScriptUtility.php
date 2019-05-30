@@ -118,7 +118,12 @@ class TypoScriptUtility
             $GLOBALS['TSFE']->determineId();
             $GLOBALS['TSFE']->initTemplate();
             $GLOBALS['TSFE']->rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($id, '');
-            $GLOBALS['TSFE']->getConfigArray();
+
+            try {
+                $GLOBALS['TSFE']->getConfigArray();
+            } catch (ServiceUnavailableException $e) {
+                // Skip unconfigured page type
+            }
 
             // Calculate the absolute path prefix
             if (!empty($GLOBALS['TSFE']->config['config']['absRefPrefix'])) {
