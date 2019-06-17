@@ -36,6 +36,7 @@
 
 namespace Tollwerk\TwComponentlibrary\Component\Preview;
 
+use InvalidArgumentException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -149,6 +150,29 @@ class FluidTemplate implements TemplateInterface
     }
 
     /**
+     * Resolve a URL
+     *
+     * @param string $url URL
+     *
+     * @return bool|string Resolved URL
+     */
+    protected static function resolveUrl($url)
+    {
+        $url = trim($url);
+        if (strlen($url)) {
+            if (preg_match('%^https?\:\/\/%', $url)) {
+                return $url;
+            }
+            $absScript = GeneralUtility::getFileAbsFileName($url);
+            if (is_file($absScript)) {
+                return substr($absScript, strlen(PATH_site));
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Add common header scripts
      *
      * @param string $commonHeaderScripts Common header scripts
@@ -203,7 +227,7 @@ class FluidTemplate implements TemplateInterface
             $templatePathAndFileName = null;
         }
         if (!$templatePathAndFileName) {
-            throw new \InvalidArgumentException(sprintf('Couldn\'t find standalone template "%s" for basic preview rendering',
+            throw new InvalidArgumentException(sprintf('Couldn\'t find standalone template "%s" for basic preview rendering',
                 $templateName), 1518958675);
         }
 
@@ -234,29 +258,6 @@ class FluidTemplate implements TemplateInterface
         if ($url) {
             $this->stylesheets[self::hashResource($url)] = $url;
         }
-    }
-
-    /**
-     * Resolve a URL
-     *
-     * @param string $url URL
-     *
-     * @return bool|string Resolved URL
-     */
-    protected static function resolveUrl($url)
-    {
-        $url = trim($url);
-        if (strlen($url)) {
-            if (preg_match('%^https?\:\/\/%', $url)) {
-                return $url;
-            }
-            $absScript = GeneralUtility::getFileAbsFileName($url);
-            if (is_file($absScript)) {
-                return substr($absScript, strlen(PATH_site));
-            }
-        }
-
-        return null;
     }
 
     /**

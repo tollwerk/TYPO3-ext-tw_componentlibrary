@@ -35,10 +35,16 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Exception;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionObject;
+use RuntimeException;
 use Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
+use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
@@ -209,7 +215,7 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @param ControllerContext|null $controllerContext Controller context
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function __construct(ControllerContext $controllerContext = null)
     {
@@ -245,18 +251,18 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * Find the extension name the current component belongs to
      *
-     * @throws \RuntimeException If the component path is invalid
-     * @throws \ReflectionException
+     * @throws RuntimeException If the component path is invalid
+     * @throws ReflectionException
      */
     protected function determineExtensionName()
     {
-        $reflectionClass   = new \ReflectionClass($this);
+        $reflectionClass   = new ReflectionClass($this);
         $componentFilePath = dirname($reflectionClass->getFileName());
 
         // If the file path is invalid
         $extensionDirPosition = strpos($componentFilePath, 'ext'.DIRECTORY_SEPARATOR);
         if ($extensionDirPosition === false) {
-            throw new \RuntimeException('Invalid component path', 1481360976);
+            throw new RuntimeException('Invalid component path', 1481360976);
         }
 
         // Extract the extension key
@@ -268,7 +274,7 @@ abstract class AbstractComponent implements ComponentInterface
 
         // If the extension is unknown
         if (!in_array($extensionKey, ExtensionManagementUtility::getLoadedExtensionListArray())) {
-            throw new \RuntimeException(sprintf('Unknown extension key "%s"', $extensionKey), 1481361198);
+            throw new RuntimeException(sprintf('Unknown extension key "%s"', $extensionKey), 1481361198);
         }
 
         // Register the extension key & name
@@ -277,7 +283,7 @@ abstract class AbstractComponent implements ComponentInterface
 
         // Process the component path
         if (array_shift($componentPath) !== 'Components') {
-            throw new \RuntimeException('Invalid component path', 1481360976);
+            throw new RuntimeException('Invalid component path', 1481360976);
         }
         $this->componentPath = array_map([static::class, 'expandComponentName'], $componentPath);
     }
@@ -287,7 +293,7 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function determineNameAndVariant()
     {
-        $reflectionClass = new \ReflectionClass($this);
+        $reflectionClass = new ReflectionClass($this);
         $componentName   = preg_replace('/Component$/', '', $reflectionClass->getShortName());
         list($this->basename, $variant) = preg_split('/_+/', $componentName, 2);
         $this->name    = self::expandComponentName($this->basename);
@@ -396,7 +402,7 @@ abstract class AbstractComponent implements ComponentInterface
      */
     protected function getDocumentationDirectory($rootRelative = false)
     {
-        $reflectionObject = new \ReflectionObject($this);
+        $reflectionObject = new ReflectionObject($this);
         $componentFile    = $reflectionObject->getFileName();
 <<<<<<< HEAD
         $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->basename;
@@ -476,7 +482,7 @@ abstract class AbstractComponent implements ComponentInterface
             $properties['valid']   = true;
 
             // In case of an error
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $properties['error'] = $e->getMessage();
         }
 
@@ -496,7 +502,7 @@ abstract class AbstractComponent implements ComponentInterface
 
         // Export the configuration & $template
         if (!$this->config) {
-            throw new \RuntimeException('Invalid configuration', 1481363496);
+            throw new RuntimeException('Invalid configuration', 1481363496);
         }
 
         $properties['config']    = $this->config;
@@ -605,7 +611,7 @@ abstract class AbstractComponent implements ComponentInterface
     protected function setPreview($preview)
     {
         if (!($preview instanceof TemplateInterface) && !is_string($preview) && ($preview !== null)) {
-            throw new \RuntimeException('Invalid preview preview', 1481368492);
+            throw new RuntimeException('Invalid preview preview', 1481368492);
         }
         $this->preview = $preview;
     }
@@ -614,8 +620,8 @@ abstract class AbstractComponent implements ComponentInterface
      * Initialize a global Frontend renderer and return a content object renderer instance
      *
      * @return ContentObjectRenderer Content object renderer
-     * @throws \Exception
-     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     * @throws Exception
+     * @throws ServiceUnavailableException
      */
     protected function initializeTSFE()
     {

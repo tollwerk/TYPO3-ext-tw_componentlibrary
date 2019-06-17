@@ -35,6 +35,7 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Exception;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
 
 /**
@@ -69,7 +70,7 @@ abstract class ContentComponent extends AbstractComponent
             $result = $this->beautify($GLOBALS['TSFE']->cObj->cObjGetSingle('RECORDS', $this->config));
 
             // In case of an error
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
                       .$e->getTraceAsString().'</pre>';
         }

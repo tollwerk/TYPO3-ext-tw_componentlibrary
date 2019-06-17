@@ -35,6 +35,9 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Exception;
+use ReflectionClass;
+use RuntimeException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
@@ -119,7 +122,7 @@ abstract class ExtbaseComponent extends AbstractComponent
         if (!empty($extensionName)) {
             $extensionName = GeneralUtility::camelCaseToLowerCaseUnderscored(trim($extensionName));
             if (!in_array($extensionName, ExtensionManagementUtility::getLoadedExtensionListArray())) {
-                throw new \RuntimeException(sprintf('Extension "%s" is not available', $extensionName), 1481645834);
+                throw new RuntimeException(sprintf('Extension "%s" is not available', $extensionName), 1481645834);
             }
             $this->extbaseExtensionName = $extensionName;
         }
@@ -127,7 +130,7 @@ abstract class ExtbaseComponent extends AbstractComponent
         // Validate the plugin name
         $pluginName = trim($pluginName);
         if (empty($pluginName)) {
-            throw new \RuntimeException(sprintf('Invalid plugin name "%s"', $pluginName), 1481646376);
+            throw new RuntimeException(sprintf('Invalid plugin name "%s"', $pluginName), 1481646376);
         }
         $this->extbasePlugin = $pluginName;
 
@@ -135,11 +138,11 @@ abstract class ExtbaseComponent extends AbstractComponent
         $controllerClass = trim($controllerClass);
         if (empty($controllerClass)
             || !class_exists($controllerClass)
-            || !($controllerReflection = new \ReflectionClass($controllerClass))->implementsInterface(
+            || !($controllerReflection = new ReflectionClass($controllerClass))->implementsInterface(
                 ControllerInterface::class
             )
         ) {
-            throw new \RuntimeException(sprintf('Invalid controller class "%s"', $controllerClass), 1481646376);
+            throw new RuntimeException(sprintf('Invalid controller class "%s"', $controllerClass), 1481646376);
         }
         $this->extbaseControllerClass = $controllerClass;
         $this->extbaseController      = preg_replace('/Controller$/', '', $controllerReflection->getShortName());
@@ -147,7 +150,7 @@ abstract class ExtbaseComponent extends AbstractComponent
         // Validate the controller action
         $actionName = trim($actionName);
         if (empty($actionName) || !is_callable([$this->extbaseControllerClass, $actionName.'Action'])) {
-            throw new \RuntimeException(sprintf('Invalid controller action "%s"', $actionName), 1481646569);
+            throw new RuntimeException(sprintf('Invalid controller action "%s"', $actionName), 1481646569);
         }
         $this->extbaseAction = $actionName;
 
@@ -190,7 +193,7 @@ abstract class ExtbaseComponent extends AbstractComponent
         // Validate the argument name
         $name = trim($name);
         if (empty($name)) {
-            throw new \RuntimeException('Invalid extbase controller argument name', 1481708515);
+            throw new RuntimeException('Invalid extbase controller argument name', 1481708515);
         }
 
         $this->request->setArgument($name, $value);
@@ -218,14 +221,14 @@ abstract class ExtbaseComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         try {
-            /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
+            /** @var Response $response */
             $response = $this->objectManager->get(Response::class);
             $this->request->setOriginalRequestMappingResults($this->validationErrors);
             $this->getControllerInstance()->processRequest($this->request, $response);
             $result = $this->beautify($response->getContent());
 
             // In case of an error
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
                       .$e->getTraceAsString().'</pre>';
         }
@@ -295,7 +298,7 @@ abstract class ExtbaseComponent extends AbstractComponent
             $controllerInstance = $this->getControllerInstance();
             $controllerInstance->skipActionCall(true);
 
-            /** @var \TYPO3\CMS\Extbase\Mvc\Web\Response $response */
+            /** @var Response $response */
             $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
             $controllerInstance->processRequest($this->request, $response);
 

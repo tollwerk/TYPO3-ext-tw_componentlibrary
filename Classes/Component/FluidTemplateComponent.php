@@ -35,6 +35,9 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Exception;
+use ReflectionObject;
+use RuntimeException;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
@@ -96,7 +99,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
             list(, $templateRootPaths) = $typoScriptParser->getVal('templateRootPaths', $viewConfig);
             list(, $partialRootPaths) = $typoScriptParser->getVal('partialRootPaths', $viewConfig);
 
-            /** @var \TYPO3\CMS\Fluid\View\StandaloneView $view */
+            /** @var StandaloneView $view */
             $view = $this->objectManager->get(StandaloneView::class);
             $view->getRenderingContext()->getVariableProvider()->add(
                 'settings',
@@ -118,7 +121,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
             );
 
             // In case of an error
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
                       .$e->getTraceAsString().'</pre>';
         }
@@ -144,7 +147,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
      */
     protected function loadJsonParameters()
     {
-        $reflectionObject = new \ReflectionObject($this);
+        $reflectionObject = new ReflectionObject($this);
         $componentFile    = $reflectionObject->getFileName();
         $parameterFile    = dirname($componentFile).DIRECTORY_SEPARATOR.pathinfo(
                 $componentFile,
@@ -169,13 +172,13 @@ abstract class FluidTemplateComponent extends AbstractComponent
      * @param string $param Parameter name
      * @param mixed $value  Parameter value
      *
-     * @throws \RuntimeException If the parameter name is invalid
+     * @throws RuntimeException If the parameter name is invalid
      */
     protected function setParameter($param, $value)
     {
         $param = trim($param);
         if (!strlen($param)) {
-            throw new \RuntimeException(sprintf('Invalid fluid template parameter "%s"', $param), 1481551574);
+            throw new RuntimeException(sprintf('Invalid fluid template parameter "%s"', $param), 1481551574);
         }
 
         $this->parameters[$param] = $value;
@@ -216,7 +219,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
             ];
             $templateFile = GeneralUtility::getFileAbsFileName($this->template);
             if (!strlen($templateFile) || !is_file($templateFile)) {
-                throw new \RuntimeException(sprintf('Invalid template file "%s"', $templateFile), 1481552328);
+                throw new RuntimeException(sprintf('Invalid template file "%s"', $templateFile), 1481552328);
             }
             $this->template = file_get_contents($templateFile);
         }

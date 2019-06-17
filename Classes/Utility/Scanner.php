@@ -35,8 +35,15 @@
 
 namespace Tollwerk\TwComponentlibrary\Utility;
 
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use ReflectionClass;
+use ReflectionException;
+use RegexIterator;
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use function json_decode;
 
 /**
  * Component scanner
@@ -76,6 +83,8 @@ class Scanner
      * Discover the components of a single extension
      *
      * @param $extensionKey
+     *
+     * @return array Extension components
      */
     protected static function discoverExtensionComponents($extensionKey)
     {
@@ -91,16 +100,17 @@ class Scanner
      * @param string $directory Directory path
      *
      * @return array Components
+     * @throws ReflectionException
      */
     protected static function discoverExtensionComponentDirectory($directory)
     {
         $components        = [];
-        $directoryIterator = new \RecursiveDirectoryIterator($directory);
-        $recursiveIterator = new \RecursiveIteratorIterator($directoryIterator);
-        $regexIterator     = new \RegexIterator(
+        $directoryIterator = new RecursiveDirectoryIterator($directory);
+        $recursiveIterator = new RecursiveIteratorIterator($directoryIterator);
+        $regexIterator     = new RegexIterator(
             $recursiveIterator,
             PATH_SEPARATOR.'^'.preg_quote($directory.DIRECTORY_SEPARATOR).'.+Component\.php$'.PATH_SEPARATOR,
-            \RecursiveRegexIterator::GET_MATCH
+            RecursiveRegexIterator::GET_MATCH
         );
 
         // Run through all potential component files
@@ -108,7 +118,7 @@ class Scanner
             // Run through all classes declared in the file
             foreach (self::discoverClassesInFile(file_get_contents($component[0])) as $className) {
                 // Test if this is a component class
-                $classReflection = new \ReflectionClass($className);
+                $classReflection = new ReflectionClass($className);
                 if ($classReflection->implementsInterface(ComponentInterface::class)) {
                     $components[] = self::addLocalConfiguration($component[0], self::discoverComponent($className));
                 }
@@ -208,7 +218,7 @@ class Scanner
         if (is_dir($dirname) && empty(self::$localConfigurations[$dirname])) {
             $localConfig                         = $dirname.DIRECTORY_SEPARATOR.'local.json';
             self::$localConfigurations[$dirname] = file_exists($localConfig) ?
-                (array)@\json_decode(file_get_contents($localConfig)) : [];
+                (array)@json_decode(file_get_contents($localConfig)) : [];
         }
 
         return self::$localConfigurations[$dirname];

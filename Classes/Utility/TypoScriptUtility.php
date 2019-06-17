@@ -36,6 +36,9 @@
 
 namespace Tollwerk\TwComponentlibrary\Utility;
 
+use Exception;
+use RuntimeException;
+use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\TimeTracker\TimeTracker;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -65,14 +68,14 @@ class TypoScriptUtility
      * @param string $key  TypoScript key
      *
      * @return array TypoScript values
-     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
-     * @throws \Exception If the TypoScript key is invalid
+     * @throws ServiceUnavailableException
+     * @throws Exception If the TypoScript key is invalid
      */
     public static function extractTypoScriptKeyForPidAndType($id, $typeNum, $key)
     {
         $key = trim($key);
         if (!strlen($key)) {
-            throw new \RuntimeException(sprintf('Invalid TypoScript key "%s"', $key), 1481365294);
+            throw new RuntimeException(sprintf('Invalid TypoScript key "%s"', $key), 1481365294);
         }
 
         // Get a frontend controller for the page id and type
@@ -91,8 +94,8 @@ class TypoScriptUtility
      * @param int $typeNum Page Type
      *
      * @return TypoScriptFrontendController Frontend controller
-     * @throws \Exception
-     * @throws \TYPO3\CMS\Core\Error\Http\ServiceUnavailableException
+     * @throws Exception
+     * @throws ServiceUnavailableException
      */
     public static function getTSFE($id, $typeNum)
     {
