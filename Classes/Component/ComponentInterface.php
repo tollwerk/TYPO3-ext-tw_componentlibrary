@@ -35,6 +35,8 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
+
 /**
  * Component interface
  *

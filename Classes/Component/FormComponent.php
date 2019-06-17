@@ -35,10 +35,15 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Exception;
+use RuntimeException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
 use TYPO3\CMS\Form\Domain\Configuration\ConfigurationService;
+use TYPO3\CMS\Form\Domain\Configuration\Exception\PrototypeNotFoundException;
 use TYPO3\CMS\Form\Domain\Exception\RenderingException;
+use TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException;
+use TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotValidException;
 use TYPO3\CMS\Form\Domain\Model\FormDefinition;
 use TYPO3\CMS\Form\Domain\Model\FormElements\Page;
 use TYPO3\CMS\Form\Domain\Model\Renderable\AbstractRenderable;
@@ -117,7 +122,7 @@ abstract class FormComponent extends AbstractComponent
             $result = $this->beautify($renderer->render());
 
             // In case of an error
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
                       .$e->getTraceAsString().'</pre>';
         }
@@ -131,8 +136,8 @@ abstract class FormComponent extends AbstractComponent
      * Gets called immediately after construction. Override this method in components to initialize the component.
      *
      * @return void
-     * @throws \TYPO3\CMS\Form\Domain\Configuration\Exception\PrototypeNotFoundException
-     * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
+     * @throws PrototypeNotFoundException
+     * @throws TypeDefinitionNotFoundException
      */
     protected function initialize()
     {
@@ -166,8 +171,8 @@ abstract class FormComponent extends AbstractComponent
      * @param array $renderingOptions Rendering options
      *
      * @return AbstractRenderable Renderable form element
-     * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
-     * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotValidException
+     * @throws TypeDefinitionNotFoundException
+     * @throws TypeDefinitionNotValidException
      */
     protected function createElement($typeName, $identifier = null, $properties = [], $renderingOptions = [])
     {
@@ -192,12 +197,12 @@ abstract class FormComponent extends AbstractComponent
      *
      * @param string $message Validation error message
      *
-     * @throws \RuntimeException If no element has been created prior to adding an error message
+     * @throws RuntimeException If no element has been created prior to adding an error message
      */
     protected function addElementError($message)
     {
         if ($this->element === null) {
-            throw new \RuntimeException('Create a form element prior to adding a validation error', 1519731421);
+            throw new RuntimeException('Create a form element prior to adding a validation error', 1519731421);
         }
         $this->addError($this->element->getIdentifier(), $message);
     }
@@ -223,7 +228,7 @@ abstract class FormComponent extends AbstractComponent
         if ($this->config !== null) {
             $templateFile = GeneralUtility::getFileAbsFileName($this->config);
             if (!strlen($templateFile) || !is_file($templateFile)) {
-                throw new \RuntimeException(sprintf('Invalid template file "%s"', $templateFile), 1481552328);
+                throw new RuntimeException(sprintf('Invalid template file "%s"', $templateFile), 1481552328);
             }
             $this->template = file_get_contents($templateFile);
         }

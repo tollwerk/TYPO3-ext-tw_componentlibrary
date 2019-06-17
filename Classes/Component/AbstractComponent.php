@@ -44,11 +44,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Error\Error;
 use TYPO3\CMS\Extbase\Error\Result;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerContext;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
 use TYPO3\CMS\Extbase\Mvc\Web\Request;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
-use XhtmlFormatter\Formatter;
 
 /**
  * Abstract component
@@ -337,7 +338,11 @@ abstract class AbstractComponent implements ComponentInterface
             $validIndexDocuments = [
                 'index.md',
                 'readme.md',
+<<<<<<< HEAD
                 strtolower($this->basename.'.md')
+=======
+                strtolower($this->name.'.md')
+>>>>>>> Improve code style
             ];
             $indexDocument       = null;
             $documents           = [];
@@ -393,7 +398,11 @@ abstract class AbstractComponent implements ComponentInterface
     {
         $reflectionObject = new \ReflectionObject($this);
         $componentFile    = $reflectionObject->getFileName();
+<<<<<<< HEAD
         $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->basename;
+=======
+        $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->name;
+>>>>>>> Improve code style
 
         return $rootRelative ? substr($docDirectory, strlen(PATH_site) - 1) : $docDirectory;
     }
@@ -519,6 +528,8 @@ abstract class AbstractComponent implements ComponentInterface
      * Export the request options
      *
      * @return array
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
      */
     protected function exportRequest()
     {
@@ -545,6 +556,8 @@ abstract class AbstractComponent implements ComponentInterface
      * Return the component's request arguments
      *
      * @return mixed Request arguments
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
      */
     public function getRequestArguments()
     {
@@ -625,9 +638,9 @@ abstract class AbstractComponent implements ComponentInterface
         // TODO: Remove this hotfix. Necessary because the formater inserts whitespaces that break inline-block css!!!
         return $html;
 
-        $formatter = new Formatter();
-
-        return $formatter->format($html);
+//        $formatter = new Formatter();
+//
+//        return $formatter->format($html);
     }
 
     /**

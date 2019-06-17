@@ -35,7 +35,11 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use Exception;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
+use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
 
 /**
  * Abstract TypoScript component
@@ -56,6 +60,9 @@ abstract class TypoScriptComponent extends AbstractComponent
      * Render this component
      *
      * @return string Rendered component (HTML)
+     * @throws ServiceUnavailableException
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
      */
     public function render()
     {
@@ -73,7 +80,7 @@ abstract class TypoScriptComponent extends AbstractComponent
             $result = $this->beautify(call_user_func_array([$GLOBALS['TSFE']->cObj, 'cObjGetSingle'], $typoScript));
 
             // In case of an error
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $result = '<pre class="error"><strong>'.$e->getMessage().'</strong>'.PHP_EOL
                       .$e->getTraceAsString().'</pre>';
         }
@@ -95,6 +102,7 @@ abstract class TypoScriptComponent extends AbstractComponent
      * Return component specific properties
      *
      * @return array Component specific properties
+     * @throws ServiceUnavailableException
      */
     protected function exportInternal()
     {
