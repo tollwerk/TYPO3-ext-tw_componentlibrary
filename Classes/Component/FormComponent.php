@@ -160,19 +160,29 @@ abstract class FormComponent extends AbstractComponent
     /**
      * Create a form element
      *
-     * @param string $typeName   Type of the new form element
-     * @param string $identifier Form element identifier
+     * @param string $typeName        Type of the new form element
+     * @param string $identifier      Form element identifier
+     * @param array $properties       Element properties
+     * @param array $renderingOptions Rendering options
      *
      * @return AbstractRenderable Renderable form element
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotFoundException
      * @throws \TYPO3\CMS\Form\Domain\Exception\TypeDefinitionNotValidException
      */
-    protected function createElement($typeName, $identifier = null)
+    protected function createElement($typeName, $identifier = null, $properties = [], $renderingOptions = [])
     {
         $identifier    = trim($identifier) ?:
             strtr(GeneralUtility::camelCaseToLowerCaseUnderscored($typeName), '_', '-').'-1';
         $this->element = $this->page->createElement($identifier, $typeName);
         $this->element->setProperty('fluidAdditionalAttributes', []);
+
+        foreach ($properties as $key => $value) {
+            $this->element->setProperty($key, $value);
+        }
+
+        foreach ($renderingOptions as $key => $value) {
+            $this->element->setRenderingOption($key, $value);
+        }
 
         return $this->element;
     }
