@@ -35,8 +35,8 @@
 
 namespace Tollwerk\TwComponentlibrary\Utility;
 
+use RuntimeException as RuntimeExceptionAlias;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Exception\CommandException;
 
 /**
  * Component Kickstarter
@@ -52,18 +52,23 @@ class Kickstarter
     /**
      * Kickstart a new component
      *
-     * @param string $name      Component name
+     * @param array $name       Component name
      * @param string $type      Component type
      * @param string $extension Host extension
+     * @param string $vendor    Vendor name
      *
-     * @throws CommandException If the provider extension is invalid
+     * @return string Component class name
+     * @throws RuntimeExceptionAlias If the component directory couldn't be created
+     * @throws RuntimeExceptionAlias If the component descriptor couldn't be created
      */
-    public static function create($name, $type, $extension, $vendor)
+    public static function create(array $name, string $type, string $extension, string $vendor): string
     {
         // Prepare the component name
         $componentLabel = $componentName = array_pop($name);
         if (substr($componentName, -9) !== 'Component') {
             $componentName .= 'Component';
+        } else {
+            $componentLabel = substr($componentLabel, 0, -9);
         }
 
         // Prepare the component directory
@@ -73,7 +78,7 @@ class Kickstarter
             .implode(DIRECTORY_SEPARATOR, $name)
         );
         if (!is_dir($componentAbsPath) && !mkdir($componentAbsPath, 06775, true)) {
-            throw new CommandException('Could not create component directory', 1507997978);
+            throw new RuntimeExceptionAlias('Could not create component directory', 1507997978);
         }
 
         // Prepare the component namespace
@@ -96,7 +101,12 @@ class Kickstarter
         );
         $skeletonString   = strtr(file_get_contents($skeletonTemplate), $substitute);
         $skeletonFile     = $componentAbsPath.DIRECTORY_SEPARATOR.$componentName.'.php';
-        file_put_contents($skeletonFile, $skeletonString);
-        chmod($skeletonFile, 0664);
+
+        // Create the component descriptor
+        if (!file_put_contents($skeletonFile, $skeletonString) || !chmod($skeletonFile, 0664)) {
+            throw new RuntimeExceptionAlias('Could not create component descriptor', 1566130574);
+        }
+
+        return $componentNamespace.'\\'.$componentLabel;
     }
 }

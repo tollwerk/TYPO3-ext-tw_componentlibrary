@@ -344,11 +344,7 @@ abstract class AbstractComponent implements ComponentInterface
             $validIndexDocuments = [
                 'index.md',
                 'readme.md',
-<<<<<<< HEAD
                 strtolower($this->basename.'.md')
-=======
-                strtolower($this->name.'.md')
->>>>>>> Improve code style
             ];
             $indexDocument       = null;
             $documents           = [];
@@ -404,11 +400,7 @@ abstract class AbstractComponent implements ComponentInterface
     {
         $reflectionObject = new ReflectionObject($this);
         $componentFile    = $reflectionObject->getFileName();
-<<<<<<< HEAD
         $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->basename;
-=======
-        $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->name;
->>>>>>> Improve code style
 
         return $rootRelative ? substr($docDirectory, strlen(PATH_site) - 1) : $docDirectory;
     }
