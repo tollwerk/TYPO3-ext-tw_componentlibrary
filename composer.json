@@ -5,8 +5,10 @@
   "homepage": "https://github.com/tollwerk/TYPO3-ext-tw_componentlibrary",
   "license": "GPL-2.0+",
   "require": {
-    "alom/graphviz": "~1.1",
-    "machy8/xhtml-formatter": "~1.0"
+    "ext-json": "*",
+    "typo3/cms-core": "^10.0",
+    "alom/graphviz": "^1.1",
+    "machy8/xhtml-formatter": "^1.0"
   },
   "autoload": {
     "psr-4": {
