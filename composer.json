@@ -6,7 +6,7 @@
   "license": "GPL-2.0+",
   "require": {
     "ext-json": "*",
-    "typo3/cms-core": "^10.0",
+    "typo3/cms-core": "^9.5|^10.0",
     "alom/graphviz": "^1.1",
     "machy8/xhtml-formatter": "^1.0"
   },
