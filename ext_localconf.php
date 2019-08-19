@@ -36,78 +36,66 @@ if (!defined('TYPO3_MODE')) {
     die ('Access denied.');
 }
 
-// Expose the extension configuration
-$GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCONF);
+call_user_func(
+    function() {
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+            'TwComponentlibrary',
+            'Component',
+            [\Tollwerk\TwComponentlibrary\Controller\ComponentController::class => 'render'],
+            [\Tollwerk\TwComponentlibrary\Controller\ComponentController::class => 'renders']
+        );
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-    'Tollwerk.'.$_EXTKEY,
-    'Component',
-    ['Component' => 'render'],
-    ['Component' => 'render']
-);
+        // Override the default Extbase template view
+        $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Fluid\View\TemplateView::class] = array(
+            'className' => \Tollwerk\TwComponentlibrary\Component\TemplateView::class,
+        );
 
-// Override the default Extbase template view
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\View\\TemplateView'] = array(
-    'className' => 'Tollwerk\\TwComponentlibrary\\Component\\TemplateView',
-);
+        // Exclude the component GET parameter from cHash calculation
+        $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'] = ltrim(
+            $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'].',tx_twcomponentlibrary_component[component]',
+            ','
+        );
 
-// Exclude the component GET parameter from cHash calculation
-$GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'] = ltrim(
-    $GLOBALS['TYPO3_CONF_VARS']['FE']['cHashExcludedParameters'].',tx_twcomponentlibrary_component[component]',
-    ','
-);
+        // Component library integration
+        if (
+            !empty($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary']['componentlibrary'])
+            && !empty($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary']['script'])
+            && file_exists($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary']['script'])
+        ) {
+            // Register icon
+            $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
+            $iconRegistry->registerIcon(
+                'tx_twcomponentlibrary_cache',
+                \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
+                [
+                    'source' => 'EXT:tw_componentlibrary/Resources/Public/Icons/'.ucfirst(
+                            $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary']['componentlibrary']
+                        ).'.svg'
+                ]
+            );
 
-/**
- * ###################################################
- * Component library integration
- * ###################################################
- */
-if (
-    !empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['componentlibrary'])
-    && !empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['script'])
-    && file_exists($GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['script'])
-) {
-    // Register icon
-    $iconRegistry = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Imaging\IconRegistry::class);
-    $iconRegistry->registerIcon(
-        'tx_twcomponentlibrary_cache',
-        \TYPO3\CMS\Core\Imaging\IconProvider\SvgIconProvider::class,
-        [
-            'source' => 'EXT:tw_componentlibrary/Resources/Public/Icons/'.ucfirst(
-                    $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY]['componentlibrary']
-                ).'.svg'
-        ]
-    );
+            // Extend the backend cache action menu
+            $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions'][] = \Tollwerk\TwComponentlibrary\Hook\CacheHook::class;
+        }
 
-    // Extend the backend cache action menu
-    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions'][] = \Tollwerk\TwComponentlibrary\Hook\CacheHook::class;
-}
-
-
-/**
- * ###################################################
- * Graph service
- * ###################################################
- */
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
-    $_EXTKEY,
-    // Service type
-    'graphviz',
-    // Service key
-    'tx_twcomponentlibrary_graphviz',
-    array(
-        'title'       => 'GraphViz',
-        'description' => 'Create an SVG graph uzing the GraphViz library',
-
-        'subtype' => 'svg',
-
-        'available' => true,
-        'priority'  => 60,
-        'quality'   => 80,
-
-        'os'   => '',
-        'exec' => 'ccomps,dot,gvpack,neato',
-
-        'className' => \Tollwerk\TwComponentlibrary\Service\GraphvizService::class
-    )
+        // Graph service
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addService(
+            'tw_componentlibrary',
+            // Service type
+            'graphviz',
+            // Service key
+            'tx_twcomponentlibrary_graphviz',
+            array(
+                'title'       => 'GraphViz',
+                'description' => 'Create an SVG graph uzing the GraphViz library',
+                'subtype'     => 'svg',
+                'available'   => true,
+                'priority'    => 60,
+                'quality'     => 80,
+                'os'          => '',
+                'exec'        => 'ccomps,dot,gvpack,neato',
+                'className'   => \Tollwerk\TwComponentlibrary\Service\GraphvizService::class
+            )
+        );
+    }
 );

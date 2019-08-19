@@ -77,7 +77,44 @@ twComponentGraph {
         xhtml_cleaning = 0
         admPanel = 0
         index_enable = 0
-        additionalHeaders.10.header = Content-Type: image/svg+xml
+        additionalHeaders.10 {
+            header = Content-Type: image/svg+xml
+            replace = 1
+        }
+    }
+}
+
+# Discover available components
+twComponentDiscovery = PAGE
+twComponentDiscovery {
+    typeNum = 2402
+    10 = USER_INT
+    10 {
+        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+        settings < plugin.tx_twcomponentlibrary.settings
+        persistence < plugin.tx_twcomponentlibrary.persistence
+        view < plugin.tx_twcomponentlibrary.view
+        vendorName = Tollwerk
+        pluginName = Component
+        extensionName = TwComponentlibrary
+        controller = Component
+        action = discover
+        switchableControllerActions {
+            Component {
+                1 = discover
+            }
+        }
+    }
+
+    config {
+        disableAllHeaderCode = 1
+        xhtml_cleaning = 0
+        admPanel = 0
+        index_enable = 0
+        additionalHeaders.10 {
+            header = Content-Type: application/json
+            replace = 1
+        }
     }
 }
 
