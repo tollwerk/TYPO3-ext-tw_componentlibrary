@@ -35,6 +35,7 @@
 
 namespace Tollwerk\TwComponentlibrary\Controller;
 
+use ReflectionException;
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate;
 use Tollwerk\TwComponentlibrary\Service\GraphvizService;
@@ -107,12 +108,42 @@ class ComponentController extends ActionController
      */
     public function discoverAction()
     {
+        // Discover and return components
+        $this->discoverComponents(false);
+    }
+
+    /**
+     * Initialize the resources action
+     */
+    public function initializeResourcesAction()
+    {
+        $this->defaultViewObjectName = JsonView::class;
+    }
+
+    /**
+     * Resources action
+     */
+    public function resourcesAction()
+    {
+        // Discover and return component resources
+        $this->discoverComponents(true);
+    }
+
+    /**
+     * Discover components or component resources
+     *
+     * @param bool $resources Return component resources only
+     *
+     * @throws ReflectionException
+     */
+    protected function discoverComponents(bool $resources): void
+    {
         // Register common stylesheets & scripts
         FluidTemplate::addCommonStylesheets($this->settings['stylesheets']);
         FluidTemplate::addCommonHeaderScripts($this->settings['headerScripts']);
         FluidTemplate::addCommonFooterScripts($this->settings['footerScripts']);
 
         // Discover and return components
-        $this->view->assign('value', Scanner::discoverAll());
+        $this->view->assign('value', Scanner::discoverAll($resources));
     }
 }

@@ -41,6 +41,8 @@ use RuntimeException;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
 use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
@@ -80,8 +82,10 @@ abstract class FluidTemplateComponent extends AbstractComponent
      * Render this component
      *
      * @return string Rendered component (HTML)
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
      */
-    public function render()
+    public function render(): string
     {
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
@@ -191,7 +195,8 @@ abstract class FluidTemplateComponent extends AbstractComponent
      */
     protected function setTemplate($template)
     {
-        $this->template = trim($template) ?: null;
+        $template       = trim($template);
+        $this->template = strlen($template) ? $template : null;
     }
 
     /**
@@ -228,5 +233,30 @@ abstract class FluidTemplateComponent extends AbstractComponent
             ['parameters' => $this->parameters],
             parent::exportInternal()
         );
+    }
+
+    /**
+     * Return all component resources
+     *
+     * @return string[] Component resource files
+     */
+    public function getResources(): array
+    {
+        $resources = parent::getResources();
+
+        // Add the Fluid template file
+        if ($this->template !== null) {
+            $resources[] = $this->template;
+        }
+
+        // Add the template resources
+        $templateResources = $this->preview->getTemplateResources(true);
+
+        return array_values(array_merge(
+            $resources,
+            $templateResources->getStylesheets(),
+            $templateResources->getHeaderScripts(),
+            $templateResources->getFooterScripts()
+        ));
     }
 }

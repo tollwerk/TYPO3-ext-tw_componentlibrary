@@ -118,6 +118,40 @@ twComponentDiscovery {
     }
 }
 
+# Return a list of component resources
+twComponentResources = PAGE
+twComponentResources {
+    typeNum = 2403
+    10 = USER_INT
+    10 {
+        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+        settings < plugin.tx_twcomponentlibrary.settings
+        persistence < plugin.tx_twcomponentlibrary.persistence
+        view < plugin.tx_twcomponentlibrary.view
+        vendorName = Tollwerk
+        pluginName = Component
+        extensionName = TwComponentlibrary
+        controller = Component
+        action = resources
+        switchableControllerActions {
+            Component {
+                1 = resources
+            }
+        }
+    }
+
+    config {
+        disableAllHeaderCode = 1
+        xhtml_cleaning = 0
+        admPanel = 0
+        index_enable = 0
+        additionalHeaders.10 {
+            header = Content-Type: application/json
+            replace = 1
+        }
+    }
+}
+
 plugin.tx_form {
     settings {
         yamlConfigurations {

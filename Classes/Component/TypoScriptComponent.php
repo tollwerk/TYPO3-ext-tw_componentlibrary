@@ -55,6 +55,12 @@ abstract class TypoScriptComponent extends AbstractComponent
      * @var string
      */
     protected $type = self::TYPE_TYPOSCRIPT;
+    /**
+     * TypoScript files
+     *
+     * @var string[]
+     */
+    protected $typoScriptFiles = [];
 
     /**
      * Render this component
@@ -64,7 +70,7 @@ abstract class TypoScriptComponent extends AbstractComponent
      * @throws InvalidArgumentNameException
      * @throws InvalidExtensionNameException
      */
-    public function render()
+    public function render(): string
     {
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
@@ -98,6 +104,20 @@ abstract class TypoScriptComponent extends AbstractComponent
         $this->config = trim($key) ?: null;
     }
 
+
+    /**
+     * Add a TypoScript file
+     *
+     * @param string $typoScriptFile TypoScript file
+     */
+    protected function addTypoScriptFile(string $typoScriptFile)
+    {
+        $typoScriptFile = trim($typoScriptFile);
+        if (strlen($typoScriptFile)) {
+            $this->typoScriptFiles[] = $typoScriptFile;
+        }
+    }
+
     /**
      * Return component specific properties
      *
@@ -118,5 +138,18 @@ abstract class TypoScriptComponent extends AbstractComponent
         }
 
         return parent::exportInternal();
+    }
+
+
+    /**
+     * Return all component resources
+     *
+     * @return string[] Component resource files
+     */
+    public function getResources(): array
+    {
+        $typoScriptFiles = parent::getResources();
+
+        return array_merge($typoScriptFiles, $this->typoScriptFiles);
     }
 }

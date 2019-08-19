@@ -37,13 +37,20 @@ namespace Tollwerk\TwComponentlibrary\Component;
 
 use Exception;
 use ReflectionClass;
+use ReflectionException;
 use RuntimeException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Controller\ControllerInterface;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidActionNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidControllerNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
+use TYPO3\CMS\Extbase\Object\Exception as ExtbaseException;
 
 /**
  * Abstract Extbase component
@@ -115,6 +122,13 @@ abstract class ExtbaseComponent extends AbstractComponent
      * @param string $controllerClass    Controller name
      * @param string $actionName         Action name
      * @param string|null $extensionName Extension name
+     *
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
+     * @throws ReflectionException
+     * @throws InvalidActionNameException
+     * @throws InvalidControllerNameException
+     * @throws ExtbaseException
      */
     public function setExtbaseConfiguration($pluginName, $controllerClass, $actionName, $extensionName = null)
     {
@@ -187,6 +201,8 @@ abstract class ExtbaseComponent extends AbstractComponent
      *
      * @param string $name Argument name
      * @param mixed $value Argument value
+     *
+     * @throws InvalidArgumentNameException
      */
     public function setControllerActionArgument($name, $value)
     {
@@ -214,8 +230,10 @@ abstract class ExtbaseComponent extends AbstractComponent
      * Render this component
      *
      * @return string Rendered component (HTML)
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
      */
-    public function render()
+    public function render(): string
     {
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
@@ -240,6 +258,7 @@ abstract class ExtbaseComponent extends AbstractComponent
      * Return an extend Extbase controller instance
      *
      * @return ActionController|ComponentControllerInterface Extended Extbase controller instance
+     * @throws ExtbaseException
      */
     protected function getControllerInstance()
     {
@@ -282,6 +301,8 @@ abstract class ExtbaseComponent extends AbstractComponent
      * Return component specific properties
      *
      * @return array Component specific properties
+     * @throws UnsupportedRequestTypeException
+     * @throws ExtbaseException
      */
     protected function exportInternal()
     {
@@ -299,7 +320,7 @@ abstract class ExtbaseComponent extends AbstractComponent
             $controllerInstance->skipActionCall(true);
 
             /** @var Response $response */
-            $response = $this->objectManager->get('TYPO3\\CMS\\Extbase\\Mvc\\Web\\Response');
+            $response = $this->objectManager->get(Response::class);
             $controllerInstance->processRequest($this->request, $response);
 
             $this->template = $controllerInstance->getView()
@@ -307,5 +328,26 @@ abstract class ExtbaseComponent extends AbstractComponent
         }
 
         return parent::exportInternal();
+    }
+
+    /**
+     * Return all component resources
+     *
+     * @return string[] Component resource files
+     */
+    public function getResources(): array
+    {
+        $resources = parent::getResources();
+
+        if (strlen($this->extbaseControllerClass)) {
+            try {
+                $reflectionClass = new \ReflectionClass($this->extbaseControllerClass);
+                $resources[]     = $reflectionClass->getFileName();
+            } catch (ReflectionException $e) {
+                // Skip
+            }
+        }
+
+        return $resources;
     }
 }

@@ -37,6 +37,7 @@
 namespace Tollwerk\TwComponentlibrary\Component\Preview;
 
 use InvalidArgumentException;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
@@ -139,7 +140,7 @@ class FluidTemplate implements TemplateInterface
      *
      * @param string $commonStylesheets Common stylesheets
      */
-    public static function addCommonStylesheets($commonStylesheets)
+    public static function addCommonStylesheets(string $commonStylesheets): void
     {
         foreach (GeneralUtility::trimExplode(',', $commonStylesheets, true) as $commonStylesheet) {
             $commonStylesheet = self::resolveUrl($commonStylesheet);
@@ -165,7 +166,7 @@ class FluidTemplate implements TemplateInterface
             }
             $absScript = GeneralUtility::getFileAbsFileName($url);
             if (is_file($absScript)) {
-                return substr($absScript, strlen(PATH_site));
+                return substr($absScript, strlen(Environment::getPublicPath()) + 1);
             }
         }
 
@@ -177,7 +178,7 @@ class FluidTemplate implements TemplateInterface
      *
      * @param string $commonHeaderScripts Common header scripts
      */
-    public static function addCommonHeaderScripts($commonHeaderScripts)
+    public static function addCommonHeaderScripts(string $commonHeaderScripts): void
     {
         foreach (GeneralUtility::trimExplode(',', $commonHeaderScripts, true) as $commonHeaderScript) {
             $commonHeaderScript = self::resolveUrl($commonHeaderScript);
@@ -192,7 +193,7 @@ class FluidTemplate implements TemplateInterface
      *
      * @param string $commonFooterScripts Common footer scripts
      */
-    public static function addCommonFooterScripts($commonFooterScripts)
+    public static function addCommonFooterScripts(string $commonFooterScripts): void
     {
         foreach (GeneralUtility::trimExplode(',', $commonFooterScripts, true) as $commonFooterScript) {
             $commonFooterScript = self::resolveUrl($commonFooterScript);
@@ -335,15 +336,17 @@ class FluidTemplate implements TemplateInterface
     /**
      * Return all template resources
      *
+     * @param bool $includeCommon Include common resources
+     *
      * @return TemplateResources Template resources
      */
-    public function getTemplateResources()
+    public function getTemplateResources(bool $includeCommon = false): TemplateResources
     {
         return new TemplateResources(
-            $this->stylesheets,
-            $this->headerScripts,
+            $includeCommon ? array_merge(self::$commonStylesheets, $this->stylesheets) : $this->stylesheets,
+            $includeCommon ? array_merge(self::$commonHeaderScripts, $this->headerScripts) : $this->headerScripts,
             $this->headerIncludes,
-            $this->footerScripts,
+            $includeCommon ? array_merge(self::$commonFooterScripts, $this->footerScripts) : $this->footerScripts,
             $this->footerIncludes
         );
     }

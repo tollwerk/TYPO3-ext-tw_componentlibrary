@@ -37,6 +37,8 @@ namespace Tollwerk\TwComponentlibrary\Component;
 
 use Exception;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
 
 /**
  * Abstract content component
@@ -57,8 +59,10 @@ abstract class ContentComponent extends AbstractComponent
      * Render this component
      *
      * @return string Rendered component (HTML)
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
      */
-    public function render()
+    public function render(): string
     {
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();

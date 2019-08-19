@@ -49,21 +49,21 @@ interface TemplateInterface
      *
      * @param string $commonStylesheets Common stylesheets
      */
-    public static function addCommonStylesheets($commonStylesheets);
+    public static function addCommonStylesheets(string $commonStylesheets): void;
 
     /**
      * Add common header scripts
      *
      * @param string $commonHeaderScripts Common header scripts
      */
-    public static function addCommonHeaderScripts($commonHeaderScripts);
+    public static function addCommonHeaderScripts(string $commonHeaderScripts): void;
 
     /**
      * Add common footer scripts
      *
      * @param string $commonFooterScripts Common footer scripts
      */
-    public static function addCommonFooterScripts($commonFooterScripts);
+    public static function addCommonFooterScripts(string $commonFooterScripts): void;
 
     /**
      * Serialize the template
@@ -110,7 +110,9 @@ interface TemplateInterface
     /**
      * Return all template resources
      *
+     * @param bool $includeCommon Include common resources
+     *
      * @return TemplateResources Template resources
      */
-    public function getTemplateResources();
+    public function getTemplateResources(bool $includeCommon = false): TemplateResources;
 }

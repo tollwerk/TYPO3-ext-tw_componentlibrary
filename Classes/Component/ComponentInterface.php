@@ -123,35 +123,42 @@ interface ComponentInterface
      *
      * @param string $componentPath Component path
      *
-     * @return string Component name
+     * @return string|null Component name
      */
-    public static function expandComponentName($componentPath);
+    public static function expandComponentName($componentPath): ?string;
 
     /**
      * Export the component's properties
      *
      * @return array Properties
      */
-    public function export();
+    public function export(): array;
 
     /**
      * Render this component
      *
      * @return string Rendered component (HTML)
      */
-    public function render();
+    public function render(): string;
 
     /**
      * Return a list of component dependencies
      *
-     * @return array Component dependencies
+     * @return string[] Component dependencies
      */
-    public function getDependencies();
+    public function getDependencies(): array;
 
     /**
      * Return the preview template resources
      *
      * @return TemplateResources Preview template resources
      */
-    public function getPreviewTemplateResources();
+    public function getPreviewTemplateResources(): TemplateResources;
+
+    /**
+     * Return all component resources
+     *
+     * @return string[]
+     */
+    public function getResources(): array;
 }

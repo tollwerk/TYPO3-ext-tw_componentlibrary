@@ -44,6 +44,7 @@ use Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
 use Tollwerk\TwComponentlibrary\Utility\TypoScriptUtility;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -158,9 +159,15 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * Associated resources
      *
-     * @var array
+     * @var string[]
      */
     protected $resources = [];
+    /**
+     * Resource files
+     *
+     * @var string[]
+     */
+    protected $resourceFiles = [];
     /**
      * Notice (Markdown)
      *
@@ -200,7 +207,7 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * List of components dependencies
      *
-     * @var array
+     * @var string[]
      */
     protected $dependencies = [];
     /**
@@ -216,6 +223,7 @@ abstract class AbstractComponent implements ComponentInterface
      * @param ControllerContext|null $controllerContext Controller context
      *
      * @throws ReflectionException
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
      */
     public function __construct(ControllerContext $controllerContext = null)
     {
@@ -235,6 +243,7 @@ abstract class AbstractComponent implements ComponentInterface
      * Get the template resources of component dependencies
      *
      * @return TemplateResources[] Component dependency templace resources
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
      */
     protected function getDependencyTemplateResources()
     {
@@ -305,9 +314,9 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @param string $componentPath Component path
      *
-     * @return string Component name
+     * @return string|null Component name
      */
-    public static function expandComponentName($componentPath)
+    public static function expandComponentName($componentPath): ?string
     {
         return trim(
             implode(
@@ -402,7 +411,7 @@ abstract class AbstractComponent implements ComponentInterface
         $componentFile    = $reflectionObject->getFileName();
         $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->basename;
 
-        return $rootRelative ? substr($docDirectory, strlen(PATH_site) - 1) : $docDirectory;
+        return $rootRelative ? substr($docDirectory, strlen(Environment::getPublicPath())) : $docDirectory;
     }
 
     /**
@@ -453,7 +462,7 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @return array Properties
      */
-    final public function export()
+    final public function export(): array
     {
         $properties = [
             'status'  => $this->status,
@@ -565,9 +574,9 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * Return a list of component dependencies
      *
-     * @return array Component dependencies
+     * @return string[] Component dependencies
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return $this->dependencies;
     }
@@ -577,9 +586,19 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @return TemplateResources Preview template resources
      */
-    public function getPreviewTemplateResources()
+    public function getPreviewTemplateResources(): TemplateResources
     {
         return $this->preview->getTemplateResources();
+    }
+
+    /**
+     * Return all component resources
+     *
+     * @return string[] Component resource files
+     */
+    public function getResources(): array
+    {
+        return $this->resourceFiles;
     }
 
     /**
@@ -587,11 +606,11 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @param string $resource Associated resource
      */
-    protected function addResource($resource)
+    protected function addResource(string $resource)
     {
         $resource = trim($resource);
         if (strlen($resource)) {
-            $this->resources[] = $resource;
+            $this->resources[] = $this->resourceFiles[] = $resource;
         }
     }
 

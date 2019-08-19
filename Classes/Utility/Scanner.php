@@ -43,6 +43,7 @@ use ReflectionException;
 use RegexIterator;
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use function json_decode;
 
 /**
@@ -63,17 +64,20 @@ class Scanner
     protected static $localConfigurations = [];
 
     /**
-     * Discover all components
+     * Discover all components or component resources
      *
-     * @return array Components
+     * @param bool $resources Return the component resources only
+     *
+     * @return array Components / Component resources
+     * @throws ReflectionException
      */
-    public static function discoverAll()
+    public static function discoverAll(bool $resources = false): array
     {
         $components = [];
 
         // Run through all extensions
         foreach (ExtensionManagementUtility::getLoadedExtensionListArray() as $extensionKey) {
-            $components = array_merge($components, self::discoverExtensionComponents($extensionKey));
+            $components = array_merge($components, self::discoverExtensionComponents($extensionKey, $resources));
         }
 
         return $components;
@@ -82,27 +86,31 @@ class Scanner
     /**
      * Discover the components of a single extension
      *
-     * @param $extensionKey
+     * @param string $extensionKey Extension key
+     * @param bool $resources      Return the component resources only
      *
      * @return array Extension components
+     * @throws ReflectionException
      */
-    protected static function discoverExtensionComponents($extensionKey)
+    protected static function discoverExtensionComponents(string $extensionKey, bool $resources): array
     {
         // Test if the extension contains a component directory
         $extCompRootDirectory = ExtensionManagementUtility::extPath($extensionKey, 'Components');
 
-        return is_dir($extCompRootDirectory) ? self::discoverExtensionComponentDirectory($extCompRootDirectory) : [];
+        return is_dir($extCompRootDirectory) ?
+            self::discoverExtensionComponentDirectory($extCompRootDirectory, $resources) : [];
     }
 
     /**
      * Recursively scan a directory for components and return a component list
      *
      * @param string $directory Directory path
+     * @param bool $resources   Return the component resources only
      *
      * @return array Components
      * @throws ReflectionException
      */
-    protected static function discoverExtensionComponentDirectory($directory)
+    protected static function discoverExtensionComponentDirectory(string $directory, bool $resources): array
     {
         $components        = [];
         $directoryIterator = new RecursiveDirectoryIterator($directory);
@@ -120,7 +128,17 @@ class Scanner
                 // Test if this is a component class
                 $classReflection = new ReflectionClass($className);
                 if ($classReflection->implementsInterface(ComponentInterface::class)) {
-                    $components[] = self::addLocalConfiguration($component[0], self::discoverComponent($className));
+                    if ($resources) {
+                        $components[$className] = array_map(
+                            [GeneralUtility::class, 'getFileAbsFileName'],
+                            self::discoverComponent($className, true)
+                        );
+                        continue;
+                    }
+                    $components[] = self::addLocalConfiguration(
+                        $component[0],
+                        self::discoverComponent($className, false)
+                    );
                 }
             }
         }
@@ -228,14 +246,15 @@ class Scanner
      * Discover a single component class
      *
      * @param string $componentClass Component class
+     * @param bool $resources        Return the component resources only
      *
-     * @return array Component profile
+     * @return array Component profile / resources
      */
-    public static function discoverComponent($componentClass)
+    public static function discoverComponent(string $componentClass, bool $resources): array
     {
         /** @var ComponentInterface $component */
         $component = new $componentClass;
 
-        return $component->export();
+        return $resources ? $component->getResources() : $component->export();
     }
 }

@@ -38,6 +38,8 @@ namespace Tollwerk\TwComponentlibrary\Component;
 use Exception;
 use RuntimeException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
 use TYPO3\CMS\Extbase\Mvc\Web\Response;
 use TYPO3\CMS\Form\Domain\Configuration\ConfigurationService;
 use TYPO3\CMS\Form\Domain\Configuration\Exception\PrototypeNotFoundException;
@@ -94,8 +96,10 @@ abstract class FormComponent extends AbstractComponent
      * Render this component
      *
      * @return string Rendered component (HTML)
+     * @throws InvalidArgumentNameException
+     * @throws InvalidExtensionNameException
      */
-    public function render()
+    public function render(): string
     {
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
@@ -234,5 +238,21 @@ abstract class FormComponent extends AbstractComponent
         }
 
         return parent::exportInternal();
+    }
+
+    /**
+     * Return all component resources
+     *
+     * @return string[] Component resource files
+     */
+    public function getResources(): array
+    {
+        $resources = parent::getResources();
+
+        if (strlen($this->config)) {
+            $resources[] = $this->config;
+        }
+
+        return $resources;
     }
 }
