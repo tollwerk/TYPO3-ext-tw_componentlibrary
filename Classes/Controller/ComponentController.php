@@ -68,11 +68,15 @@ class ComponentController extends ActionController
         FluidTemplate::addCommonFooterScripts($this->settings['footerScripts']);
 
         $componentInstance = $this->objectManager->get($component, $this->controllerContext);
-        if ($componentInstance instanceof ComponentInterface) {
-            return trim($componentInstance->render());
+
+        try {
+            $this->view->assign('component', $component);
+            $result = ($componentInstance instanceof ComponentInterface) ? $componentInstance->render() : $this->view->render();
+        } catch (\Exception $e) {
+            $result = $e->getMessage();
         }
 
-        return $this->view->render();
+        return trim($result);
     }
 
     /**
@@ -81,6 +85,7 @@ class ComponentController extends ActionController
      * @param string $component Component class
      *
      * @return string SVG component graph
+     * @throws ReflectionException
      * @todo Add a dummy graph telling that GraphViz isn't available
      */
     public function graphAction($component = null)

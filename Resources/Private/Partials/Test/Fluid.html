@@ -1,0 +1,26 @@
+s
+<f:comment><!--
+
+    Fluid test component
+
+    @param null none        Parameter description
+
+--></f:comment>
+<html xmlns:f="https://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+    <f:variable name="date"
+                value="{f:format.date(format: 'c', date: 'now')}"/>
+    <div>
+        <h1>
+            Heading from {date}
+        </h1>
+        <p>
+            Here's an image (static asset):
+            <f:image src="EXT:tw_componentlibrary/Resources/Public/Icons/Fractal.svg" width="50"/>
+        </p>
+        <p hidden>
+            This is hidden content.
+        </p>
+    </div>
+</html>

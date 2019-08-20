@@ -40,6 +40,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
 use RuntimeException;
+use tidy;
 use Tollwerk\TwComponentlibrary\Component\Preview\FluidTemplate;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateInterface;
 use Tollwerk\TwComponentlibrary\Component\Preview\TemplateResources;
@@ -650,14 +651,27 @@ abstract class AbstractComponent implements ComponentInterface
      *
      * @return string Beautified HTML source code
      */
-    protected function beautify($html)
+    protected function beautify(string $html): string
     {
-        // TODO: Remove this hotfix. Necessary because the formater inserts whitespaces that break inline-block css!!!
-        return $html;
+        if (class_exists('\\tidy') && function_exists('\\tidy_get_output')) {
+            $config = [
+                'indent'            => true,
+                'indent-spaces'     => 4,
+                'output-xml'        => true,
+                'input-xml'         => true,
+                'wrap'              => 200,
+                'sort-attributes'   => 'alpha',
+                'indent-attributes' => true,
+            ];
 
-//        $formatter = new Formatter();
-//
-//        return $formatter->format($html);
+            $tidy = new tidy();
+            $tidy->parseString($html, $config, 'utf8');
+            $tidy->cleanRepair();
+
+            return tidy_get_output($tidy);
+        }
+
+        return $html;
     }
 
     /**

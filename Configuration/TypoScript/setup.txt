@@ -159,3 +159,7 @@ plugin.tx_form {
         }
     }
 }
+
+lib.typoScriptComponentTest = TEXT
+lib.typoScriptComponentTest.value = This is a rendered TypoScript component
+lib.typoScriptComponentTest.wrap = <p>|</p>

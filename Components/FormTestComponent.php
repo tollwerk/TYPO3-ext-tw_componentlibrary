@@ -55,7 +55,8 @@ class FormTestComponent extends FormComponent
      */
     protected function configure()
     {
-        $this->setTemplate('EXT:tw_componentlibrary/Resources/Private/Partials/Test/Form.html');
-        $this->createElement('Hidden', 'name');
+        $this->setTemplate('EXT:form/Resources/Private/Frontend/Partials/Text.html');
+        $this->createElement('Text', 'name')
+             ->setProperty('fluidAdditionalAttributes', ['placeholder' => 'John Doe']);
     }
 }

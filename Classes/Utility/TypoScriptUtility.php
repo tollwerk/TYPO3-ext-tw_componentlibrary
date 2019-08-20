@@ -79,7 +79,8 @@ class TypoScriptUtility
         }
 
         // Get a frontend controller for the page id and type
-        $TSFE = self::getTSFE($id, $typeNum);
+//        $TSFE = self::getTSFE($id, $typeNum);
+        $TSFE = $GLOBALS['TSFE'];
         list($name, $conf) = GeneralUtility::makeInstance(TypoScriptParser::class)->getVal($key, $TSFE->tmpl->setup);
         $lastKey = explode('.', $key);
         $lastKey = array_pop($lastKey);
@@ -99,6 +100,12 @@ class TypoScriptUtility
      */
     public static function getTSFE($id, $typeNum)
     {
+        try {
+            throw new Exception();
+        } catch (\Exception $e) {
+            die($e->getTraceAsString());
+        }
+
         // Initialize the tracker if necessary
         if (!is_object($GLOBALS['TT'])) {
             $GLOBALS['TT'] = new TimeTracker(false);
@@ -115,9 +122,9 @@ class TypoScriptUtility
             );
 
             $GLOBALS['TSFE']->sys_page = GeneralUtility::makeInstance(PageRepository::class);
-            $GLOBALS['TSFE']->sys_page->init(true);
-            $GLOBALS['TSFE']->connectToDB();
-            $GLOBALS['TSFE']->initFEuser();
+//            $GLOBALS['TSFE']->sys_page->init(true);
+//            $GLOBALS['TSFE']->connectToDB();
+//            $GLOBALS['TSFE']->initFEuser();
             $GLOBALS['TSFE']->determineId();
             $GLOBALS['TSFE']->initTemplate();
             $GLOBALS['TSFE']->rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($id, '');

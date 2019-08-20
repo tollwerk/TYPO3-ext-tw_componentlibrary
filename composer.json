@@ -7,8 +7,10 @@
   "require": {
     "ext-json": "*",
     "typo3/cms-core": "^10.0",
-    "alom/graphviz": "^1.1",
-    "machy8/xhtml-formatter": "^1.0"
+    "alom/graphviz": "^1.1"
+  },
+  "suggest": {
+    "ext-tidy": "Enable source code formatting"
   },
   "autoload": {
     "psr-4": {

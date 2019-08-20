@@ -50,7 +50,8 @@ class TyposcriptTestComponent extends TypoScriptComponent
      */
     protected function configure()
     {
-        $this->setTypoScriptKey('plugin.tx_twcomponentlibrary');
+        $this->setTypoScriptKey('lib.typoScriptComponentTest');
         $this->addTypoScriptFile('EXT:tw_componentlibrary/Configuration/TypoScript/setup.txt');
+        $this->addTypoScriptFile('EXT:tw_componentlibrary/Configuration/TypoScript/constants.txt');
     }
 }

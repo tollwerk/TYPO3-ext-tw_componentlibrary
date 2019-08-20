@@ -91,7 +91,6 @@ abstract class FluidTemplateComponent extends AbstractComponent
         $_GET = $this->getRequestArguments();
 
         try {
-
             // Instantiate a TypoScript parser
             $configurationManager = $this->objectManager->get(ConfigurationManager::class);
             $typoScriptParser     = GeneralUtility::makeInstance(TypoScriptParser::class);
@@ -119,10 +118,8 @@ abstract class FluidTemplateComponent extends AbstractComponent
             $view->getRequest()->setControllerExtensionName($this->extensionName);
             $view->getRequest()->setOriginalRequestMappingResults($this->validationErrors);
             $view->assignMultiple($this->parameters);
-            $view->assignMultiple($this->parameters);
-            $result = $this->beautify(
-                $this->section ? $view->renderSection($this->section, $this->parameters) : $view->render()
-            );
+            $rendered = $this->section ? $view->renderSection($this->section, $this->parameters) : $view->render();
+            $result   = $this->beautify(trim($rendered));
 
             // In case of an error
         } catch (Exception $e) {
@@ -226,7 +223,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
             if (!strlen($templateFile) || !is_file($templateFile)) {
                 throw new RuntimeException(sprintf('Invalid template file "%s"', $templateFile), 1481552328);
             }
-            $this->template = file_get_contents($templateFile);
+            $this->template = $this->beautify(file_get_contents($templateFile));
         }
 
         return array_merge(
