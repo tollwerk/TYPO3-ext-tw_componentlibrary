@@ -142,6 +142,7 @@ abstract class FormComponent extends AbstractComponent
      * @return void
      * @throws PrototypeNotFoundException
      * @throws TypeDefinitionNotFoundException
+     * @throws \TYPO3\CMS\Extbase\Object\Exception
      */
     protected function initialize()
     {
@@ -235,6 +236,12 @@ abstract class FormComponent extends AbstractComponent
                 throw new RuntimeException(sprintf('Invalid template file "%s"', $templateFile), 1481552328);
             }
             $this->template = file_get_contents($templateFile);
+            $this->config   = [
+                'type'             => $this->element->getType(),
+                'properties'       => $this->element->getProperties(),
+                'renderingOptions' => $this->element->getRenderingOptions(),
+                'template'         => $templateFile,
+            ];
         }
 
         return parent::exportInternal();

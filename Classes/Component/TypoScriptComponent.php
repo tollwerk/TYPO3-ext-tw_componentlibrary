@@ -135,6 +135,7 @@ abstract class TypoScriptComponent extends AbstractComponent
             );
             $this->template = empty($typoScript) ?
                 null : TypoScriptUtility::serialize(implode('.', explode('.', $this->config, -1)), $typoScript);
+            $this->config   = ['typoScriptKey' => $this->config, 'typoScriptFiles' => $this->typoScriptFiles];
         }
 
         return parent::exportInternal();
