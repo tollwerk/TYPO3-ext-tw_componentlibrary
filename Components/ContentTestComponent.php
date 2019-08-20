@@ -44,6 +44,12 @@ class ContentTestComponent extends ContentComponent
      * @var int
      */
     protected $status = self::STATUS_TBD;
+    /**
+     * Development component
+     *
+     * @var bool
+     */
+    const DEVELOPMENT = true;
 
     /**
      * Configure the component

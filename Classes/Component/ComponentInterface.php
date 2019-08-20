@@ -161,4 +161,11 @@ interface ComponentInterface
      * @return string[]
      */
     public function getResources(): array;
+
+    /**
+     * Return whether this is a development component
+     *
+     * @return bool Is a development component
+     */
+    public function isDevelopment(): bool;
 }

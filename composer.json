@@ -14,7 +14,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Tollwerk\\TwComponentlibrary\\": "Classes/"
+      "Tollwerk\\TwComponentlibrary\\": "Classes/",
+      "Tollwerk\\TwComponentlibrary\\Component\\": "Components/"
     }
   },
   "autoload-dev": {

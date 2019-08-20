@@ -67,17 +67,18 @@ class Scanner
      * Discover all components or component resources
      *
      * @param bool $resources Return the component resources only
+     * @param bool $dev       Include development components
      *
      * @return array Components / Component resources
      * @throws ReflectionException
      */
-    public static function discoverAll(bool $resources = false): array
+    public static function discoverAll(bool $resources = false, bool $dev = false): array
     {
         $components = [];
 
         // Run through all extensions
         foreach (ExtensionManagementUtility::getLoadedExtensionListArray() as $extensionKey) {
-            $components = array_merge($components, self::discoverExtensionComponents($extensionKey, $resources));
+            $components = array_merge($components, self::discoverExtensionComponents($extensionKey, $resources, $dev));
         }
 
         return $components;
@@ -88,17 +89,18 @@ class Scanner
      *
      * @param string $extensionKey Extension key
      * @param bool $resources      Return the component resources only
+     * @param bool $dev            Include development components
      *
      * @return array Extension components
      * @throws ReflectionException
      */
-    protected static function discoverExtensionComponents(string $extensionKey, bool $resources): array
+    protected static function discoverExtensionComponents(string $extensionKey, bool $resources, bool $dev): array
     {
         // Test if the extension contains a component directory
         $extCompRootDirectory = ExtensionManagementUtility::extPath($extensionKey, 'Components');
 
         return is_dir($extCompRootDirectory) ?
-            self::discoverExtensionComponentDirectory($extCompRootDirectory, $resources) : [];
+            self::discoverExtensionComponentDirectory($extCompRootDirectory, $resources, $dev) : [];
     }
 
     /**
@@ -106,11 +108,12 @@ class Scanner
      *
      * @param string $directory Directory path
      * @param bool $resources   Return the component resources only
+     * @param bool $dev         Include development components
      *
      * @return array Components
      * @throws ReflectionException
      */
-    protected static function discoverExtensionComponentDirectory(string $directory, bool $resources): array
+    protected static function discoverExtensionComponentDirectory(string $directory, bool $resources, bool $dev): array
     {
         $components        = [];
         $directoryIterator = new RecursiveDirectoryIterator($directory);
@@ -128,17 +131,19 @@ class Scanner
                 // Test if this is a component class
                 $classReflection = new ReflectionClass($className);
                 if ($classReflection->implementsInterface(ComponentInterface::class)) {
-                    if ($resources) {
-                        $components[$className] = array_map(
-                            [GeneralUtility::class, 'getFileAbsFileName'],
-                            self::discoverComponent($className, true)
+                    if ($dev || !$classReflection->getConstant('DEVELOPMENT')) {
+                        if ($resources) {
+                            $components[$className] = array_map(
+                                [GeneralUtility::class, 'getFileAbsFileName'],
+                                self::discoverComponent($className, true)
+                            );
+                            continue;
+                        }
+                        $components[] = self::addLocalConfiguration(
+                            $component[0],
+                            self::discoverComponent($className, false)
                         );
-                        continue;
                     }
-                    $components[] = self::addLocalConfiguration(
-                        $component[0],
-                        self::discoverComponent($className, false)
-                    );
                 }
             }
         }

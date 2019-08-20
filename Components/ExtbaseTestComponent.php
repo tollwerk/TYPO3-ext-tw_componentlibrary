@@ -25,7 +25,13 @@
 
 namespace Tollwerk\TwComponentlibrary\Component;
 
+use ReflectionException;
 use Tollwerk\TwComponentlibrary\Controller\ComponentController;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidActionNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidControllerNameException;
+use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
+use TYPO3\CMS\Extbase\Object\Exception;
 
 /**
  * ExtbaseTest component
@@ -44,11 +50,23 @@ class ExtbaseTestComponent extends ExtbaseComponent
      * @var int
      */
     protected $status = self::STATUS_TBD;
+    /**
+     * Development component
+     *
+     * @var bool
+     */
+    const DEVELOPMENT = true;
 
     /**
      * Configure the component
      *
      * @return void
+     * @throws ReflectionException
+     * @throws InvalidActionNameException
+     * @throws InvalidArgumentNameException
+     * @throws InvalidControllerNameException
+     * @throws InvalidExtensionNameException
+     * @throws Exception
      */
     protected function configure()
     {

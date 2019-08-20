@@ -217,6 +217,12 @@ abstract class AbstractComponent implements ComponentInterface
      * @var null|ControllerContext
      */
     protected $controllerContext;
+    /**
+     * Development component
+     *
+     * @var bool
+     */
+    const DEVELOPMENT = false;
 
     /**
      * Component constructor
@@ -683,5 +689,15 @@ abstract class AbstractComponent implements ComponentInterface
     protected function addError($property, $message)
     {
         $this->validationErrors->forProperty($property)->addError(new Error($message, time()));
+    }
+
+    /**
+     * Return whether this is a development component
+     *
+     * @return bool Is a development component
+     */
+    public function isDevelopment(): bool
+    {
+        return static::DEVELOPMENT;
     }
 }

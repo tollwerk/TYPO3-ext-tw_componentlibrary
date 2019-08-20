@@ -52,6 +52,7 @@ call_user_func(
 
         // Exclude the component GET parameter from cHash calculation
         $GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twcomponentlibrary_component[component]';
+        $GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twcomponentlibrary_component[dev]';
 
         // Component library integration
         if (

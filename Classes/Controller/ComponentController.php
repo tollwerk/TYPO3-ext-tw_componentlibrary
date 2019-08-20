@@ -110,11 +110,15 @@ class ComponentController extends ActionController
 
     /**
      * Discover action
+     *
+     * @param bool $dev Include development components
+     *
+     * @throws ReflectionException
      */
-    public function discoverAction()
+    public function discoverAction(bool $dev = false)
     {
         // Discover and return components
-        $this->discoverComponents(false);
+        $this->discoverComponents(false, $dev);
     }
 
     /**
@@ -127,21 +131,26 @@ class ComponentController extends ActionController
 
     /**
      * Resources action
+     *
+     * @param bool $dev Include development components
+     *
+     * @throws ReflectionException
      */
-    public function resourcesAction()
+    public function resourcesAction(bool $dev = false)
     {
         // Discover and return component resources
-        $this->discoverComponents(true);
+        $this->discoverComponents(true, $dev);
     }
 
     /**
      * Discover components or component resources
      *
      * @param bool $resources Return component resources only
+     * @param bool $dev       Include development components
      *
      * @throws ReflectionException
      */
-    protected function discoverComponents(bool $resources): void
+    protected function discoverComponents(bool $resources, bool $dev): void
     {
         // Register common stylesheets & scripts
         FluidTemplate::addCommonStylesheets($this->settings['stylesheets']);
@@ -149,6 +158,6 @@ class ComponentController extends ActionController
         FluidTemplate::addCommonFooterScripts($this->settings['footerScripts']);
 
         // Discover and return components
-        $this->view->assign('value', Scanner::discoverAll($resources));
+        $this->view->assign('value', Scanner::discoverAll($resources, $dev));
     }
 }
