@@ -25,7 +25,7 @@
 use Tollwerk\TwComponentlibrary\Controller\FractalController;
 
 $routes                 = [];
-$extensionConfiguration = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary'];
+$extensionConfiguration = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary'];
 if (!empty($extensionConfiguration['componentlibrary'])) {
     $componentLibrary          = $extensionConfiguration['componentlibrary'];
     $routes[$componentLibrary] = [

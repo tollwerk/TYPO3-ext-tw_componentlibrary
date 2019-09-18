@@ -1,0 +1,49 @@
+<f:comment><!--
+
+    Render a programmatic color system
+
+    @param array colorGroups      Color groups
+
+--></f:comment>
+<html xmlns:f="https://xsd.helhum.io/ns/typo3/cms-fluid/master/ViewHelpers" data-namespace-typo3-fluid="true">
+    <div class="color-system">
+        <label for="details">Show primary colors &amp; details</label>
+        <input type="checkbox" id="details"/>
+        <div class="color-system-hues">
+            <f:for each="{hues}" as="originaltones" key="hue">
+                <h2 class="color-original"
+                    style="color:{originaltones.original.foreground};background-color:{originaltones.original.background}">
+                    <span title="Hexadecimal color">{originaltones.original.background}</span> —
+                    <span title="Contrast against white">{originaltones.original.white}</span> /
+                    <span title="Contrast against black">{originaltones.original.black}</span> —
+                    <span title="Luminance">{originaltones.original.luminance}</span>
+                </h2>
+                <ul class="color-scale">
+                    <f:for each="{originaltones.tones}" as="tone" key="name" iteration="i">
+                        <li style="color:{tone.foreground};background-color:{tone.hex}">
+                            <f:if condition="{i.isFirst}">
+                                <span class="color-hue" title="Hue name">{hue}</span>
+                            </f:if>
+                            <span class="color-name" title="{hue}-{name}">{name}</span>
+                            <span class="color-details">
+                        <span class="color-hex" title="Hexadecimal color">{tone.hex}</span>
+                        <span class="color-contrast"><span title="Contrast against white">{tone.white}</span> / <span
+                            title="Contrast against black">{tone.black}</span></span>
+                        <span class="color-luminance" title="Luminance">{tone.luminance}</span>
+                    </span>
+                        </li>
+                    </f:for>
+                </ul>
+            </f:for>
+        </div>
+        <textarea id="copy" class="hide-element">
+            <f:for each="{hues}" as="originaltones" key="hue"><f:for each="{originaltones.tones}" as="tone" key="name"
+                                                                     iteration="i">--color-{hue}--{name}: {tone.hex};</f:for>
+            </f:for>
+        </textarea>
+        <button type="button"
+                onclick="var nl=String.fromCharCode(13),d=document,c=d.getElementById('copy');c.value=c.value.replace(nl,' ').trim().split(';').map(function(s){return s.trim()}).join(';'+nl);c.select();d.execCommand('copy')">
+            Copy to clipboard
+        </button>
+    </div>
+</html>

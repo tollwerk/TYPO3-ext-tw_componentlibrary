@@ -43,7 +43,7 @@ class CacheHook implements ClearCacheActionsHookInterface
      */
     public function manipulateCacheActions(&$cacheActions, &$optionValues)
     {
-        $extensionConfiguration = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary'];
+        $extensionConfiguration = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary'];
         if ($GLOBALS['BE_USER']->isAdmin() && !empty($extensionConfiguration['componentlibrary'])) {
             $componentLibrary = $extensionConfiguration['componentlibrary'];
             $cacheActions[]   = array(

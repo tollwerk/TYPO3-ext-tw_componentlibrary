@@ -130,7 +130,8 @@ class Scanner
             foreach (self::discoverClassesInFile(file_get_contents($component[0])) as $className) {
                 // Test if this is a component class
                 $classReflection = new ReflectionClass($className);
-                if ($classReflection->implementsInterface(ComponentInterface::class)) {
+                if ($classReflection->implementsInterface(ComponentInterface::class)
+                    && !$classReflection->isAbstract()) {
                     if ($dev || !$classReflection->getConstant('DEVELOPMENT')) {
                         if ($resources) {
                             $components[$className] = array_map(

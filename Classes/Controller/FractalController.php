@@ -56,7 +56,7 @@ class FractalController
      */
     public function updateAction(ServerRequest $request): ResponseInterface
     {
-        $script         = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams']['tw_componentlibrary']['script'];
+        $script         = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary']['script'];
         $descriptorspec = array(
             0 => array('pipe', 'r'),
             1 => array('pipe', 'w'),
