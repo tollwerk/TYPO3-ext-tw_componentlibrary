@@ -89,7 +89,6 @@ abstract class FluidTemplateComponent extends AbstractComponent
     {
         // Set the request arguments as GET parameters
         $_GET = $this->getRequestArguments();
-
         try {
             // Instantiate a TypoScript parser
             $configurationManager = $this->objectManager->get(ConfigurationManager::class);
@@ -119,7 +118,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
             $view->getRequest()->setOriginalRequestMappingResults($this->validationErrors);
             $view->assignMultiple($this->parameters);
             $rendered = $this->section ? $view->renderSection($this->section, $this->parameters) : $view->render();
-            $result   = $this->beautify(trim($rendered));
+            $result   = $this->beautify($rendered, true);
 
             // In case of an error
         } catch (Exception $e) {

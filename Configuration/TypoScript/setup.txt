@@ -24,7 +24,7 @@ plugin.tx_twcomponentlibrary {
 twComponentRender = PAGE
 twComponentRender {
     typeNum = 2400
-    10 = USER_INT
+    10 = USER
     10 {
         userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
         settings < plugin.tx_twcomponentlibrary.settings
