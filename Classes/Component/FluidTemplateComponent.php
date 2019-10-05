@@ -38,9 +38,11 @@ namespace Tollwerk\TwComponentlibrary\Component;
 use Exception;
 use ReflectionObject;
 use RuntimeException;
+use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\DomainObject\DomainObjectInterface;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentNameException;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidExtensionNameException;
 use TYPO3\CMS\Fluid\View\StandaloneView;
@@ -226,7 +228,7 @@ abstract class FluidTemplateComponent extends AbstractComponent
         }
 
         return array_merge(
-            ['parameters' => $this->parameters],
+            ['parameters' => $this->guardParameters($this->parameters)],
             parent::exportInternal()
         );
     }
@@ -254,5 +256,30 @@ abstract class FluidTemplateComponent extends AbstractComponent
             $templateResources->getHeaderScripts(),
             $templateResources->getFooterScripts()
         ));
+    }
+
+    /**
+     * Exclude objects from exported parameters
+     *
+     * @param array $parameters Parameters
+     *
+     * @return array Guarded parameters
+     */
+    protected function guardParameters(array $parameters): array
+    {
+        $guarded = [];
+        foreach ($parameters as $key => $value) {
+            if (is_array($value)) {
+                $guarded[$key] = $this->guardParameters($value);
+                continue;
+            }
+            if (is_object($value)) {
+                $hasUid = ($value instanceof DomainObjectInterface) || ($value instanceof FileInterface);
+                $value  = get_class($value).($hasUid ? '['.$value->getUid().']' : '');
+            }
+            $guarded[$key] = $value;
+        }
+
+        return $guarded;
     }
 }
