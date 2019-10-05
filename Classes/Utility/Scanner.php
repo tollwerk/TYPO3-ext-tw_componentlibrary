@@ -44,6 +44,10 @@ use RegexIterator;
 use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException;
+use TYPO3\CMS\Extbase\Object\Exception;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use function json_decode;
 
 /**
@@ -62,6 +66,12 @@ class Scanner
      * @var array
      */
     protected static $localConfigurations = [];
+    /**
+     * Plugin TypoScript configuration
+     *
+     * @var array
+     */
+    protected static $pluginConfiguration;
 
     /**
      * Discover all components or component resources
@@ -71,10 +81,16 @@ class Scanner
      *
      * @return array Components / Component resources
      * @throws ReflectionException
+     * @throws InvalidConfigurationTypeException
+     * @throws Exception
      */
     public static function discoverAll(bool $resources = false, bool $dev = false): array
     {
-        $components = [];
+        $objectManager               = GeneralUtility::makeInstance(ObjectManager::class);
+        $configurationManager        = $objectManager->get(ConfigurationManager::class);
+        $configuration               = $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
+        static::$pluginConfiguration = $configuration['plugin.'];
+        $components                  = [];
 
         // Run through all extensions
         foreach (ExtensionManagementUtility::getLoadedExtensionListArray() as $extensionKey) {
@@ -96,11 +112,17 @@ class Scanner
      */
     protected static function discoverExtensionComponents(string $extensionKey, bool $resources, bool $dev): array
     {
-        // Test if the extension contains a component directory
-        $extCompRootDirectory = ExtensionManagementUtility::extPath($extensionKey, 'Components');
+        // Only export components for this extension when export feature is enabled
+        $pluginKey = 'tx_'.str_replace('_', '', $extensionKey).'.';
+        if (boolval(self::$pluginConfiguration[$pluginKey]['features.']['exportComponents'] ?? 0)) {
+            // Test if the extension contains a component directory
+            $extCompRootDirectory = ExtensionManagementUtility::extPath($extensionKey, 'Components');
+            if (is_dir($extCompRootDirectory)) {
+                return self::discoverExtensionComponentDirectory($extCompRootDirectory, $resources, $dev);
+            }
+        }
 
-        return is_dir($extCompRootDirectory) ?
-            self::discoverExtensionComponentDirectory($extCompRootDirectory, $resources, $dev) : [];
+        return [];
     }
 
     /**

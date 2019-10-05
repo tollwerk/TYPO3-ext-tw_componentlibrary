@@ -11,6 +11,9 @@
                 <source>Extracts and updates the component definitions in your external Fractal component library.
                 </source>
             </trans-unit>
+            <trans-unit id="enable.export">
+                <source>Export component definitions via API</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

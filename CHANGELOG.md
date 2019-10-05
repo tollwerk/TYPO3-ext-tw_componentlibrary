@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - TYPO3 10 compatibility
 - Enable HTML beautifier for rendered component source code
 - Switch to USER TypoScript for component rendering
+- Component export needs to be enabled via `features.exportComponent` 
 
 ## [0.6.0] - 2019-04-16
 

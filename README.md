@@ -553,6 +553,23 @@ Sample result:
 
 Use the exposed JSON data in any way that makes sense for you. The [Fractal-TYPO3 bridge](https://github.com/tollwerk/fractal-typo3), for instance, builds an explorable component library out of it.
 
+**Important note**: As of version 1.0, the components declared by an extension will only be exported if the TypoScript setup of the extension features a `features.exportComponents` key with value `1`. This is expected to be found at `plugin.tx_myext` in the overall TypoScript configuration, where `tx_myext` is built from the prefix `tx_` and your extension without underscores:
+
+```typo3_typoscript
+plugin.tx_myext {
+    features {
+        exportComponents = 1
+    }
+}
+```
+
+You can make this configurable via the extension constants. The component library extension comes with a language label you can use for that (in `constants.typoscript`):
+
+```typo3_typoscript
+# cat=plugin.tx_myext/enable/a; type=boolean; label=LLL:EXT:tw_componentlibrary/Resources/Private/Language/locallang_core.xlf:enable.export
+exportComponents =
+```
+
 ### Rendering components
 
 The extension introduces the new `type` parameter value `2400` which is used for calling TYPO3 as rendering engine for single components. The request
