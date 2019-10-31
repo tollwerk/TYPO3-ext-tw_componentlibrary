@@ -36,6 +36,7 @@
 
 namespace Tollwerk\TwComponentlibrary\Command;
 
+use ReflectionException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,6 +45,7 @@ use Tollwerk\TwComponentlibrary\Utility\Scanner;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
+use TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException;
 use TYPO3\CMS\Extbase\Object\Exception;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
@@ -60,7 +62,7 @@ class ComponentDiscoverCommand extends Command
      *
      * @var array
      */
-    protected $configuration;
+    protected $config;
 
     /**
      * Constructor
@@ -93,6 +95,10 @@ class ComponentDiscoverCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
+     *
+     * @throws Exception
+     * @throws ReflectionException
+     * @throws InvalidConfigurationTypeException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
