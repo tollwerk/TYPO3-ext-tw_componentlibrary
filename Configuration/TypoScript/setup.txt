@@ -43,6 +43,7 @@ twComponentRender {
     }
 
     config {
+        no_cache = 1
         disableAllHeaderCode = 1
         xhtml_cleaning = 0
         admPanel = 0
@@ -73,6 +74,7 @@ twComponentGraph {
     }
 
     config {
+        no_cache = 1
         disableAllHeaderCode = 1
         xhtml_cleaning = 0
         admPanel = 0
@@ -107,6 +109,7 @@ twComponentDiscovery {
     }
 
     config {
+        no_cache = 1
         disableAllHeaderCode = 1
         xhtml_cleaning = 0
         admPanel = 0
@@ -141,6 +144,7 @@ twComponentResources {
     }
 
     config {
+        no_cache = 1
         disableAllHeaderCode = 1
         xhtml_cleaning = 0
         admPanel = 0
