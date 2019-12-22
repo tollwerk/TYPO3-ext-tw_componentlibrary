@@ -96,6 +96,7 @@ class ComponentDiscoverCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
+     * @return int Status
      * @throws Exception
      * @throws ReflectionException
      * @throws InvalidConfigurationTypeException
@@ -108,5 +109,7 @@ class ComponentDiscoverCommand extends Command
         FluidTemplate::addCommonFooterScripts($this->config['settings']['footerScripts']);
 
         echo json_encode(Scanner::discoverAll(), JSON_PRETTY_PRINT);
+
+        return 0;
     }
 }

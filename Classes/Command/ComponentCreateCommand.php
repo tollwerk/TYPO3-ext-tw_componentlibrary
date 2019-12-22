@@ -49,6 +49,7 @@ use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Exception\CommandException;
+use TYPO3\CMS\Extbase\Object\Exception;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 
 /**
@@ -158,6 +159,8 @@ class ComponentCreateCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
+     *
+     * @throws Exception
      */
     protected function interact(InputInterface $input, OutputInterface $output)
     {
@@ -226,6 +229,7 @@ class ComponentCreateCommand extends Command
      * @param InputInterface $input   Input
      * @param OutputInterface $output Output
      *
+     * @return int Status
      * @throws CommandException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -233,8 +237,12 @@ class ComponentCreateCommand extends Command
         try {
             $component = Kickstarter::create($this->name, $this->type, $this->extension, $this->vendor);
             $output->writeln(sprintf('<fg=green>Successfully created component "%s"</>', $component));
+
+            return 0;
         } catch (\Exception $e) {
             $output->writeln('<error>'.$e->getMessage().'</error>');
+
+            return intval($e->getCode());
         }
     }
 }

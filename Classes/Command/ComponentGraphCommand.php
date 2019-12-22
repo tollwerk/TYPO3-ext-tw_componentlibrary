@@ -36,11 +36,14 @@
 
 namespace Tollwerk\TwComponentlibrary\Command;
 
+use ReflectionException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tollwerk\TwComponentlibrary\Utility\Graph;
 use Tollwerk\TwComponentlibrary\Utility\Scanner;
+use TYPO3\CMS\Extbase\Configuration\Exception\InvalidConfigurationTypeException;
+use TYPO3\CMS\Extbase\Object\Exception;
 
 /**
  * Component graph command
@@ -64,10 +67,17 @@ class ComponentGraphCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
+     *
+     * @return int
+     * @throws ReflectionException
+     * @throws InvalidConfigurationTypeException
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $graph = new Graph(Scanner::discoverAll());
         echo $graph();
+
+        return 0;
     }
 }
