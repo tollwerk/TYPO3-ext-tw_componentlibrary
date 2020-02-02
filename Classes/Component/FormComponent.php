@@ -123,7 +123,7 @@ abstract class FormComponent extends AbstractComponent
             $form = $this->form->bind($this->controllerContext->getRequest(), $response);
             $renderer->setFormRuntime($form);
 
-            $result = $this->beautify($renderer->render());
+            $result = $this->beautify($renderer->render(), true);
 
             // In case of an error
         } catch (Exception $e) {
