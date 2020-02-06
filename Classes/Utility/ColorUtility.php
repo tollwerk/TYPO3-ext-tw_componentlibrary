@@ -35,6 +35,8 @@
 
 namespace Tollwerk\TwComponentlibrary\Utility;
 
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+
 /**
  * Color Utility
  *
@@ -271,7 +273,8 @@ class ColorUtility
      */
     public static function hex2rgb($hex): array
     {
-        return array_map('intval', sscanf($hex, "#%02x%02x%02x"));
+        DebuggerUtility::var_dump(sscanf($hex, "#%02x%02x%02x"));
+        return array_map('intval', sscanf($hex, "#%02x%02x%02x") ? : []);
     }
 
     /**
