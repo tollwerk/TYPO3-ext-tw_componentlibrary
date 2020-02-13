@@ -97,7 +97,7 @@ class Scanner
             $components = array_merge($components, self::discoverExtensionComponents($extensionKey, $resources, $dev));
         }
 
-        return $components;
+        return self::filterExtendedComponents($components);
     }
 
     /**
@@ -284,5 +284,26 @@ class Scanner
         $component = new $componentClass;
 
         return $resources ? $component->getResources() : $component->export();
+    }
+
+    /**
+     * Remove all extended components in favor of their extensions
+     *
+     * @param array $components Components
+     *
+     * @return array Filtered components
+     */
+    protected static function filterExtendedComponents(array $components): array
+    {
+        $extendedComponents = array_unique(array_filter(array_map(
+            function(array $component) {
+                return $component['extends'];
+            },
+            $components
+        )));
+
+        return array_values(array_filter($components, function(array $component) use ($extendedComponents) {
+            return !in_array($component['class'], $extendedComponents);
+        }));
     }
 }

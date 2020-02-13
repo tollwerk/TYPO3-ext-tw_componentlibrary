@@ -468,15 +468,19 @@ abstract class AbstractComponent implements ComponentInterface
      * Export the component's properties
      *
      * @return array Properties
+     * @throws ReflectionException
      */
     final public function export(): array
     {
+        $reflectionClass = new ReflectionClass(get_class($this));
+        $parentClass = $reflectionClass->getParentClass();
         $properties = [
             'status' => $this->status,
             'name' => $this->name,
             'variant' => $this->variant,
             'label' => $this->label,
             'class' => get_class($this),
+            'extends' => $parentClass ? $parentClass->getName() : null,
             'type' => $this->type,
             'valid' => false,
             'path' => $this->componentPath,
