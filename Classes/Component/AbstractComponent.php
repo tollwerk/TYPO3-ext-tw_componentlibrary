@@ -684,7 +684,7 @@ abstract class AbstractComponent implements ComponentInterface
             $html = $tidy->html()->value ?? $html;
         }
 
-        return $stripEmptyLines ? preg_replace('/[\R\s]*\R+/', PHP_EOL, $html) : $html;
+        return $stripEmptyLines ? preg_replace('/[\r\n\s]*\r\n+/', PHP_EOL, $html) : $html;
     }
 
     /**

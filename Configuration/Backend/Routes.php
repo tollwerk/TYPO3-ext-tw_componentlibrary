@@ -22,17 +22,16 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***********************************************************************************/
 
-use Tollwerk\TwComponentlibrary\Controller\FractalController;
-
-$routes                 = [];
 $extensionConfiguration = $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['tw_componentlibrary'];
 if (!empty($extensionConfiguration['componentlibrary'])) {
-    $componentLibrary          = $extensionConfiguration['componentlibrary'];
-    $routes[$componentLibrary] = [
-        'path'   => '/'.$componentLibrary,
-        'access' => 'public',
-        'target' => FractalController::class.'::updateAction'
+    $componentLibrary = $extensionConfiguration['componentlibrary'];
+
+    return [
+        $componentLibrary => [
+            'path'   => '/'.$componentLibrary,
+            'target' => \Tollwerk\TwComponentlibrary\Controller\FractalController::class.'::updateAction'
+        ]
     ];
 }
 
-return $routes;
+return [];
