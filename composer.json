@@ -25,7 +25,7 @@
     }
   },
   "replace": {
-    "tw_componentlibrary": "self.version",
+    "tollwerk/tw-componentlibrary": "self.version",
     "typo3-ter/tw_componentlibrary": "self.version"
   },
   "authors": [

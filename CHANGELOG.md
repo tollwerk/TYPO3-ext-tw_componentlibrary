@@ -4,21 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - unreleased
+## [1.0.0] - 2020-05-02
 
 ### Added
 
 - Enable configuration of form components
-- Support development components
+- Add support for development components
 - Include color system base component
+- Enable HTML source code beautification
+- Add contras viewhelper
+- Add support for abstract components / component extensions 
 
 ### Changed
 
 - Switch to Symfony style CLI commands
-- TYPO3 10 compatibility
+- Bump to TYPO3 10 minimum requirement
 - Enable HTML beautifier for rendered component source code
 - Switch to USER TypoScript for component rendering
-- Component export needs to be enabled via `features.exportComponent` 
+- Component export needs to be enabled via `features.exportComponent`
+- Improve error output & context export
 
 ## [0.6.0] - 2019-04-16
 
