@@ -275,16 +275,23 @@ abstract class AbstractComponent implements ComponentInterface
         $reflectionClass = new ReflectionClass($this);
         $componentFilePath = dirname($reflectionClass->getFileName());
 
+        // 0 = vendor, 1 = extension name
+        $componentNamespace = explode(
+            '\\',
+            $reflectionClass->getNamespaceName()
+        );
+
         // If the file path is invalid
-        $extensionDirPosition = strpos($componentFilePath, 'ext' . DIRECTORY_SEPARATOR);
+        $extensionKeyFromNamespace = GeneralUtility::camelCaseToLowerCaseUnderscored($componentNamespace[1]);
+        $defaultExtPath = 'ext' . DIRECTORY_SEPARATOR;
+        $extensionDirPosition = strpos($componentFilePath, $extensionKeyFromNamespace) ?: strpos($componentFilePath, $defaultExtPath) + strlen($defaultExtPath);
         if ($extensionDirPosition === false) {
-            throw new RuntimeException('Invalid component path', 1481360976);
+            throw new RuntimeException('Invalid extension path', 1588774618);
         }
 
-        // Extract the extension key
         $componentPath = explode(
             DIRECTORY_SEPARATOR,
-            substr($componentFilePath, $extensionDirPosition + strlen('ext' . DIRECTORY_SEPARATOR))
+            substr($componentFilePath, $extensionDirPosition)
         );
         $extensionKey = array_shift($componentPath);
 
