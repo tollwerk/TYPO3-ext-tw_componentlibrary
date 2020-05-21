@@ -650,22 +650,6 @@ abstract class AbstractComponent implements ComponentInterface
     }
 
     /**
-     * Initialize a global Frontend renderer and return a content object renderer instance
-     *
-     * @return ContentObjectRenderer Content object renderer
-     * @throws Exception
-     * @throws ServiceUnavailableException
-     */
-    protected function initializeTSFE()
-    {
-        $GLOBALS['TSFE']       = TypoScriptUtility::getTSFE($this->page, $this->typeNum);
-        $GLOBALS['TSFE']->cObj = new ContentObjectRenderer($GLOBALS['TSFE']);
-        $GLOBALS['TSFE']->cObj->start($GLOBALS['TSFE']->page, 'pages');
-
-        return $GLOBALS['TSFE']->cObj;
-    }
-
-    /**
      * Beautify HTML source
      *
      * @param string $html          HTML source code

@@ -38,9 +38,16 @@ namespace Tollwerk\TwComponentlibrary\Utility;
 
 use Exception;
 use RuntimeException;
+use Tollwerk\TwBase\Utility\FrontendUriUtility;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Error\Http\ServiceUnavailableException;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\TimeTracker\TimeTracker;
 use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
+use TYPO3\CMS\Core\TypoScript\TemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
@@ -54,11 +61,11 @@ use TYPO3\CMS\Frontend\Page\PageRepository;
 class TypoScriptUtility
 {
     /**
-     * Cached frontend controllers
+     * Cached TypoScript Controller instances by root page
      *
-     * @var array
+     * @var TypoScriptFrontendController[]
      */
-    protected static $frontendControllers = [];
+    protected static $rootPageTyposcriptController = [];
 
     /**
      * Extract and return a TypoScript key for a particular page and type
@@ -79,8 +86,13 @@ class TypoScriptUtility
         }
 
         // Get a frontend controller for the page id and type
-//        $TSFE = self::getTSFE($id, $typeNum);
-        $TSFE = $GLOBALS['TSFE'];
+        if (TYPO3_MODE != 'FE') {
+            $TSFE       = self::getTypoScriptFrontendController($id, $typeNum);
+            $TSFE->tmpl = GeneralUtility::makeInstance(TemplateService::class, $TSFE->getContext(), null, $TSFE);
+            $TSFE->tmpl->start(BackendUtility::BEgetRootLine($id));
+        } else {
+            $TSFE =& $GLOBALS['TSFE'];
+        }
         list($name, $conf) = GeneralUtility::makeInstance(TypoScriptParser::class)->getVal($key, $TSFE->tmpl->setup);
         $lastKey = explode('.', $key);
         $lastKey = array_pop($lastKey);
@@ -89,72 +101,124 @@ class TypoScriptUtility
     }
 
     /**
-     * Instantiate a Frontend controller for the given configuration
+     * Create a TypoScript frontend controller for a particular page ID
      *
-     * @param int $id      Page ID
-     * @param int $typeNum Page Type
+     * @param int $pageUid     Page ID
+     * @param int $pageType    Page type
+     * @param string $language Language
      *
-     * @return TypoScriptFrontendController Frontend controller
-     * @throws Exception
+     * @return TypoScriptFrontendController TypoScript frontend controller
      * @throws ServiceUnavailableException
+     * @throws SiteNotFoundException
      */
-    public static function getTSFE($id, $typeNum)
-    {
-        try {
-            throw new Exception();
-        } catch (\Exception $e) {
-            die($e->getTraceAsString());
-        }
-
-        // Initialize the tracker if necessary
+    public static function getTypoScriptFrontendController(
+        int $pageUid,
+        int $pageType = 0,
+        string $language = null
+    ): TypoScriptFrontendController {
+        // Initialize the time tracker if necessary
         if (!is_object($GLOBALS['TT'])) {
-            $GLOBALS['TT'] = new TimeTracker(false);
+            $GLOBALS['TT'] = new TimeTracker();
             $GLOBALS['TT']->start();
         }
 
-        if (!array_key_exists("$id/$typeNum", self::$frontendControllers)) {
-            $tsfeBackup      = empty($GLOBALS['TSFE']) ? null : $GLOBALS['TSFE'];
-            $GLOBALS['TSFE'] = GeneralUtility::makeInstance(
-                TypoScriptFrontendController::class,
-                $GLOBALS['TYPO3_CONF_VARS'],
-                $id,
-                $typeNum
-            );
+        // Find the root page for the requested page ID
+        $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
+        $site       = $siteFinder->getSiteByPageId($pageUid);
+        if ($site instanceof Site) {
+            $rootPage = $site->getRootPageId();
 
-            $GLOBALS['TSFE']->sys_page = GeneralUtility::makeInstance(PageRepository::class);
-//            $GLOBALS['TSFE']->sys_page->init(true);
-//            $GLOBALS['TSFE']->connectToDB();
-//            $GLOBALS['TSFE']->initFEuser();
-            $GLOBALS['TSFE']->determineId();
-            $GLOBALS['TSFE']->initTemplate();
-            $GLOBALS['TSFE']->rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($id, '');
+            // If there's no TypoScript frontend controller for the root page yet
+            if (empty(self::$rootPageTyposcriptController[$rootPage.'/'.$pageType])) {
+                $backupTsfeController = $GLOBALS['TSFE'] ?? null;
 
-            try {
-                $GLOBALS['TSFE']->getConfigArray();
-            } catch (ServiceUnavailableException $e) {
-                // Skip unconfigured page type
+                self::$rootPageTyposcriptController[$rootPage.'/'.$pageType] = version_compare(TYPO3_version, '10.0.0',
+                    '>=') ?
+                    self::create10xContext($site) :
+                    self::createUpTo9xContext(
+                        $site,
+                        $pageUid,
+                        $pageType
+                    );
+
+                // Restore backed-up TSFE
+                if ($backupTsfeController) {
+                    $GLOBALS['TSFE'] = $backupTsfeController;
+                }
             }
 
-            // Calculate the absolute path prefix
-            if (!empty($GLOBALS['TSFE']->config['config']['absRefPrefix'])) {
-                $absRefPrefix                  = trim($GLOBALS['TSFE']->config['config']['absRefPrefix']);
-                $GLOBALS['TSFE']->absRefPrefix = ($absRefPrefix === 'auto') ? GeneralUtility::getIndpEnv(
-                    'TYPO3_SITE_PATH'
-                ) : $absRefPrefix;
-            } else {
-                $GLOBALS['TSFE']->absRefPrefix = '';
-            }
-
-            self::$frontendControllers["$id/$typeNum"] = $GLOBALS['TSFE'];
-
-            if ($tsfeBackup) {
-                $GLOBALS['TSFE'] = $tsfeBackup;
-            } else {
-                unset($GLOBALS['TSFE']);
-            }
+            return self::$rootPageTyposcriptController[$rootPage.'/'.$pageType];
         }
 
-        return self::$frontendControllers["$id/$typeNum"];
+        throw new RuntimeException('Can\'t find site for page ID '.$pageUid, 1563878859);
+    }
+
+    /**
+     * Create a TYPO3 >= 10.x frontend engine
+     *
+     * @param Site $site
+     *
+     * @return TypoScriptFrontendController
+     */
+    protected static function create10xContext(Site $site): TypoScriptFrontendController
+    {
+        $GLOBALS['TSFE']           = GeneralUtility::makeInstance(
+            TypoScriptFrontendController::class,
+            GeneralUtility::makeInstance(Context::class),
+            $site,
+            $site->getDefaultLanguage()
+        );
+        $GLOBALS['TSFE']->sys_page = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Domain\Repository\PageRepository::class);
+        $GLOBALS['TSFE']->newCObj();
+
+        return $GLOBALS['TSFE'];
+    }
+
+    /**
+     * Create a TYPO3 <10.x frontend engine
+     *
+     * @param Site $site    Site
+     * @param int $pageUid  Page ID
+     * @param int $pageType Page Type
+     *
+     * @return TypoScriptFrontendController
+     * @throws ServiceUnavailableException
+     */
+    protected static function createUpTo9xContext(Site $site, int $pageUid, int $pageType): TypoScriptFrontendController
+    {
+        $GLOBALS['TSFE'] = GeneralUtility::makeInstance(
+            TypoScriptFrontendController::class,
+            (array)$GLOBALS['TYPO3_CONF_VARS'],
+            $pageUid,
+            $pageType
+        );
+
+        $GLOBALS['TSFE']->sys_page = GeneralUtility::makeInstance(PageRepository::class);
+        $GLOBALS['TSFE']->connectToDB();
+        $GLOBALS['TSFE']->initFEuser();
+        $GLOBALS['TSFE']->determineId();
+        $GLOBALS['TSFE']->initTemplate();
+        $GLOBALS['TSFE']->rootLine = $GLOBALS['TSFE']->sys_page->getRootLine($pageUid, '');
+
+        try {
+            $GLOBALS['TSFE']->getConfigArray();
+        } catch (ServiceUnavailableException $e) {
+            // Skip unconfigured page type
+        }
+
+        // Calculate the absolute path prefix
+        if (!empty($GLOBALS['TSFE']->config['config']['absRefPrefix'])) {
+            $absRefPrefix                  = trim($GLOBALS['TSFE']->config['config']['absRefPrefix']);
+            $GLOBALS['TSFE']->absRefPrefix = ($absRefPrefix === 'auto') ?
+                $site->getAttribute('base') : $absRefPrefix;
+        } else {
+            $GLOBALS['TSFE']->absRefPrefix = '';
+        }
+
+        // Initialize a content object
+        $GLOBALS['TSFE']->newCObj();
+
+        return $GLOBALS['TSFE'];
     }
 
     /**
