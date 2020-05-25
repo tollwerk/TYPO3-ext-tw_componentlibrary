@@ -41,7 +41,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Component Kickstarter
  *
- * `typo3/cli_dispatch.phpsh extbase component:create --name Component --type fluid|typoscript|extbase --extension
+ * `vendor/bin/typo3 component:create --name Component --type fluid|typoscript|extbase|form --extension
  * my_extension`
  *
  * @package    Tollwerk\TwComponentlibrary

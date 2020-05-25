@@ -53,7 +53,7 @@ use function json_decode;
 /**
  * Component scanner
  *
- * `typo3/cli_dispatch.phpsh extbase component:discover`
+ * `vendor/bin/typo3 component:discover`
  *
  * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility

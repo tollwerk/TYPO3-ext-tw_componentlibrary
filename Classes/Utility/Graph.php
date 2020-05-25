@@ -43,7 +43,7 @@ use Tollwerk\TwComponentlibrary\Component\ComponentInterface;
 /**
  * Component dependency graph utility
  *
- * `typo3/cli_dispatch.phpsh extbase component:graph
+ * `vendor/bin/typo3 component:graph
  *
  * @package    Tollwerk\TwComponentlibrary
  * @subpackage Tollwerk\TwComponentlibrary\Utility

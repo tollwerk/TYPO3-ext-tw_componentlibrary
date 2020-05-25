@@ -484,7 +484,7 @@ It's up to the consuming application to use these values for particular purposes
 The extension provides a command line component kickstarter which let's you scaffold new components with ease. It's implemented as an extbase CLI command:
 
 ```bash
-php typo3/cli_dispatch.phpsh extbase component:create Test/Button fluid tw_tollwerk Tollwerk
+php vendor/bin/typo3 component:create Test/Button fluid tw_tollwerk Tollwerk
 ```
 
 The command takes 4 arguments (in the following order; you can also enter it with explicit argument names):
@@ -509,7 +509,7 @@ If you're mostly adding components to a particular provider extension, you can s
 You can then omit the `--extension` and `--vendor` arguments when calling the CLI command:
 
 ```
-php typo3/cli_dispatch.phpsh extbase component:create Test/Button fluid
+php vendor/bin/typo3 component:create Test/Button fluid
 ```
 
 ### Extracting components
@@ -517,7 +517,7 @@ php typo3/cli_dispatch.phpsh extbase component:create Test/Button fluid
 The extension adds an Extbase CLI command that lets you **discover the declared components in JSON format** on the command line:
 
 ```bash
-typo3/cli_dispatch.phpsh extbase component:discover
+vendor/bin/typo3 component:discover
 ```
 
 Sample result:
