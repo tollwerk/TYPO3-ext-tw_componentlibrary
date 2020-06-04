@@ -44,6 +44,12 @@ class ###label###Component extends ExtbaseComponent
      * @var int
      */
     protected $status = self::STATUS_TBD;
+    /**
+     * List of components dependencies
+     *
+     * @var string[]
+     */
+    protected $dependencies = [];
 
     /**
      * Configure the component
