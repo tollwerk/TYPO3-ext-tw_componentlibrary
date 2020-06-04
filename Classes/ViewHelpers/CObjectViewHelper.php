@@ -51,7 +51,7 @@ class CObjectViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\CObjectViewHelper
      *
      * @return void
      */
-    protected function simulateFrontendEnvironment()
+    protected static function simulateFrontendEnvironment(): void
     {
         if (empty($_SERVER['TYPO3_FRACTAL'])) {
             parent::simulateFrontendEnvironment();
@@ -64,7 +64,7 @@ class CObjectViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\CObjectViewHelper
      * @return void
      * @see simulateFrontendEnvironment()
      */
-    protected function resetFrontendEnvironment()
+    protected static function resetFrontendEnvironment(): void
     {
         if (empty($_SERVER['TYPO3_FRACTAL'])) {
             parent::resetFrontendEnvironment();
