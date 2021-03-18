@@ -46,5 +46,10 @@
     "component",
     "library",
     "inventory"
-  ]
+  ],
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "tw_componentlibrary"
+    }
+  }
 }
