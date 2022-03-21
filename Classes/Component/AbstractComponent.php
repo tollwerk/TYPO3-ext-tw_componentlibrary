@@ -429,7 +429,20 @@ abstract class AbstractComponent implements ComponentInterface
         $componentFile    = $reflectionObject->getFileName();
         $docDirectory     = dirname($componentFile).DIRECTORY_SEPARATOR.$this->basename;
 
-        return $rootRelative ? substr($docDirectory, strlen(Environment::getPublicPath())) : $docDirectory;
+        if ($rootRelative) {
+            // Extract extension key with subdirectories from docDirectory
+            $extensionDirPosition = strpos($docDirectory, $this->extensionKey);
+            $extDocPath = substr($docDirectory, $extensionDirPosition);
+
+            // Todo: support TYPO3 installations in sub folders
+            // Get Extensions path relative to public path
+            $publicExtPath = substr(Environment::getExtensionsPath(), strlen(Environment::getPublicPath()));
+
+            // Concatenate with extension path
+            $docDirectory = $publicExtPath . DIRECTORY_SEPARATOR . $extDocPath;
+        }
+
+        return $docDirectory;
     }
 
     /**
